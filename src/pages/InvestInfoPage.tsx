@@ -44,9 +44,9 @@ type ResearchSubTab = 'weekly' | 'lineup'
 // 리서치 PDF 데이터 (요약 포함)
 const researchPDFs = {
   weekly: [
-    { id: 'w1', title: 'ETF Weekly (26.01.05)', date: '2026.01.05', filename: '260105_Kiwoom_ETF Weekly.pdf', summary: '신년 첫 주 글로벌 ETF 시장 동향 및 투자 전략 분석' },
-    { id: 'w2', title: 'ETF Weekly (25.12.29)', date: '2025.12.29', filename: '251229_Kiwoom_ETF Weekly.pdf', summary: '연말 결산 특집: 2025년 ETF 시장 리뷰 및 2026 전망' },
-    { id: 'w3', title: 'ETF Weekly (25.12.15)', date: '2025.12.15', filename: '251215_Kiwoom_ETF Weekly.pdf', summary: '배당 시즌 도래, 고배당 ETF 투자 포인트 정리' },
+    { id: 'w1', title: 'ETF Weekly (26.01.05)', date: '2026.01.05', filename: '260105_Kiwoom_ETF_Weekly.pdf', summary: '신년 첫 주 글로벌 ETF 시장 동향 및 투자 전략 분석' },
+    { id: 'w2', title: 'ETF Weekly (25.12.29)', date: '2025.12.29', filename: '251229_Kiwoom_ETF_Weekly.pdf', summary: '연말 결산 특집: 2025년 ETF 시장 리뷰 및 2026 전망' },
+    { id: 'w3', title: 'ETF Weekly (25.12.15)', date: '2025.12.15', filename: '251215_Kiwoom_ETF_Weekly.pdf', summary: '배당 시즌 도래, 고배당 ETF 투자 포인트 정리' },
   ],
   lineup: [
     { id: 'l1', title: '뉴 ETF 라인업 (1월 2주)', date: '2026.01.10', filename: 'Kiwoom_New_ETF_Lineup_Jan_W2.pdf', summary: 'AI 반도체·미국 배당 신규 ETF 상장 분석' },
