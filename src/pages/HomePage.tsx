@@ -270,12 +270,12 @@ export function HomePage({ accountType, onSelectETF, onNavigate }: HomePageProps
 
       {/* ETF 탐색하기 - 탐색 페이지로 연결 */}
       <div className="px-4 py-2">
-        <Card className="bg-gradient-to-r from-[#1f3d2a] to-[#1f1a2e] border-emerald-500/30">
+        <Card className="bg-gradient-to-r from-[#2a1f3d] to-[#1f1a2e] border-[#d64f79]/30">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="rounded-full bg-emerald-500/20 p-2.5">
-                  <Search className="h-5 w-5 text-emerald-400" />
+                <div className="rounded-full bg-[#d64f79]/20 p-2.5">
+                  <Search className="h-5 w-5 text-[#d64f79]" />
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-white mb-0.5">
@@ -290,7 +290,7 @@ export function HomePage({ accountType, onSelectETF, onNavigate }: HomePageProps
                 variant="outline"
                 size="sm"
                 onClick={() => onNavigate('discover')}
-                className="shrink-0 border-emerald-500/30 hover:bg-emerald-500/10"
+                className="shrink-0"
               >
                 <ArrowRight className="h-4 w-4" />
               </Button>

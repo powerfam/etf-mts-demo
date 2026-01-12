@@ -70,7 +70,7 @@ export const mockETFs: ETF[] = [
     issuer: '미래에셋자산운용', listedDate: '2020/08/07', indexProvider: 'S&P', assetClass: '주식', marketClass: '해외',
   },
   {
-    id: '3', ticker: '133690', name: 'TIGER 미국나스닥100', shortName: 'TIGER 나스닥100',
+    id: '3', ticker: '133690', name: 'TIGER 미국나스닥100', shortName: 'TIGER 미국나스닥100',
     price: 112500, prevClose: 111800, change: 700, changePercent: 0.63,
     iNav: 112480, discrepancy: 0.02, ter: 0.07, spread: 0.04,
     adtv: 456000000000, aum: 4200000000000, trackingError: 0.05, volatility: 18.3, dividendYield: 0.5,
@@ -94,7 +94,7 @@ export const mockETFs: ETF[] = [
     issuer: '미래에셋자산운용', listedDate: '2008/04/03', indexProvider: 'KRX', assetClass: '주식', marketClass: '국내',
   },
   {
-    id: '5', ticker: '379800', name: 'KODEX 미국S&P500TR', shortName: 'KODEX S&P500TR',
+    id: '5', ticker: '379800', name: 'KODEX 미국S&P500TR', shortName: 'KODEX 미국S&P500TR',
     price: 16890, prevClose: 16780, change: 110, changePercent: 0.66,
     iNav: 16885, discrepancy: 0.03, ter: 0.05, spread: 0.03,
     adtv: 234000000000, aum: 2100000000000, trackingError: 0.04, volatility: 14.0, dividendYield: 0,
@@ -154,7 +154,7 @@ export const mockETFs: ETF[] = [
     issuer: '삼성자산운용', listedDate: '2012/02/13', indexProvider: 'KIS', assetClass: '채권', marketClass: '국내',
   },
   {
-    id: '10', ticker: '138230', name: 'KOSEF 미국달러선물', shortName: 'KOSEF 달러선물',
+    id: '10', ticker: '138230', name: 'KOSEF 미국달러선물', shortName: 'KOSEF 미국달러선물',
     price: 13250, prevClose: 13180, change: 70, changePercent: 0.53,
     iNav: 13245, discrepancy: 0.04, ter: 0.25, spread: 0.05,
     adtv: 78000000000, aum: 450000000000, trackingError: 0.06, volatility: 8.5, dividendYield: 0,
@@ -166,7 +166,7 @@ export const mockETFs: ETF[] = [
     issuer: '키움투자자산운용', listedDate: '2010/11/18', indexProvider: 'S&P', assetClass: '통화', marketClass: '해외',
   },
   {
-    id: '11', ticker: '305720', name: 'KODEX 2차전지산업', shortName: 'KODEX 2차전지',
+    id: '11', ticker: '305720', name: 'KODEX 2차전지산업', shortName: 'KODEX 2차전지산업',
     price: 8950, prevClose: 8820, change: 130, changePercent: 1.47,
     iNav: 8945, discrepancy: 0.06, ter: 0.45, spread: 0.08,
     adtv: 234000000000, aum: 890000000000, trackingError: 0.12, volatility: 28.5, dividendYield: 0.3,
@@ -190,7 +190,7 @@ export const mockETFs: ETF[] = [
     issuer: '삼성자산운용', listedDate: '2006/06/27', indexProvider: 'KRX', assetClass: '주식', marketClass: '국내',
   },
   {
-    id: '13', ticker: '381180', name: 'TIGER 미국테크TOP10', shortName: 'TIGER 테크TOP10',
+    id: '13', ticker: '381180', name: 'TIGER 미국테크TOP10', shortName: 'TIGER 미국테크TOP10',
     price: 15680, prevClose: 15520, change: 160, changePercent: 1.03,
     iNav: 15675, discrepancy: 0.03, ter: 0.49, spread: 0.07,
     adtv: 123000000000, aum: 670000000000, trackingError: 0.09, volatility: 22.5, dividendYield: 0.2,
@@ -214,7 +214,7 @@ export const mockETFs: ETF[] = [
     issuer: '삼성자산운용', listedDate: '2016/05/27', indexProvider: 'KRX', assetClass: '주식', marketClass: '국내',
   },
   {
-    id: '15', ticker: '132030', name: 'KODEX 골드선물(H)', shortName: 'KODEX 골드선물',
+    id: '15', ticker: '132030', name: 'KODEX 골드선물(H)', shortName: 'KODEX 골드선물(H)',
     price: 16780, prevClose: 16650, change: 130, changePercent: 0.78,
     iNav: 16775, discrepancy: 0.03, ter: 0.68, spread: 0.06,
     adtv: 67000000000, aum: 380000000000, trackingError: 0.08, volatility: 14.2, dividendYield: 0,
@@ -226,7 +226,7 @@ export const mockETFs: ETF[] = [
     issuer: '삼성자산운용', listedDate: '2010/07/05', indexProvider: 'S&P', assetClass: '원자재', marketClass: '해외',
   },
   {
-    id: '16', ticker: '411060', name: 'ACE 미국배당다우존스', shortName: 'ACE 미국배당',
+    id: '16', ticker: '411060', name: 'ACE 미국배당다우존스', shortName: 'ACE 미국배당다우존스',
     price: 12450, prevClose: 12380, change: 70, changePercent: 0.57,
     iNav: 12445, discrepancy: 0.04, ter: 0.05, spread: 0.04,
     adtv: 89000000000, aum: 1200000000000, trackingError: 0.05, volatility: 11.8, dividendYield: 3.8,
@@ -238,7 +238,7 @@ export const mockETFs: ETF[] = [
     issuer: '한국투자신탁운용', listedDate: '2022/03/17', indexProvider: 'S&P', assetClass: '주식', marketClass: '해외',
   },
   {
-    id: '17', ticker: '229200', name: 'KODEX 코스닥150레버리지', shortName: 'KODEX 코스닥레버리지',
+    id: '17', ticker: '229200', name: 'KODEX 코스닥150레버리지', shortName: 'KODEX 코스닥150레버리지',
     price: 6850, prevClose: 6720, change: 130, changePercent: 1.93,
     iNav: 6845, discrepancy: 0.07, ter: 0.64, spread: 0.08,
     adtv: 456000000000, aum: 620000000000, trackingError: 0.18, volatility: 38.5, dividendYield: 0,
@@ -250,7 +250,7 @@ export const mockETFs: ETF[] = [
     issuer: '삼성자산운용', listedDate: '2016/06/30', indexProvider: 'KRX', assetClass: '주식', marketClass: '국내',
   },
   {
-    id: '18', ticker: '252670', name: 'KODEX 200선물인버스2X', shortName: 'KODEX 인버스2X',
+    id: '18', ticker: '252670', name: 'KODEX 200선물인버스2X', shortName: 'KODEX 200선물인버스2X',
     price: 2180, prevClose: 2240, change: -60, changePercent: -2.68,
     iNav: 2182, discrepancy: -0.09, ter: 0.64, spread: 0.10,
     adtv: 890000000000, aum: 1100000000000, trackingError: 0.22, volatility: 26.0, dividendYield: 0,
@@ -262,7 +262,7 @@ export const mockETFs: ETF[] = [
     issuer: '삼성자산운용', listedDate: '2016/09/22', indexProvider: 'KRX', assetClass: '주식', marketClass: '국내',
   },
   {
-    id: '19', ticker: '453330', name: 'TIGER 미국S&P500(H)', shortName: 'TIGER S&P500(H)',
+    id: '19', ticker: '453330', name: 'TIGER 미국S&P500(H)', shortName: 'TIGER 미국S&P500(H)',
     price: 12850, prevClose: 12780, change: 70, changePercent: 0.55,
     iNav: 12845, discrepancy: 0.04, ter: 0.14, spread: 0.04,
     adtv: 123000000000, aum: 890000000000, trackingError: 0.05, volatility: 13.5, dividendYield: 1.3,
@@ -274,7 +274,7 @@ export const mockETFs: ETF[] = [
     issuer: '미래에셋자산운용', listedDate: '2023/03/28', indexProvider: 'S&P', assetClass: '주식', marketClass: '해외',
   },
   {
-    id: '20', ticker: '261220', name: 'KODEX WTI원유선물', shortName: 'KODEX WTI원유',
+    id: '20', ticker: '261220', name: 'KODEX WTI원유선물', shortName: 'KODEX WTI원유선물',
     price: 8450, prevClose: 8380, change: 70, changePercent: 0.84,
     iNav: 8445, discrepancy: 0.06, ter: 0.68, spread: 0.08,
     adtv: 45000000000, aum: 280000000000, trackingError: 0.15, volatility: 32.5, dividendYield: 0,
@@ -311,7 +311,7 @@ export const mockETFs: ETF[] = [
     issuer: '케이비자산운용', listedDate: '2021/04/09', indexProvider: 'S&P', assetClass: '주식', marketClass: '해외',
   },
   {
-    id: '23', ticker: '368590', name: 'RISE 미국나스닥100', shortName: 'RISE 나스닥100',
+    id: '23', ticker: '368590', name: 'RISE 미국나스닥100', shortName: 'RISE 미국나스닥100',
     price: 18650, prevClose: 18520, change: 130, changePercent: 0.70,
     iNav: 18645, discrepancy: 0.03, ter: 0.006, spread: 0.03,
     adtv: 463000000000, aum: 4630000000000, trackingError: 0.04, volatility: 18.2, dividendYield: 0.5,
@@ -359,7 +359,7 @@ export const mockETFs: ETF[] = [
     issuer: '미래에셋자산운용', listedDate: '2023/06/20', indexProvider: 'S&P', assetClass: '주식', marketClass: '해외',
   },
   {
-    id: '27', ticker: '329200', name: 'TIGER 리츠부동산인프라', shortName: 'TIGER 리츠부동산',
+    id: '27', ticker: '329200', name: 'TIGER 리츠부동산인프라', shortName: 'TIGER 리츠부동산인프라',
     price: 5280, prevClose: 5250, change: 30, changePercent: 0.57,
     iNav: 5278, discrepancy: 0.04, ter: 0.08, spread: 0.05,
     adtv: 243950000000, aum: 2439500000000, trackingError: 0.06, volatility: 12.8, dividendYield: 4.5,
@@ -395,7 +395,7 @@ export const mockETFs: ETF[] = [
     issuer: '케이비자산운용', listedDate: '2017/04/14', indexProvider: 'FnGuide', assetClass: '주식', marketClass: '국내',
   },
   {
-    id: '30', ticker: '357870', name: 'TIGER CD금리투자KIS(합성)', shortName: 'TIGER CD금리',
+    id: '30', ticker: '357870', name: 'TIGER CD금리투자KIS(합성)', shortName: 'TIGER CD금리투자KIS(합성)',
     price: 53850, prevClose: 53820, change: 30, changePercent: 0.06,
     iNav: 53848, discrepancy: 0.00, ter: 0.03, spread: 0.01,
     adtv: 856940000000, aum: 8569400000000, trackingError: 0.01, volatility: 0.3, dividendYield: 3.5,
@@ -455,7 +455,7 @@ export const mockETFs: ETF[] = [
     issuer: '미래에셋자산운용', listedDate: '2018/09/12', indexProvider: 'WiseFn', assetClass: '주식', marketClass: '국내',
   },
   {
-    id: '35', ticker: '319640', name: 'TIGER 골드선물(H)', shortName: 'TIGER 골드선물',
+    id: '35', ticker: '319640', name: 'TIGER 골드선물(H)', shortName: 'TIGER 골드선물(H)',
     price: 17250, prevClose: 17100, change: 150, changePercent: 0.88,
     iNav: 17245, discrepancy: 0.03, ter: 0.39, spread: 0.05,
     adtv: 49500000000, aum: 495000000000, trackingError: 0.07, volatility: 14.0, dividendYield: 0,
@@ -467,7 +467,7 @@ export const mockETFs: ETF[] = [
     issuer: '미래에셋자산운용', listedDate: '2019/04/09', indexProvider: 'S&P', assetClass: '원자재', marketClass: '해외',
   },
   {
-    id: '36', ticker: '252710', name: 'TIGER 200선물인버스2X', shortName: 'TIGER 인버스2X',
+    id: '36', ticker: '252710', name: 'TIGER 200선물인버스2X', shortName: 'TIGER 200선물인버스2X',
     price: 1850, prevClose: 1920, change: -70, changePercent: -3.65,
     iNav: 1852, discrepancy: -0.11, ter: 0.022, spread: 0.12,
     adtv: 966000000000, aum: 1932000000000, trackingError: 0.25, volatility: 26.5, dividendYield: 0,
@@ -528,7 +528,7 @@ export const mockETFs: ETF[] = [
   },
   // 41~60: 추가 ETF
   {
-    id: '41', ticker: '429000', name: 'TIGER 미국S&P500배당귀족', shortName: 'TIGER S&P500배당귀족',
+    id: '41', ticker: '429000', name: 'TIGER 미국S&P500배당귀족', shortName: 'TIGER 미국S&P500배당귀족',
     price: 13850, prevClose: 13780, change: 70, changePercent: 0.51,
     iNav: 13845, discrepancy: 0.04, ter: 0.25, spread: 0.05,
     adtv: 94500000000, aum: 945000000000, trackingError: 0.06, volatility: 12.8, dividendYield: 2.8,
@@ -624,7 +624,7 @@ export const mockETFs: ETF[] = [
     issuer: '삼성자산운용', listedDate: '2019/01/22', indexProvider: 'FnGuide', assetClass: '주식', marketClass: '국내',
   },
   {
-    id: '49', ticker: '412570', name: 'TIGER 2차전지TOP10레버리지', shortName: 'TIGER 2차전지레버리지',
+    id: '49', ticker: '412570', name: 'TIGER 2차전지TOP10레버리지', shortName: 'TIGER 2차전지TOP10레버리지',
     price: 4850, prevClose: 4720, change: 130, changePercent: 2.75,
     iNav: 4845, discrepancy: 0.10, ter: 0.29, spread: 0.12,
     adtv: 1008500000000, aum: 2017000000000, trackingError: 0.28, volatility: 65.0, dividendYield: 0,
@@ -636,7 +636,7 @@ export const mockETFs: ETF[] = [
     issuer: '미래에셋자산운용', listedDate: '2021/12/15', indexProvider: 'KRX', assetClass: '주식', marketClass: '국내',
   },
   {
-    id: '50', ticker: '462330', name: 'KODEX 2차전지산업레버리지', shortName: 'KODEX 2차전지레버리지',
+    id: '50', ticker: '462330', name: 'KODEX 2차전지산업레버리지', shortName: 'KODEX 2차전지산업레버리지',
     price: 3250, prevClose: 3180, change: 70, changePercent: 2.20,
     iNav: 3248, discrepancy: 0.06, ter: 0.49, spread: 0.10,
     adtv: 3876000000000, aum: 7752000000000, trackingError: 0.25, volatility: 58.0, dividendYield: 0,
@@ -648,7 +648,7 @@ export const mockETFs: ETF[] = [
     issuer: '삼성자산운용', listedDate: '2023/07/04', indexProvider: 'FnGuide', assetClass: '주식', marketClass: '국내',
   },
   {
-    id: '51', ticker: '475350', name: 'RISE 버크셔포트폴리오TOP10', shortName: 'RISE 버크셔TOP10',
+    id: '51', ticker: '475350', name: 'RISE 버크셔포트폴리오TOP10', shortName: 'RISE 버크셔포트폴리오TOP10',
     price: 12850, prevClose: 12750, change: 100, changePercent: 0.78,
     iNav: 12845, discrepancy: 0.04, ter: 0.01, spread: 0.04,
     adtv: 51000000000, aum: 510000000000, trackingError: 0.06, volatility: 14.5, dividendYield: 1.2,
@@ -660,7 +660,7 @@ export const mockETFs: ETF[] = [
     issuer: '케이비자산운용', listedDate: '2024/02/27', indexProvider: 'Solactive', assetClass: '주식', marketClass: '해외',
   },
   {
-    id: '52', ticker: '388420', name: 'RISE 비메모리반도체액티브', shortName: 'RISE 비메모리반도체',
+    id: '52', ticker: '388420', name: 'RISE 비메모리반도체액티브', shortName: 'RISE 비메모리반도체액티브',
     price: 8950, prevClose: 8820, change: 130, changePercent: 1.47,
     iNav: 8945, discrepancy: 0.06, ter: 0.50, spread: 0.08,
     adtv: 135400000000, aum: 270800000000, trackingError: 0.12, volatility: 28.0, dividendYield: 0.2,
@@ -684,7 +684,7 @@ export const mockETFs: ETF[] = [
     issuer: '미래에셋자산운용', listedDate: '2012/12/17', indexProvider: 'S&P', assetClass: '원자재', marketClass: '해외',
   },
   {
-    id: '54', ticker: '139320', name: 'TIGER 금은선물(H)', shortName: 'TIGER 금은선물',
+    id: '54', ticker: '139320', name: 'TIGER 금은선물(H)', shortName: 'TIGER 금은선물(H)',
     price: 12850, prevClose: 12750, change: 100, changePercent: 0.78,
     iNav: 12845, discrepancy: 0.04, ter: 0.69, spread: 0.06,
     adtv: 18000000000, aum: 360000000000, trackingError: 0.09, volatility: 16.5, dividendYield: 0,
@@ -696,7 +696,7 @@ export const mockETFs: ETF[] = [
     issuer: '미래에셋자산운용', listedDate: '2011/04/08', indexProvider: 'S&P', assetClass: '원자재', marketClass: '해외',
   },
   {
-    id: '55', ticker: '137610', name: 'TIGER 농산물선물Enhanced(H)', shortName: 'TIGER 농산물선물',
+    id: '55', ticker: '137610', name: 'TIGER 농산물선물Enhanced(H)', shortName: 'TIGER 농산물선물Enhanced(H)',
     price: 7850, prevClose: 7780, change: 70, changePercent: 0.90,
     iNav: 7845, discrepancy: 0.06, ter: 0.69, spread: 0.08,
     adtv: 25000000000, aum: 500000000000, trackingError: 0.12, volatility: 18.5, dividendYield: 0,
@@ -708,7 +708,7 @@ export const mockETFs: ETF[] = [
     issuer: '미래에셋자산운용', listedDate: '2011/01/11', indexProvider: 'S&P', assetClass: '원자재', marketClass: '해외',
   },
   {
-    id: '56', ticker: '245340', name: 'TIGER 미국다우존스30', shortName: 'TIGER 다우존스30',
+    id: '56', ticker: '245340', name: 'TIGER 미국다우존스30', shortName: 'TIGER 미국다우존스30',
     price: 52850, prevClose: 52580, change: 270, changePercent: 0.51,
     iNav: 52845, discrepancy: 0.01, ter: 0.35, spread: 0.04,
     adtv: 37400000000, aum: 748000000000, trackingError: 0.05, volatility: 13.2, dividendYield: 1.5,
@@ -744,7 +744,7 @@ export const mockETFs: ETF[] = [
     issuer: '케이비자산운용', listedDate: '2020/12/08', indexProvider: 'Hang Seng', assetClass: '주식', marketClass: '해외',
   },
   {
-    id: '59', ticker: '379790', name: 'RISE 유로스탁스50(H)', shortName: 'RISE 유로스탁스50',
+    id: '59', ticker: '379790', name: 'RISE 유로스탁스50(H)', shortName: 'RISE 유로스탁스50(H)',
     price: 14250, prevClose: 14180, change: 70, changePercent: 0.49,
     iNav: 14245, discrepancy: 0.04, ter: 0.021, spread: 0.04,
     adtv: 7000000000, aum: 140000000000, trackingError: 0.05, volatility: 14.5, dividendYield: 2.5,
@@ -756,7 +756,7 @@ export const mockETFs: ETF[] = [
     issuer: '케이비자산운용', listedDate: '2021/04/09', indexProvider: 'STOXX', assetClass: '주식', marketClass: '해외',
   },
   {
-    id: '60', ticker: '448290', name: 'TIGER 미국S&P500(H)', shortName: 'TIGER S&P500(H)',
+    id: '60', ticker: '448290', name: 'TIGER 미국S&P500(H)', shortName: 'TIGER 미국S&P500(H)',
     price: 13850, prevClose: 13780, change: 70, changePercent: 0.51,
     iNav: 13845, discrepancy: 0.04, ter: 0.07, spread: 0.04,
     adtv: 272500000000, aum: 545000000000, trackingError: 0.05, volatility: 13.5, dividendYield: 1.3,
@@ -769,7 +769,7 @@ export const mockETFs: ETF[] = [
   },
   // 61~80: 추가 ETF
   {
-    id: '61', ticker: '448300', name: 'TIGER 미국나스닥100(H)', shortName: 'TIGER 나스닥100(H)',
+    id: '61', ticker: '448300', name: 'TIGER 미국나스닥100(H)', shortName: 'TIGER 미국나스닥100(H)',
     price: 12250, prevClose: 12150, change: 100, changePercent: 0.82,
     iNav: 12245, discrepancy: 0.04, ter: 0.006, spread: 0.04,
     adtv: 155000000000, aum: 310000000000, trackingError: 0.05, volatility: 18.0, dividendYield: 0.5,
@@ -781,7 +781,7 @@ export const mockETFs: ETF[] = [
     issuer: '미래에셋자산운용', listedDate: '2022/11/25', indexProvider: 'NASDAQ', assetClass: '주식', marketClass: '해외',
   },
   {
-    id: '62', ticker: '441680', name: 'TIGER 미국나스닥100커버드콜(합성)', shortName: 'TIGER 나스닥커버드콜',
+    id: '62', ticker: '441680', name: 'TIGER 미국나스닥100커버드콜(합성)', shortName: 'TIGER 미국나스닥100커버드콜(합성)',
     price: 11850, prevClose: 11780, change: 70, changePercent: 0.59,
     iNav: 11845, discrepancy: 0.04, ter: 0.37, spread: 0.05,
     adtv: 348500000000, aum: 697000000000, trackingError: 0.08, volatility: 12.5, dividendYield: 8.5,
@@ -793,7 +793,7 @@ export const mockETFs: ETF[] = [
     issuer: '미래에셋자산운용', listedDate: '2022/09/22', indexProvider: 'NASDAQ', assetClass: '주식', marketClass: '해외',
   },
   {
-    id: '63', ticker: '435420', name: 'TIGER 미국나스닥100채권혼합Fn', shortName: 'TIGER 나스닥채권혼합',
+    id: '63', ticker: '435420', name: 'TIGER 미국나스닥100채권혼합Fn', shortName: 'TIGER 미국나스닥100채권혼합Fn',
     price: 11250, prevClose: 11180, change: 70, changePercent: 0.63,
     iNav: 11245, discrepancy: 0.04, ter: 0.25, spread: 0.04,
     adtv: 213500000000, aum: 427000000000, trackingError: 0.06, volatility: 9.5, dividendYield: 1.8,
@@ -805,7 +805,7 @@ export const mockETFs: ETF[] = [
     issuer: '미래에셋자산운용', listedDate: '2022/07/06', indexProvider: 'FnGuide', assetClass: '혼합자산', marketClass: '해외',
   },
   {
-    id: '64', ticker: '423160', name: 'KODEX KOFR금리액티브(합성)', shortName: 'KODEX KOFR금리',
+    id: '64', ticker: '423160', name: 'KODEX KOFR금리액티브(합성)', shortName: 'KODEX KOFR금리액티브(합성)',
     price: 52850, prevClose: 52820, change: 30, changePercent: 0.06,
     iNav: 52848, discrepancy: 0.00, ter: 0.05, spread: 0.01,
     adtv: 392290000000, aum: 3922900000000, trackingError: 0.01, volatility: 0.2, dividendYield: 3.5,
@@ -829,7 +829,7 @@ export const mockETFs: ETF[] = [
     issuer: '삼성자산운용', listedDate: '2019/07/04', indexProvider: 'FnGuide', assetClass: '혼합자산', marketClass: '해외',
   },
   {
-    id: '66', ticker: '252400', name: 'RISE 200선물레버리지', shortName: 'RISE 200레버리지',
+    id: '66', ticker: '252400', name: 'RISE 200선물레버리지', shortName: 'RISE 200선물레버리지',
     price: 8250, prevClose: 8120, change: 130, changePercent: 1.60,
     iNav: 8245, discrepancy: 0.06, ter: 0.60, spread: 0.08,
     adtv: 100000000000, aum: 200000000000, trackingError: 0.18, volatility: 25.0, dividendYield: 0,
@@ -841,7 +841,7 @@ export const mockETFs: ETF[] = [
     issuer: '케이비자산운용', listedDate: '2016/09/12', indexProvider: 'KRX', assetClass: '주식', marketClass: '국내',
   },
   {
-    id: '67', ticker: '252420', name: 'RISE 200선물인버스2X', shortName: 'RISE 인버스2X',
+    id: '67', ticker: '252420', name: 'RISE 200선물인버스2X', shortName: 'RISE 200선물인버스2X',
     price: 1750, prevClose: 1820, change: -70, changePercent: -3.85,
     iNav: 1752, discrepancy: -0.11, ter: 0.60, spread: 0.12,
     adtv: 145000000000, aum: 290000000000, trackingError: 0.25, volatility: 26.0, dividendYield: 0,
@@ -853,7 +853,7 @@ export const mockETFs: ETF[] = [
     issuer: '케이비자산운용', listedDate: '2016/09/22', indexProvider: 'KRX', assetClass: '주식', marketClass: '국내',
   },
   {
-    id: '68', ticker: '252410', name: 'RISE 200선물인버스', shortName: 'RISE 인버스',
+    id: '68', ticker: '252410', name: 'RISE 200선물인버스', shortName: 'RISE 200선물인버스',
     price: 4850, prevClose: 4920, change: -70, changePercent: -1.42,
     iNav: 4852, discrepancy: -0.04, ter: 0.60, spread: 0.08,
     adtv: 90000000000, aum: 180000000000, trackingError: 0.12, volatility: 12.5, dividendYield: 0,
@@ -865,7 +865,7 @@ export const mockETFs: ETF[] = [
     issuer: '케이비자산운용', listedDate: '2016/09/12', indexProvider: 'KRX', assetClass: '주식', marketClass: '국내',
   },
   {
-    id: '69', ticker: '267770', name: 'TIGER 200선물레버리지', shortName: 'TIGER 200레버리지',
+    id: '69', ticker: '267770', name: 'TIGER 200선물레버리지', shortName: 'TIGER 200선물레버리지',
     price: 48250, prevClose: 47650, change: 600, changePercent: 1.26,
     iNav: 48240, discrepancy: 0.02, ter: 0.022, spread: 0.04,
     adtv: 29000000000, aum: 580000000000, trackingError: 0.15, volatility: 24.8, dividendYield: 0,
@@ -877,7 +877,7 @@ export const mockETFs: ETF[] = [
     issuer: '미래에셋자산운용', listedDate: '2017/04/25', indexProvider: 'KRX', assetClass: '주식', marketClass: '국내',
   },
   {
-    id: '70', ticker: '464310', name: 'TIGER 글로벌AI&로보틱스INDXX', shortName: 'TIGER AI로보틱스',
+    id: '70', ticker: '464310', name: 'TIGER 글로벌AI&로보틱스INDXX', shortName: 'TIGER 글로벌AI&로보틱스INDXX',
     price: 9850, prevClose: 9720, change: 130, changePercent: 1.34,
     iNav: 9845, discrepancy: 0.05, ter: 0.49, spread: 0.07,
     adtv: 79500000000, aum: 159000000000, trackingError: 0.12, volatility: 26.0, dividendYield: 0.2,
@@ -889,7 +889,7 @@ export const mockETFs: ETF[] = [
     issuer: '미래에셋자산운용', listedDate: '2023/08/17', indexProvider: 'Indxx', assetClass: '주식', marketClass: '해외',
   },
   {
-    id: '71', ticker: '453950', name: 'TIGER TSMC파운드리밸류체인', shortName: 'TIGER TSMC밸류체인',
+    id: '71', ticker: '453950', name: 'TIGER TSMC파운드리밸류체인', shortName: 'TIGER TSMC파운드리밸류체인',
     price: 8250, prevClose: 8120, change: 130, changePercent: 1.60,
     iNav: 8245, discrepancy: 0.06, ter: 0.49, spread: 0.08,
     adtv: 11000000000, aum: 220000000000, trackingError: 0.12, volatility: 28.5, dividendYield: 0.3,
@@ -901,7 +901,7 @@ export const mockETFs: ETF[] = [
     issuer: '미래에셋자산운용', listedDate: '2023/04/04', indexProvider: 'FACTSET', assetClass: '주식', marketClass: '해외',
   },
   {
-    id: '72', ticker: '476690', name: 'TIGER 글로벌비만치료제TOP2Plus', shortName: 'TIGER 비만치료제',
+    id: '72', ticker: '476690', name: 'TIGER 글로벌비만치료제TOP2Plus', shortName: 'TIGER 글로벌비만치료제TOP2Plus',
     price: 11850, prevClose: 11650, change: 200, changePercent: 1.72,
     iNav: 11845, discrepancy: 0.04, ter: 0.45, spread: 0.06,
     adtv: 56000000000, aum: 112000000000, trackingError: 0.10, volatility: 32.0, dividendYield: 0,
@@ -913,7 +913,7 @@ export const mockETFs: ETF[] = [
     issuer: '미래에셋자산운용', listedDate: '2024/02/29', indexProvider: 'Indxx', assetClass: '주식', marketClass: '해외',
   },
   {
-    id: '73', ticker: '400970', name: 'TIGER Fn메타버스', shortName: 'TIGER 메타버스',
+    id: '73', ticker: '400970', name: 'TIGER Fn메타버스', shortName: 'TIGER Fn메타버스',
     price: 5850, prevClose: 5780, change: 70, changePercent: 1.21,
     iNav: 5845, discrepancy: 0.09, ter: 0.45, spread: 0.10,
     adtv: 92000000000, aum: 184000000000, trackingError: 0.15, volatility: 32.5, dividendYield: 0.2,
@@ -925,7 +925,7 @@ export const mockETFs: ETF[] = [
     issuer: '미래에셋자산운용', listedDate: '2021/10/13', indexProvider: 'FnGuide', assetClass: '주식', marketClass: '국내',
   },
   {
-    id: '74', ticker: '377990', name: 'TIGER Fn신재생에너지', shortName: 'TIGER 신재생에너지',
+    id: '74', ticker: '377990', name: 'TIGER Fn신재생에너지', shortName: 'TIGER Fn신재생에너지',
     price: 6250, prevClose: 6180, change: 70, changePercent: 1.13,
     iNav: 6245, discrepancy: 0.08, ter: 0.50, spread: 0.09,
     adtv: 42000000000, aum: 84000000000, trackingError: 0.14, volatility: 30.0, dividendYield: 0.3,
@@ -961,7 +961,7 @@ export const mockETFs: ETF[] = [
     issuer: '미래에셋자산운용', listedDate: '2020/10/07', indexProvider: 'KRX', assetClass: '주식', marketClass: '국내',
   },
   {
-    id: '77', ticker: '138530', name: 'TIGER LG그룹+펀더멘털', shortName: 'TIGER LG그룹',
+    id: '77', ticker: '138530', name: 'TIGER LG그룹+펀더멘털', shortName: 'TIGER LG그룹+펀더멘털',
     price: 12850, prevClose: 12750, change: 100, changePercent: 0.78,
     iNav: 12845, discrepancy: 0.04, ter: 0.15, spread: 0.05,
     adtv: 16400000000, aum: 328000000000, trackingError: 0.08, volatility: 16.5, dividendYield: 1.8,
@@ -973,7 +973,7 @@ export const mockETFs: ETF[] = [
     issuer: '미래에셋자산운용', listedDate: '2011/03/10', indexProvider: 'FnGuide', assetClass: '주식', marketClass: '국내',
   },
   {
-    id: '78', ticker: '445910', name: 'TIGER MKF배당귀족', shortName: 'TIGER 배당귀족',
+    id: '78', ticker: '445910', name: 'TIGER MKF배당귀족', shortName: 'TIGER MKF배당귀족',
     price: 11250, prevClose: 11180, change: 70, changePercent: 0.63,
     iNav: 11245, discrepancy: 0.04, ter: 0.20, spread: 0.05,
     adtv: 7000000000, aum: 140000000000, trackingError: 0.07, volatility: 12.0, dividendYield: 4.2,
@@ -985,7 +985,7 @@ export const mockETFs: ETF[] = [
     issuer: '미래에셋자산운용', listedDate: '2022/10/18', indexProvider: 'FnGuide', assetClass: '주식', marketClass: '국내',
   },
   {
-    id: '79', ticker: '289260', name: 'TIGER MSCI KOREA ESG리더스', shortName: 'TIGER ESG리더스',
+    id: '79', ticker: '289260', name: 'TIGER MSCI KOREA ESG리더스', shortName: 'TIGER MSCI KOREA ESG리더스',
     price: 12450, prevClose: 12380, change: 70, changePercent: 0.57,
     iNav: 12445, discrepancy: 0.04, ter: 0.40, spread: 0.05,
     adtv: 7800000000, aum: 156000000000, trackingError: 0.06, volatility: 13.5, dividendYield: 1.5,
@@ -1010,7 +1010,7 @@ export const mockETFs: ETF[] = [
   },
   // 81~100: 마지막 ETF
   {
-    id: '81', ticker: '461950', name: 'KODEX 2차전지핵심소재10', shortName: 'KODEX 2차전지핵심소재',
+    id: '81', ticker: '461950', name: 'KODEX 2차전지핵심소재10', shortName: 'KODEX 2차전지핵심소재10',
     price: 6850, prevClose: 6750, change: 100, changePercent: 1.48,
     iNav: 6845, discrepancy: 0.07, ter: 0.39, spread: 0.09,
     adtv: 412500000000, aum: 825000000000, trackingError: 0.13, volatility: 32.0, dividendYield: 0.2,
@@ -1022,7 +1022,7 @@ export const mockETFs: ETF[] = [
     issuer: '삼성자산운용', listedDate: '2023/07/04', indexProvider: 'FnGuide', assetClass: '주식', marketClass: '국내',
   },
   {
-    id: '82', ticker: '471990', name: 'KODEX AI반도체핵심장비', shortName: 'KODEX AI반도체장비',
+    id: '82', ticker: '471990', name: 'KODEX AI반도체핵심장비', shortName: 'KODEX AI반도체핵심장비',
     price: 10850, prevClose: 10680, change: 170, changePercent: 1.59,
     iNav: 10845, discrepancy: 0.05, ter: 0.39, spread: 0.07,
     adtv: 144000000000, aum: 288000000000, trackingError: 0.11, volatility: 28.5, dividendYield: 0.2,
@@ -1106,7 +1106,7 @@ export const mockETFs: ETF[] = [
     issuer: '케이비자산운용', listedDate: '2009/07/29', indexProvider: 'KRX', assetClass: '채권', marketClass: '국내',
   },
   {
-    id: '89', ticker: '385560', name: 'RISE KIS국고채30년Enhanced', shortName: 'RISE 국고채30년',
+    id: '89', ticker: '385560', name: 'RISE KIS국고채30년Enhanced', shortName: 'RISE KIS국고채30년Enhanced',
     price: 8850, prevClose: 8820, change: 30, changePercent: 0.34,
     iNav: 8848, discrepancy: 0.02, ter: 0.05, spread: 0.04,
     adtv: 78850000000, aum: 1577000000000, trackingError: 0.03, volatility: 18.5, dividendYield: 2.8,
@@ -1118,7 +1118,7 @@ export const mockETFs: ETF[] = [
     issuer: '케이비자산운용', listedDate: '2021/05/26', indexProvider: 'KIS자산평가', assetClass: '채권', marketClass: '국내',
   },
   {
-    id: '90', ticker: '481340', name: 'RISE 미국30년국채액티브', shortName: 'RISE 미국30년국채',
+    id: '90', ticker: '481340', name: 'RISE 미국30년국채액티브', shortName: 'RISE 미국30년국채액티브',
     price: 9250, prevClose: 9180, change: 70, changePercent: 0.76,
     iNav: 9245, discrepancy: 0.05, ter: 0.05, spread: 0.05,
     adtv: 30500000000, aum: 610000000000, trackingError: 0.04, volatility: 20.0, dividendYield: 3.5,
@@ -1130,7 +1130,7 @@ export const mockETFs: ETF[] = [
     issuer: '케이비자산운용', listedDate: '2024/05/28', indexProvider: 'Bloomberg', assetClass: '채권', marketClass: '해외',
   },
   {
-    id: '91', ticker: '493810', name: 'TIGER 미국AI빅테크10타겟데일리커버드콜', shortName: 'TIGER AI빅테크커버드콜',
+    id: '91', ticker: '493810', name: 'TIGER 미국AI빅테크10타겟데일리커버드콜', shortName: 'TIGER 미국AI빅테크10타겟데일리커버드콜',
     price: 10850, prevClose: 10750, change: 100, changePercent: 0.93,
     iNav: 10845, discrepancy: 0.05, ter: 0.25, spread: 0.05,
     adtv: 224500000000, aum: 449000000000, trackingError: 0.08, volatility: 18.0, dividendYield: 12.5,
@@ -1142,7 +1142,7 @@ export const mockETFs: ETF[] = [
     issuer: '미래에셋자산운용', listedDate: '2024/10/15', indexProvider: '한국경제신문', assetClass: '주식', marketClass: '해외',
   },
   {
-    id: '92', ticker: '491620', name: 'RISE 미국테크100데일리고정커버드콜', shortName: 'RISE 테크100커버드콜',
+    id: '92', ticker: '491620', name: 'RISE 미국테크100데일리고정커버드콜', shortName: 'RISE 미국테크100데일리고정커버드콜',
     price: 10250, prevClose: 10180, change: 70, changePercent: 0.69,
     iNav: 10245, discrepancy: 0.05, ter: 0.25, spread: 0.05,
     adtv: 252500000000, aum: 505000000000, trackingError: 0.07, volatility: 15.0, dividendYield: 11.0,
@@ -1154,7 +1154,7 @@ export const mockETFs: ETF[] = [
     issuer: '케이비자산운용', listedDate: '2024/10/02', indexProvider: '한국경제신문', assetClass: '주식', marketClass: '해외',
   },
   {
-    id: '93', ticker: '490600', name: 'RISE 미국배당100데일리고정커버드콜', shortName: 'RISE 배당100커버드콜',
+    id: '93', ticker: '490600', name: 'RISE 미국배당100데일리고정커버드콜', shortName: 'RISE 미국배당100데일리고정커버드콜',
     price: 10450, prevClose: 10380, change: 70, changePercent: 0.67,
     iNav: 10445, discrepancy: 0.05, ter: 0.25, spread: 0.05,
     adtv: 123500000000, aum: 247000000000, trackingError: 0.06, volatility: 10.0, dividendYield: 10.5,
@@ -1166,7 +1166,7 @@ export const mockETFs: ETF[] = [
     issuer: '케이비자산운용', listedDate: '2024/09/24', indexProvider: '한국경제신문', assetClass: '주식', marketClass: '해외',
   },
   {
-    id: '94', ticker: '460660', name: 'RISE 미국S&P배당킹', shortName: 'RISE S&P배당킹',
+    id: '94', ticker: '460660', name: 'RISE 미국S&P배당킹', shortName: 'RISE 미국S&P배당킹',
     price: 11850, prevClose: 11780, change: 70, changePercent: 0.59,
     iNav: 11845, discrepancy: 0.04, ter: 0.01, spread: 0.04,
     adtv: 14500000000, aum: 290000000000, trackingError: 0.05, volatility: 11.5, dividendYield: 3.2,
@@ -1178,7 +1178,7 @@ export const mockETFs: ETF[] = [
     issuer: '케이비자산운용', listedDate: '2023/06/27', indexProvider: 'S&P', assetClass: '주식', marketClass: '해외',
   },
   {
-    id: '95', ticker: '485690', name: 'RISE 미국AI밸류체인TOP3Plus', shortName: 'RISE AI밸류체인TOP3',
+    id: '95', ticker: '485690', name: 'RISE 미국AI밸류체인TOP3Plus', shortName: 'RISE 미국AI밸류체인TOP3Plus',
     price: 12250, prevClose: 12120, change: 130, changePercent: 1.07,
     iNav: 12245, discrepancy: 0.04, ter: 0.01, spread: 0.04,
     adtv: 52500000000, aum: 105000000000, trackingError: 0.07, volatility: 24.0, dividendYield: 0.2,
@@ -1226,7 +1226,7 @@ export const mockETFs: ETF[] = [
     issuer: '삼성자산운용', listedDate: '2018/03/26', indexProvider: 'KRX', assetClass: '주식', marketClass: '국내',
   },
   {
-    id: '99', ticker: '226980', name: 'KODEX 200 중소형', shortName: 'KODEX 200중소형',
+    id: '99', ticker: '226980', name: 'KODEX 200 중소형', shortName: 'KODEX 200 중소형',
     price: 9850, prevClose: 9780, change: 70, changePercent: 0.72,
     iNav: 9845, discrepancy: 0.05, ter: 0.30, spread: 0.06,
     adtv: 8000000000, aum: 160000000000, trackingError: 0.07, volatility: 15.5, dividendYield: 1.5,
