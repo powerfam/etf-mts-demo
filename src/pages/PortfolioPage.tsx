@@ -4,7 +4,7 @@ import { TrendingUp, TrendingDown, AlertTriangle, RefreshCw, ChevronRight, Setti
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { portfolioETFs } from '@/data/mockData'
+import { getPortfolioByAccountType } from '@/data/mockData'
 import { formatNumber, formatPercent } from '@/lib/utils'
 import type { ETF } from '@/data/mockData'
 
@@ -18,13 +18,15 @@ const COLORS = ['#d64f79', '#796ec2', '#4ade80', '#f59e0b', '#06b6d4']
 export function PortfolioPage({ accountType, onSelectETF }: PortfolioPageProps) {
   const [selectedFilter, setSelectedFilter] = useState<string>('all')
 
-  const totalValue = portfolioETFs.reduce((sum, etf) => sum + etf.totalValue, 0)
-  const totalCost = portfolioETFs.reduce((sum, etf) => sum + (etf.avgPrice * etf.quantity), 0)
-  const totalProfitLoss = portfolioETFs.reduce((sum, etf) => sum + etf.profitLoss, 0)
+  // 계좌 타입에 따른 포트폴리오 데이터 가져오기
+  const currentPortfolio = getPortfolioByAccountType(accountType)
+  const totalValue = currentPortfolio.reduce((sum, etf) => sum + etf.totalValue, 0)
+  const totalCost = currentPortfolio.reduce((sum, etf) => sum + (etf.avgPrice * etf.quantity), 0)
+  const totalProfitLoss = currentPortfolio.reduce((sum, etf) => sum + etf.profitLoss, 0)
   const totalProfitLossPercent = (totalProfitLoss / totalCost) * 100
 
   // Pie chart data
-  const pieData = portfolioETFs.map((etf, index) => ({
+  const pieData = currentPortfolio.map((etf, index) => ({
     name: etf.shortName,
     value: etf.totalValue,
     percent: (etf.totalValue / totalValue * 100).toFixed(1),
@@ -46,7 +48,7 @@ export function PortfolioPage({ accountType, onSelectETF }: PortfolioPageProps) 
   const taxInfo = getTaxInfo()
 
   // Risk alerts
-  const riskAlerts = portfolioETFs.filter(etf =>
+  const riskAlerts = currentPortfolio.filter(etf =>
     etf.healthScore < 75 || Math.abs(etf.discrepancy) > 0.1 || etf.spread > 0.1
   )
 
@@ -212,7 +214,7 @@ export function PortfolioPage({ accountType, onSelectETF }: PortfolioPageProps) 
         </div>
 
         <div className="space-y-3">
-          {portfolioETFs
+          {currentPortfolio
             .filter(etf => {
               if (selectedFilter === 'profit') return etf.profitLoss >= 0
               if (selectedFilter === 'loss') return etf.profitLoss < 0

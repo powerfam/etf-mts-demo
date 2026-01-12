@@ -2,7 +2,7 @@ import { TrendingUp, Rocket, Coins, Shield, DollarSign, Gem, Zap, Wallet, Chevro
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { mockETFs, themes, portfolioETFs } from '@/data/mockData'
+import { mockETFs, themes, getPortfolioByAccountType } from '@/data/mockData'
 import { formatNumber, formatPercent } from '@/lib/utils'
 import type { ETF } from '@/data/mockData'
 
@@ -17,8 +17,10 @@ interface HomePageProps {
 }
 
 export function HomePage({ accountType, onSelectETF, onNavigate }: HomePageProps) {
-  const totalValue = portfolioETFs.reduce((sum, etf) => sum + etf.totalValue, 0)
-  const totalProfitLoss = portfolioETFs.reduce((sum, etf) => sum + etf.profitLoss, 0)
+  // 계좌 타입에 따른 포트폴리오 데이터 가져오기
+  const currentPortfolio = getPortfolioByAccountType(accountType)
+  const totalValue = currentPortfolio.reduce((sum, etf) => sum + etf.totalValue, 0)
+  const totalProfitLoss = currentPortfolio.reduce((sum, etf) => sum + etf.profitLoss, 0)
   const totalProfitLossPercent = (totalProfitLoss / (totalValue - totalProfitLoss)) * 100
 
   // Get account-specific tax info

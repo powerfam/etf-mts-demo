@@ -1251,11 +1251,49 @@ export const mockETFs: ETF[] = [
   },
 ]
 
-export const portfolioETFs = mockETFs.slice(0, 5).map((etf, index) => {
-  const quantity = [100, 50, 30, 20, 10][index]
-  const avgPrice = Math.round(etf.price * (0.9 + Math.random() * 0.2))
+// 포트폴리오 ETF 생성 헬퍼 함수
+const createPortfolioETF = (etf: ETF, quantity: number, avgPriceMultiplier: number) => {
+  const avgPrice = Math.round(etf.price * avgPriceMultiplier)
   const totalValue = etf.price * quantity
   const profitLoss = (etf.price - avgPrice) * quantity
   const profitLossPercent = ((etf.price - avgPrice) / avgPrice) * 100
   return { ...etf, quantity, avgPrice, totalValue, profitLoss, profitLossPercent }
-})
+}
+
+// 일반계좌 포트폴리오 (공격적: 성장주, 레버리지 포함) - 약 2,500만원
+export const generalPortfolioETFs = [
+  createPortfolioETF(mockETFs[0], 150, 0.92),   // KODEX 200
+  createPortfolioETF(mockETFs[2], 80, 0.88),    // TIGER 미국나스닥100
+  createPortfolioETF(mockETFs[5], 200, 1.05),   // KODEX 레버리지
+  createPortfolioETF(mockETFs[8], 100, 0.95),   // TIGER 반도체
+  createPortfolioETF(mockETFs[12], 50, 0.90),   // KODEX 2차전지산업
+]
+
+// 연금계좌 포트폴리오 (안정적: 배당, 채권 중심) - 약 4,200만원
+export const pensionPortfolioETFs = [
+  createPortfolioETF(mockETFs[0], 300, 0.90),   // KODEX 200
+  createPortfolioETF(mockETFs[1], 400, 0.85),   // TIGER 미국S&P500
+  createPortfolioETF(mockETFs[6], 200, 0.95),   // KODEX 배당성장
+  createPortfolioETF(mockETFs[10], 150, 0.92),  // TIGER 미국배당다우존스
+  createPortfolioETF(mockETFs[44], 100, 0.98),  // TIGER 국채3년 (채권)
+]
+
+// ISA계좌 포트폴리오 (균형: 성장+배당 혼합) - 약 1,800만원
+export const isaPortfolioETFs = [
+  createPortfolioETF(mockETFs[1], 200, 0.88),   // TIGER 미국S&P500
+  createPortfolioETF(mockETFs[3], 100, 0.91),   // TIGER 200
+  createPortfolioETF(mockETFs[6], 150, 0.93),   // KODEX 배당성장
+  createPortfolioETF(mockETFs[9], 80, 0.87),    // KODEX 미국반도체MV
+]
+
+// 계좌 타입별 포트폴리오 가져오기
+export const getPortfolioByAccountType = (accountType: string) => {
+  switch (accountType) {
+    case 'pension': return pensionPortfolioETFs
+    case 'isa': return isaPortfolioETFs
+    default: return generalPortfolioETFs
+  }
+}
+
+// 기존 호환성 유지
+export const portfolioETFs = generalPortfolioETFs
