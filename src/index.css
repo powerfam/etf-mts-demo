@@ -1,0 +1,123 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --background: 270 28% 10%;
+    --foreground: 0 0% 100%;
+
+    --card: 270 25% 14%;
+    --card-foreground: 0 0% 100%;
+
+    --popover: 270 25% 14%;
+    --popover-foreground: 0 0% 100%;
+
+    --primary: 340 60% 58%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 253 35% 59%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 270 20% 20%;
+    --muted-foreground: 0 0% 70%;
+
+    --accent: 340 60% 58%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 270 20% 25%;
+    --input: 270 20% 20%;
+    --ring: 340 60% 58%;
+
+    --radius: 0.75rem;
+
+    /* Custom MTS colors */
+    --up: 340 60% 58%;
+    --down: 253 35% 59%;
+    --bg-main: #191322;
+    --color-up: #d64f79;
+    --color-down: #796ec2;
+  }
+}
+
+@layer base {
+  * {
+    border-color: hsl(270 20% 25%);
+  }
+
+  body {
+    background-color: #191322;
+    color: white;
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+  }
+}
+
+/* Utility classes for MTS */
+.text-up {
+  color: #d64f79;
+}
+
+.text-down {
+  color: #796ec2;
+}
+
+.bg-up {
+  background-color: #d64f79;
+}
+
+.bg-down {
+  background-color: #796ec2;
+}
+
+.bg-up\/10 {
+  background-color: rgba(214, 79, 121, 0.1);
+}
+
+.bg-down\/10 {
+  background-color: rgba(121, 110, 194, 0.1);
+}
+
+/* Custom scrollbar for dark theme */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #191322;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3d3450;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4d4460;
+}
+
+/* Hide scrollbar utility */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Bottom sheet animation */
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out forwards;
+}

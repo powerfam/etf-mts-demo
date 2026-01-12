@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#191322" rx="64"/>
+  <text x="256" y="280" font-family="Arial, sans-serif" font-size="128" font-weight="bold" fill="#d64f79" text-anchor="middle">ETF</text>
+  <text x="256" y="380" font-family="Arial, sans-serif" font-size="56" fill="#8B5CF6" text-anchor="middle">101</text>
+</svg>
