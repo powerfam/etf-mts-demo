@@ -1,4 +1,4 @@
-import { TrendingUp, Rocket, Coins, Shield, DollarSign, Gem, Zap, Wallet, ChevronRight, AlertTriangle, Bell, ArrowRight, BookOpen } from 'lucide-react'
+import { TrendingUp, Rocket, Coins, Shield, DollarSign, Gem, Zap, Wallet, ChevronRight, AlertTriangle, Bell, ArrowRight, BookOpen, Search } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -136,18 +136,34 @@ export function HomePage({ accountType, onSelectETF, onNavigate }: HomePageProps
           </Button>
         </div>
 
-        {/* Horizontal Wave Ticker - 우측으로 물결 흐르듯 */}
+        {/* Horizontal Wave Ticker - 우측으로 물결 흐르듯 + Shimmer 효과 */}
         <div className="relative overflow-hidden">
           <style>{`
             @keyframes tickerWave {
               0% { transform: translateX(0); }
               100% { transform: translateX(-50%); }
             }
+            @keyframes shimmer {
+              0% { transform: translateX(-100%); }
+              100% { transform: translateX(100%); }
+            }
             .ticker-wave {
               animation: tickerWave 25s linear infinite;
             }
             .ticker-wave:hover {
               animation-play-state: paused;
+            }
+            .shimmer-card {
+              position: relative;
+              overflow: hidden;
+            }
+            .shimmer-card::after {
+              content: '';
+              position: absolute;
+              inset: 0;
+              background: linear-gradient(90deg, transparent, rgba(214, 79, 121, 0.08), transparent);
+              animation: shimmer 3s ease-in-out infinite;
+              pointer-events: none;
             }
           `}</style>
 
@@ -157,7 +173,7 @@ export function HomePage({ accountType, onSelectETF, onNavigate }: HomePageProps
               <div
                 key={`${etf.id}-${index}`}
                 onClick={() => onSelectETF(etf)}
-                className="flex-shrink-0 w-[160px] bg-[#1f1a2e] border border-[#2d2640] rounded-xl p-3 cursor-pointer hover:border-[#d64f79]/50 transition-all hover:scale-105"
+                className="shimmer-card flex-shrink-0 w-[160px] bg-[#1f1a2e] border border-[#2d2640] rounded-xl p-3 cursor-pointer hover:border-[#d64f79]/50 transition-all hover:scale-105"
               >
                 {/* Rank Badge */}
                 <div className="flex items-center gap-2 mb-2">
@@ -252,7 +268,38 @@ export function HomePage({ accountType, onSelectETF, onNavigate }: HomePageProps
         </div>
       </div>
 
-      {/* ETF 101 Guide - 탐색 페이지로 연결 */}
+      {/* ETF 탐색하기 - 탐색 페이지로 연결 */}
+      <div className="px-4 py-2">
+        <Card className="bg-gradient-to-r from-[#1f3d2a] to-[#1f1a2e] border-emerald-500/30">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="rounded-full bg-emerald-500/20 p-2.5">
+                  <Search className="h-5 w-5 text-emerald-400" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-white mb-0.5">
+                    ETF 탐색하기
+                  </h3>
+                  <p className="text-xs text-gray-400">
+                    테마별, 건전성별 ETF 검색 및 비교
+                  </p>
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onNavigate('discover')}
+                className="shrink-0 border-emerald-500/30 hover:bg-emerald-500/10"
+              >
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* ETF 101 Guide - 투자정보 페이지로 연결 */}
       <div className="px-4 py-2 mb-4">
         <Card className="bg-gradient-to-r from-[#2a1f3d] to-[#1f1a2e] border-[#d64f79]/30">
           <CardContent className="p-4">
@@ -273,7 +320,7 @@ export function HomePage({ accountType, onSelectETF, onNavigate }: HomePageProps
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => onNavigate('discover')}
+                onClick={() => onNavigate('investinfo')}
                 className="shrink-0"
               >
                 <ArrowRight className="h-4 w-4" />
