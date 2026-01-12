@@ -229,7 +229,7 @@ export function DiscoverPage({ onSelectETF }: DiscoverPageProps) {
           {displayedETFs.map((etf) => (
             <Card key={etf.id} className="cursor-pointer hover:border-[#d64f79]/50" onClick={() => onSelectETF(etf)}>
               <CardContent className="p-4">
-                <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center justify-between mb-2">
                   <div>
                     <div className="text-xs text-gray-400">{etf.ticker}</div>
                     <div className="font-medium text-white">{etf.shortName}</div>
@@ -238,6 +238,15 @@ export function DiscoverPage({ onSelectETF }: DiscoverPageProps) {
                     <div className="text-lg font-bold text-white">{etf.price.toLocaleString()}</div>
                     <div className={`text-xs ${etf.change >= 0 ? 'text-up' : 'text-down'}`}>{etf.change >= 0 ? '+' : ''}{etf.changePercent.toFixed(2)}%</div>
                   </div>
+                </div>
+                {/* 시장분류 + 자산분류 배지 */}
+                <div className="flex items-center gap-1.5 mb-3">
+                  <span className={`text-[9px] px-1.5 py-0.5 rounded ${etf.marketClass === '해외' ? 'bg-blue-500/20 text-blue-400' : 'bg-emerald-500/20 text-emerald-400'}`}>
+                    {etf.marketClass}
+                  </span>
+                  <span className="text-[9px] px-1.5 py-0.5 rounded bg-gray-500/20 text-gray-400">
+                    {etf.assetClass}
+                  </span>
                 </div>
                 <div className="grid grid-cols-3 gap-2 mb-3">
                   {[['괴리율', etf.discrepancy, 0.1], ['스프레드', etf.spread, 0.05], ['체결가능', null, null]].map(([label, val, threshold]) => (

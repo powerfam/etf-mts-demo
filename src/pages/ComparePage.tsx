@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, X, CheckCircle2, Info, Radar as RadarIcon } from 'lucide-react'
+import { Plus, X, CheckCircle2, Info, Radar as RadarIcon, Search } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -21,16 +21,34 @@ interface ComparePageProps {
   onSelectETF: (etf: ETF) => void
 }
 
-export function ComparePage({ onSelectETF }: ComparePageProps) {
+export function ComparePage({ onSelectETF: _onSelectETF }: ComparePageProps) {
+  void _onSelectETF // 미사용 경고 방지
   const [selectedETFs, setSelectedETFs] = useState<ETF[]>([mockETFs[0], mockETFs[1], mockETFs[2]])
   const [showSelector, setShowSelector] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
 
   const addETF = (etf: ETF) => {
     if (selectedETFs.length < 5 && !selectedETFs.find(e => e.id === etf.id)) {
       setSelectedETFs([...selectedETFs, etf])
     }
     setShowSelector(false)
+    setSearchQuery('')
   }
+
+  // 검색 필터링
+  const filteredETFs = mockETFs
+    .filter(etf => !selectedETFs.find(e => e.id === etf.id))
+    .filter(etf => {
+      if (!searchQuery.trim()) return true
+      const query = searchQuery.toLowerCase()
+      return (
+        etf.name.toLowerCase().includes(query) ||
+        etf.shortName.toLowerCase().includes(query) ||
+        etf.ticker.includes(query) ||
+        etf.category.toLowerCase().includes(query) ||
+        etf.tags.some(tag => tag.toLowerCase().includes(query))
+      )
+    })
 
   const removeETF = (id: string) => {
     setSelectedETFs(selectedETFs.filter(e => e.id !== id))
@@ -188,17 +206,34 @@ export function ComparePage({ onSelectETF }: ComparePageProps) {
       {showSelector && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-end">
           <div className="w-full bg-[#1f1a2e] rounded-t-2xl max-h-[70vh]">
-            <div className="sticky top-0 bg-[#1f1a2e] px-4 py-3 border-b border-[#2d2640] flex items-center justify-between">
-              <h3 className="font-medium text-white">ETF 선택</h3>
-              <Button variant="ghost" size="icon" onClick={() => setShowSelector(false)}>
-                <X className="h-5 w-5" />
-              </Button>
+            <div className="sticky top-0 bg-[#1f1a2e] px-4 py-3 border-b border-[#2d2640]">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-medium text-white">ETF 선택</h3>
+                <Button variant="ghost" size="icon" onClick={() => { setShowSelector(false); setSearchQuery(''); }}>
+                  <X className="h-5 w-5" />
+                </Button>
+              </div>
+              {/* 검색창 */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="종목명, 티커, 테마 검색..."
+                  className="w-full pl-10 pr-4 py-2.5 bg-[#2a2438] border border-[#3d3650] rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#d64f79]"
+                  autoFocus
+                />
+              </div>
             </div>
-            <ScrollArea className="h-[60vh]">
+            <ScrollArea className="h-[55vh]">
               <div className="p-4 space-y-2">
-                {mockETFs
-                  .filter(etf => !selectedETFs.find(e => e.id === etf.id))
-                  .map((etf) => (
+                {filteredETFs.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500 text-sm">
+                    검색 결과가 없습니다
+                  </div>
+                ) : (
+                  filteredETFs.map((etf) => (
                     <Card
                       key={etf.id}
                       className="cursor-pointer hover:border-[#d64f79]/50"
@@ -217,7 +252,8 @@ export function ComparePage({ onSelectETF }: ComparePageProps) {
                         </div>
                       </CardContent>
                     </Card>
-                  ))}
+                  ))
+                )}
               </div>
             </ScrollArea>
           </div>
@@ -376,20 +412,6 @@ export function ComparePage({ onSelectETF }: ComparePageProps) {
         </Card>
       </div>
 
-      {/* Action Buttons */}
-      <div className="px-4 pb-4">
-        <div className="flex gap-3">
-          {selectedETFs.slice(0, 2).map((etf) => (
-            <Button
-              key={etf.id}
-              className="flex-1"
-              onClick={() => onSelectETF(etf)}
-            >
-              {etf.shortName.slice(0, 8)} 주문
-            </Button>
-          ))}
-        </div>
-      </div>
     </div>
   )
 }

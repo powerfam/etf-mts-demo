@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Header } from './components/Header'
 import { BottomNav } from './components/BottomNav'
+import { FloatingChatbot } from './components/FloatingChatbot'
 import { HomePage } from './pages/HomePage'
 import { DiscoverPage } from './pages/DiscoverPage'
 import { ETFDetailPage } from './pages/ETFDetailPage'
@@ -57,6 +58,18 @@ function App() {
     setShowContentDetail(false)
   }
 
+  // 챗봇에서 콘텐츠 선택 시 투자정보 상세로 이동
+  const handleChatbotContentSelect = (content: InvestContent) => {
+    setSelectedContent(content)
+    setShowContentDetail(true)
+    setActiveTab('investinfo')
+  }
+
+  // 챗봇에서 용어사전으로 이동
+  const handleNavigateToGlossary = () => {
+    setActiveTab('investinfo')
+  }
+
   // Show trade page
   if (showTrade) {
     return (
@@ -67,6 +80,10 @@ function App() {
           onBack={handleBackFromTrade}
         />
         <BottomNav activeTab={activeTab} onTabChange={handleNavigate} />
+        <FloatingChatbot
+          onSelectContent={handleChatbotContentSelect}
+          onNavigateToGlossary={handleNavigateToGlossary}
+        />
       </div>
     )
   }
@@ -83,6 +100,10 @@ function App() {
           onTrade={handleTrade}
         />
         <BottomNav activeTab={activeTab} onTabChange={handleNavigate} />
+        <FloatingChatbot
+          onSelectContent={handleChatbotContentSelect}
+          onNavigateToGlossary={handleNavigateToGlossary}
+        />
       </div>
     )
   }
@@ -101,6 +122,10 @@ function App() {
           }}
         />
         <BottomNav activeTab={activeTab} onTabChange={handleNavigate} />
+        <FloatingChatbot
+          onSelectContent={handleChatbotContentSelect}
+          onNavigateToGlossary={handleNavigateToGlossary}
+        />
       </div>
     )
   }
@@ -141,6 +166,14 @@ function App() {
       )}
 
       <BottomNav activeTab={activeTab} onTabChange={handleNavigate} />
+
+      {/* 전역 플로팅 챗봇 (투자정보 페이지 제외 - 해당 페이지는 자체 챗봇 있음) */}
+      {activeTab !== 'investinfo' && (
+        <FloatingChatbot
+          onSelectContent={handleChatbotContentSelect}
+          onNavigateToGlossary={handleNavigateToGlossary}
+        />
+      )}
     </div>
   )
 }

@@ -99,7 +99,15 @@ export function ETFDetailPage({ etf, accountType, onBack, onTrade }: ETFDetailPa
               {etf.isHedged && <Badge variant="info" className="text-[10px]"><Shield className="h-3 w-3 mr-0.5" />환헤지</Badge>}
             </div>
             <h1 className="text-xl font-bold text-white">{etf.name}</h1>
-            <p className="text-sm text-gray-400">{etf.category}</p>
+            <div className="flex items-center gap-2 mt-1">
+              <span className={`text-[10px] px-2 py-0.5 rounded ${etf.marketClass === '해외' ? 'bg-blue-500/20 text-blue-400' : 'bg-emerald-500/20 text-emerald-400'}`}>
+                {etf.marketClass}
+              </span>
+              <span className="text-[10px] px-2 py-0.5 rounded bg-gray-500/20 text-gray-400">
+                {etf.assetClass}
+              </span>
+              <span className="text-sm text-gray-400">{etf.category}</span>
+            </div>
           </div>
         </div>
         <div className="mt-4">

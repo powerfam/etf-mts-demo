@@ -167,7 +167,7 @@ export const mockETFs: ETF[] = [
   },
   {
     id: '11', ticker: '305720', name: 'KODEX 2차전지산업', shortName: 'KODEX 2차전지산업',
-    price: 8950, prevClose: 8820, change: 130, changePercent: 1.47,
+    price: 8520, prevClose: 8820, change: -300, changePercent: -3.40,
     iNav: 8945, discrepancy: 0.06, ter: 0.45, spread: 0.08,
     adtv: 234000000000, aum: 890000000000, trackingError: 0.12, volatility: 28.5, dividendYield: 0.3,
     category: '테마', tags: ['국내', '2차전지', '성장주'], healthScore: 78,
@@ -275,7 +275,7 @@ export const mockETFs: ETF[] = [
   },
   {
     id: '20', ticker: '261220', name: 'KODEX WTI원유선물', shortName: 'KODEX WTI원유선물',
-    price: 8450, prevClose: 8380, change: 70, changePercent: 0.84,
+    price: 8150, prevClose: 8380, change: -230, changePercent: -2.74,
     iNav: 8445, discrepancy: 0.06, ter: 0.68, spread: 0.08,
     adtv: 45000000000, aum: 280000000000, trackingError: 0.15, volatility: 32.5, dividendYield: 0,
     category: '원자재', tags: ['원유', 'WTI', '원자재'], healthScore: 72,
@@ -324,7 +324,7 @@ export const mockETFs: ETF[] = [
   },
   {
     id: '24', ticker: '364980', name: 'TIGER 2차전지TOP10', shortName: 'TIGER 2차전지TOP10',
-    price: 7850, prevClose: 7720, change: 130, changePercent: 1.68,
+    price: 7420, prevClose: 7720, change: -300, changePercent: -3.89,
     iNav: 7845, discrepancy: 0.06, ter: 0.40, spread: 0.08,
     adtv: 558500000000, aum: 890000000000, trackingError: 0.12, volatility: 32.5, dividendYield: 0.2,
     category: '테마', tags: ['국내', '2차전지', 'TOP10'], healthScore: 75,
@@ -444,7 +444,7 @@ export const mockETFs: ETF[] = [
   },
   {
     id: '34', ticker: '305540', name: 'TIGER 2차전지테마', shortName: 'TIGER 2차전지테마',
-    price: 8250, prevClose: 8120, change: 130, changePercent: 1.60,
+    price: 7850, prevClose: 8120, change: -270, changePercent: -3.33,
     iNav: 8245, discrepancy: 0.06, ter: 0.44, spread: 0.07,
     adtv: 624500000000, aum: 1249000000000, trackingError: 0.11, volatility: 30.2, dividendYield: 0.2,
     category: '테마', tags: ['국내', '2차전지', '테마'], healthScore: 76,
@@ -565,7 +565,7 @@ export const mockETFs: ETF[] = [
   },
   {
     id: '44', ticker: '300610', name: 'TIGER K게임', shortName: 'TIGER K게임',
-    price: 7850, prevClose: 7720, change: 130, changePercent: 1.68,
+    price: 7455, prevClose: 7720, change: -265, changePercent: -3.43,
     iNav: 7845, discrepancy: 0.06, ter: 0.50, spread: 0.08,
     adtv: 26500000000, aum: 265000000000, trackingError: 0.13, volatility: 28.5, dividendYield: 0.2,
     category: '테마', tags: ['국내', '게임', 'K콘텐츠'], healthScore: 74,
@@ -673,7 +673,7 @@ export const mockETFs: ETF[] = [
   },
   {
     id: '53', ticker: '160580', name: 'TIGER 구리실물', shortName: 'TIGER 구리실물',
-    price: 8650, prevClose: 8580, change: 70, changePercent: 0.82,
+    price: 8280, prevClose: 8580, change: -300, changePercent: -3.50,
     iNav: 8645, discrepancy: 0.06, ter: 0.83, spread: 0.08,
     adtv: 66000000000, aum: 132000000000, trackingError: 0.10, volatility: 22.5, dividendYield: 0,
     category: '원자재', tags: ['구리', '원자재', '실물'], healthScore: 75,
@@ -697,7 +697,7 @@ export const mockETFs: ETF[] = [
   },
   {
     id: '55', ticker: '137610', name: 'TIGER 농산물선물Enhanced(H)', shortName: 'TIGER 농산물선물Enhanced(H)',
-    price: 7850, prevClose: 7780, change: 70, changePercent: 0.90,
+    price: 7520, prevClose: 7780, change: -260, changePercent: -3.34,
     iNav: 7845, discrepancy: 0.06, ter: 0.69, spread: 0.08,
     adtv: 25000000000, aum: 500000000000, trackingError: 0.12, volatility: 18.5, dividendYield: 0,
     category: '원자재', tags: ['농산물', '원자재', '환헤지'], healthScore: 73, isHedged: true,
@@ -733,7 +733,7 @@ export const mockETFs: ETF[] = [
   },
   {
     id: '58', ticker: '371150', name: 'RISE 차이나항셍테크', shortName: 'RISE 차이나항셍테크',
-    price: 4850, prevClose: 4780, change: 70, changePercent: 1.46,
+    price: 4580, prevClose: 4780, change: -200, changePercent: -4.18,
     iNav: 4845, discrepancy: 0.10, ter: 0.14, spread: 0.10,
     adtv: 78000000000, aum: 780000000000, trackingError: 0.15, volatility: 32.5, dividendYield: 0.3,
     category: '글로벌', tags: ['중국', '항셍테크', '기술주'], healthScore: 68,
@@ -914,7 +914,7 @@ export const mockETFs: ETF[] = [
   },
   {
     id: '73', ticker: '400970', name: 'TIGER Fn메타버스', shortName: 'TIGER Fn메타버스',
-    price: 5850, prevClose: 5780, change: 70, changePercent: 1.21,
+    price: 5520, prevClose: 5780, change: -260, changePercent: -4.50,
     iNav: 5845, discrepancy: 0.09, ter: 0.45, spread: 0.10,
     adtv: 92000000000, aum: 184000000000, trackingError: 0.15, volatility: 32.5, dividendYield: 0.2,
     category: '테마', tags: ['국내', '메타버스', 'VR/AR'], healthScore: 68,
@@ -926,7 +926,7 @@ export const mockETFs: ETF[] = [
   },
   {
     id: '74', ticker: '377990', name: 'TIGER Fn신재생에너지', shortName: 'TIGER Fn신재생에너지',
-    price: 6250, prevClose: 6180, change: 70, changePercent: 1.13,
+    price: 5895, prevClose: 6180, change: -285, changePercent: -4.61,
     iNav: 6245, discrepancy: 0.08, ter: 0.50, spread: 0.09,
     adtv: 42000000000, aum: 84000000000, trackingError: 0.14, volatility: 30.0, dividendYield: 0.3,
     category: '테마', tags: ['국내', '신재생', '에너지'], healthScore: 70,
@@ -950,7 +950,7 @@ export const mockETFs: ETF[] = [
   },
   {
     id: '76', ticker: '364990', name: 'TIGER 게임TOP10', shortName: 'TIGER 게임TOP10',
-    price: 4250, prevClose: 4180, change: 70, changePercent: 1.67,
+    price: 4015, prevClose: 4180, change: -165, changePercent: -3.95,
     iNav: 4245, discrepancy: 0.12, ter: 0.40, spread: 0.12,
     adtv: 116000000000, aum: 232000000000, trackingError: 0.16, volatility: 35.0, dividendYield: 0.2,
     category: '테마', tags: ['국내', '게임', 'TOP10'], healthScore: 65,
@@ -1011,7 +1011,7 @@ export const mockETFs: ETF[] = [
   // 81~100: 마지막 ETF
   {
     id: '81', ticker: '461950', name: 'KODEX 2차전지핵심소재10', shortName: 'KODEX 2차전지핵심소재10',
-    price: 6850, prevClose: 6750, change: 100, changePercent: 1.48,
+    price: 6480, prevClose: 6750, change: -270, changePercent: -4.00,
     iNav: 6845, discrepancy: 0.07, ter: 0.39, spread: 0.09,
     adtv: 412500000000, aum: 825000000000, trackingError: 0.13, volatility: 32.0, dividendYield: 0.2,
     category: '테마', tags: ['국내', '2차전지', '핵심소재'], healthScore: 73,

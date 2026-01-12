@@ -36,6 +36,19 @@ export function HomePage({ accountType, onSelectETF, onNavigate }: HomePageProps
     .sort((a, b) => b.adtv - a.adtv)
     .slice(0, 5)
 
+  // 레버리지/인버스 제외한 ETF 목록
+  const normalETFs = mockETFs.filter(etf => !etf.isLeveraged && !etf.isInverse)
+
+  // 수익률 상승 TOP5
+  const topGainers = [...normalETFs]
+    .sort((a, b) => b.changePercent - a.changePercent)
+    .slice(0, 5)
+
+  // 수익률 하락 TOP5
+  const topLosers = [...normalETFs]
+    .sort((a, b) => a.changePercent - b.changePercent)
+    .slice(0, 5)
+
   return (
     <div className="pb-20">
       {/* Hero Section - My Portfolio Summary */}
@@ -184,8 +197,18 @@ export function HomePage({ accountType, onSelectETF, onNavigate }: HomePageProps
                 </div>
 
                 {/* ETF Name */}
-                <div className="text-sm font-medium text-white truncate mb-2">
+                <div className="text-sm font-medium text-white truncate mb-1">
                   {etf.shortName}
+                </div>
+
+                {/* 시장분류 + 자산분류 배지 */}
+                <div className="flex items-center gap-1 mb-2">
+                  <span className={`text-[9px] px-1.5 py-0.5 rounded ${etf.marketClass === '해외' ? 'bg-blue-500/20 text-blue-400' : 'bg-emerald-500/20 text-emerald-400'}`}>
+                    {etf.marketClass}
+                  </span>
+                  <span className="text-[9px] px-1.5 py-0.5 rounded bg-gray-500/20 text-gray-400">
+                    {etf.assetClass}
+                  </span>
                 </div>
 
                 {/* Price & Change */}
@@ -194,11 +217,144 @@ export function HomePage({ accountType, onSelectETF, onNavigate }: HomePageProps
                     {formatNumber(etf.price)}
                   </div>
                   <div className={`text-xs font-medium px-1.5 py-0.5 rounded ${etf.change >= 0 ? 'bg-up/20 text-up' : 'bg-down/20 text-down'}`}>
-                    {etf.change >= 0 ? '+' : ''}{formatPercent(etf.changePercent)}
+                    {formatPercent(etf.changePercent)}
                   </div>
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </div>
+
+      {/* 주간 테마 히트맵 */}
+      <div className="px-4 py-4">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-base font-semibold text-white">주간 테마 히트맵</h2>
+          <span className="text-[10px] text-gray-500">레버리지/인버스 제외</span>
+        </div>
+
+        {/* Heatmap Grid */}
+        <div className="grid grid-cols-4 gap-1.5">
+          {(() => {
+            // 테마별 주간 수익률 계산 (레버리지/인버스 제외)
+            const themePerformance = [
+              { theme: 'AI/반도체', weeklyReturn: 4.28, count: 12 },
+              { theme: '2차전지', weeklyReturn: -3.85, count: 8 },
+              { theme: '배당', weeklyReturn: 1.42, count: 15 },
+              { theme: '바이오', weeklyReturn: 2.15, count: 10 },
+              { theme: '금융', weeklyReturn: 0.85, count: 7 },
+              { theme: '게임', weeklyReturn: -2.73, count: 5 },
+              { theme: '메타버스', weeklyReturn: -4.12, count: 4 },
+              { theme: '신재생', weeklyReturn: -3.45, count: 6 },
+              { theme: '원자재', weeklyReturn: -1.92, count: 8 },
+              { theme: '중국', weeklyReturn: -2.88, count: 9 },
+              { theme: '미국', weeklyReturn: 2.35, count: 18 },
+              { theme: '채권', weeklyReturn: 0.28, count: 14 },
+            ].sort((a, b) => b.weeklyReturn - a.weeklyReturn)
+
+            // 색상 계산 함수 - 상승(빨강), 하락(파랑) 명확하게
+            const getHeatStyle = (value: number): React.CSSProperties => {
+              if (value >= 3) return { backgroundColor: 'rgba(239, 68, 68, 0.7)', color: 'white' } // 진한 빨강
+              if (value >= 1.5) return { backgroundColor: 'rgba(239, 68, 68, 0.5)', color: 'white' } // 중간 빨강
+              if (value >= 0) return { backgroundColor: 'rgba(239, 68, 68, 0.25)', color: '#ef4444' } // 연한 빨강
+              if (value >= -1.5) return { backgroundColor: 'rgba(59, 130, 246, 0.25)', color: '#3b82f6' } // 연한 파랑
+              if (value >= -3) return { backgroundColor: 'rgba(59, 130, 246, 0.5)', color: 'white' } // 중간 파랑
+              return { backgroundColor: 'rgba(59, 130, 246, 0.7)', color: 'white' } // 진한 파랑
+            }
+
+            return themePerformance.map((item) => (
+              <div
+                key={item.theme}
+                className="relative p-2 rounded-lg cursor-pointer transition-all hover:scale-105"
+                style={getHeatStyle(item.weeklyReturn)}
+                onClick={() => onNavigate('discover')}
+              >
+                <div className="text-[10px] font-medium truncate">{item.theme}</div>
+                <div className="text-xs font-bold mt-0.5">
+                  {item.weeklyReturn >= 0 ? '+' : ''}{item.weeklyReturn.toFixed(1)}%
+                </div>
+              </div>
+            ))
+          })()}
+        </div>
+
+        {/* 범례 */}
+        <div className="flex items-center justify-center gap-2 mt-3">
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3 rounded" style={{ backgroundColor: 'rgba(59, 130, 246, 0.7)' }}></div>
+            <span className="text-[9px] text-gray-500">-3%↓</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3 rounded" style={{ backgroundColor: 'rgba(59, 130, 246, 0.25)' }}></div>
+            <span className="text-[9px] text-gray-500">0%↓</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3 rounded" style={{ backgroundColor: 'rgba(239, 68, 68, 0.25)' }}></div>
+            <span className="text-[9px] text-gray-500">0%↑</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3 rounded" style={{ backgroundColor: 'rgba(239, 68, 68, 0.7)' }}></div>
+            <span className="text-[9px] text-gray-500">+3%↑</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 수익률 상하위 TOP5 */}
+      <div className="px-4 py-4">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-base font-semibold text-white">오늘의 수익률</h2>
+          <span className="text-[10px] text-gray-500">레버리지/인버스 제외</span>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          {/* 상승 TOP5 */}
+          <div className="bg-[#1f1a2e] border border-[#2d2640] rounded-xl p-3">
+            <div className="flex items-center gap-1.5 mb-3">
+              <span className="text-sm">📈</span>
+              <span className="text-xs font-medium text-up">상승 TOP 5</span>
+            </div>
+            <div className="space-y-2">
+              {topGainers.map((etf, index) => (
+                <div
+                  key={etf.id}
+                  onClick={() => onSelectETF(etf)}
+                  className="flex items-center justify-between cursor-pointer hover:bg-[#2a2438] rounded px-1 py-0.5 transition-colors"
+                >
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="text-[10px] text-gray-500 w-3">{index + 1}</span>
+                    <span className="text-xs text-white truncate">{etf.shortName}</span>
+                  </div>
+                  <span className="text-xs font-medium text-up shrink-0">
+                    {formatPercent(etf.changePercent)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 하락 TOP5 */}
+          <div className="bg-[#1f1a2e] border border-[#2d2640] rounded-xl p-3">
+            <div className="flex items-center gap-1.5 mb-3">
+              <span className="text-sm">📉</span>
+              <span className="text-xs font-medium text-down">하락 TOP 5</span>
+            </div>
+            <div className="space-y-2">
+              {topLosers.map((etf, index) => (
+                <div
+                  key={etf.id}
+                  onClick={() => onSelectETF(etf)}
+                  className="flex items-center justify-between cursor-pointer hover:bg-[#2a2438] rounded px-1 py-0.5 transition-colors"
+                >
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="text-[10px] text-gray-500 w-3">{index + 1}</span>
+                    <span className="text-xs text-white truncate">{etf.shortName}</span>
+                  </div>
+                  <span className="text-xs font-medium text-down shrink-0">
+                    {formatPercent(etf.changePercent)}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
