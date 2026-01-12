@@ -223,36 +223,33 @@ export function InvestInfoPage({
                     목록으로
                   </button>
 
-                  {/* PDF 뷰어 - object 태그 + fallback */}
-                  <div className="bg-[#2d2640] border border-[#3d3650] rounded-xl overflow-hidden">
-                    <object
-                      data={`/pdf/${selectedPDF}#toolbar=1&navpanes=0&view=FitH`}
-                      type="application/pdf"
-                      className="w-full h-[calc(100vh-280px)] min-h-[500px]"
-                    >
-                      {/* PDF를 표시할 수 없는 경우 fallback */}
-                      <div className="flex flex-col items-center justify-center h-[400px] text-center p-6">
-                        <FileText className="h-16 w-16 text-gray-500 mb-4" />
-                        <p className="text-gray-400 mb-4">
-                          PDF를 미리보기 할 수 없습니다.<br />
-                          아래 버튼으로 열어주세요.
-                        </p>
-                        <a
-                          href={`/pdf/${selectedPDF}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="px-6 py-3 bg-[#d64f79] rounded-lg text-white hover:bg-[#b33d5f] transition-colors"
-                        >
-                          PDF 열기
-                        </a>
-                      </div>
-                    </object>
+                  {/* PDF 뷰어 - 흰색 배경 + A4 비율 최적화 */}
+                  <div className="rounded-xl overflow-hidden shadow-lg">
+                    {/* 흰색 배경 컨테이너로 PDF 본래 색상 유지 */}
+                    <div className="bg-white">
+                      <iframe
+                        src={`/pdf/${selectedPDF}#toolbar=1&navpanes=1&scrollbar=1&view=FitH&pagemode=thumbs`}
+                        className="w-full border-0"
+                        style={{
+                          height: 'calc(100vh - 220px)',
+                          minHeight: '600px',
+                          maxHeight: '900px'
+                        }}
+                        title="PDF Viewer"
+                        allow="fullscreen"
+                      />
+                    </div>
                   </div>
+
+                  {/* 페이지 안내 */}
+                  <p className="text-xs text-gray-500 text-center">
+                    PDF 뷰어에서 페이지 넘김, 확대/축소가 가능합니다
+                  </p>
 
                   {/* 하단 액션 버튼 */}
                   <div className="flex gap-2">
                     <a
-                      href={`/pdf/${encodeURIComponent(selectedPDF)}`}
+                      href={`/pdf/${selectedPDF}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#2d2640] border border-[#3d3650] rounded-lg text-sm text-gray-300 hover:bg-[#3d3650] transition-colors"
@@ -261,7 +258,7 @@ export function InvestInfoPage({
                       새 탭에서 열기
                     </a>
                     <a
-                      href={`/pdf/${encodeURIComponent(selectedPDF)}`}
+                      href={`/pdf/${selectedPDF}`}
                       download
                       className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#d64f79] rounded-lg text-sm text-white hover:bg-[#b33d5f] transition-colors"
                     >
