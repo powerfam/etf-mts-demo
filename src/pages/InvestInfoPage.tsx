@@ -49,9 +49,9 @@ const researchPDFs = {
     { id: 'w3', title: 'ETF Weekly (25.12.15)', date: '2025.12.15', filename: '251215_Kiwoom_ETF_Weekly.pdf', summary: '배당 시즌 도래, 고배당 ETF 투자 포인트 정리' },
   ],
   lineup: [
-    { id: 'l1', title: '뉴 ETF 라인업 (1월 2주)', date: '2026.01.10', filename: 'Kiwoom_New_ETF_Lineup_Jan_W2.pdf', summary: 'AI 반도체·미국 배당 신규 ETF 상장 분석' },
-    { id: 'l2', title: '뉴 ETF 라인업 (12월 4주)', date: '2025.12.27', filename: 'Kiwoom_New_ETF_Lineup_Dec_W4.pdf', summary: '밸류업 지수 추종 ETF 및 커버드콜 상품 분석' },
-    { id: 'l3', title: '뉴 ETF 라인업 (12월 3주)', date: '2025.12.20', filename: 'Kiwoom_New_ETF_Lineup_Dec_W3.pdf', summary: '글로벌 원자력·양자컴퓨팅 테마 ETF 신규 상장' },
+    { id: 'l1', title: '뉴 ETF 라인업 (1월 2주)', date: '2026.01.10', filename: 'new_etf_26_1_2w.pdf', summary: 'AI 반도체·미국 배당 신규 ETF 상장 분석' },
+    { id: 'l2', title: '뉴 ETF 라인업 (12월 4주)', date: '2025.12.27', filename: 'new_etf_25_12_4w.pdf', summary: '밸류업 지수 추종 ETF 및 커버드콜 상품 분석' },
+    { id: 'l3', title: '뉴 ETF 라인업 (12월 3주)', date: '2025.12.20', filename: 'new_etf_25_12_3w.pdf', summary: '글로벌 원자력·양자컴퓨팅 테마 ETF 신규 상장' },
   ],
 }
 
@@ -223,12 +223,11 @@ export function InvestInfoPage({
                     목록으로
                   </button>
 
-                  {/* PDF 뷰어 - 흰색 배경 + A4 비율 최적화 */}
+                  {/* PDF 뷰어 - Google Docs Viewer 사용 */}
                   <div className="rounded-xl overflow-hidden shadow-lg">
-                    {/* 흰색 배경 컨테이너로 PDF 본래 색상 유지 */}
                     <div className="bg-white">
                       <iframe
-                        src={`/pdf/${selectedPDF}#toolbar=1&navpanes=1&scrollbar=1&view=FitH&pagemode=thumbs`}
+                        src={`https://docs.google.com/viewer?url=${encodeURIComponent(`https://etf-mts-demo.vercel.app/pdf/${selectedPDF}`)}&embedded=true`}
                         className="w-full border-0"
                         style={{
                           height: 'calc(100vh - 220px)',
@@ -249,7 +248,7 @@ export function InvestInfoPage({
                   {/* 하단 액션 버튼 */}
                   <div className="flex gap-2">
                     <a
-                      href={`/pdf/${selectedPDF}`}
+                      href={`https://etf-mts-demo.vercel.app/pdf/${selectedPDF}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#2d2640] border border-[#3d3650] rounded-lg text-sm text-gray-300 hover:bg-[#3d3650] transition-colors"
@@ -258,7 +257,7 @@ export function InvestInfoPage({
                       새 탭에서 열기
                     </a>
                     <a
-                      href={`/pdf/${selectedPDF}`}
+                      href={`https://etf-mts-demo.vercel.app/pdf/${selectedPDF}`}
                       download
                       className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#d64f79] rounded-lg text-sm text-white hover:bg-[#b33d5f] transition-colors"
                     >
