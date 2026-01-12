@@ -49,9 +49,9 @@ const researchPDFs = {
     { id: 'w3', title: 'ETF Weekly (25.12.15)', date: '2025.12.15', filename: '251215_Kiwoom_ETF Weekly.pdf', summary: '배당 시즌 도래, 고배당 ETF 투자 포인트 정리' },
   ],
   lineup: [
-    { id: 'l1', title: '뉴 ETF 라인업 (1월 2주)', date: '2026.01.10', filename: 'New_ETF_Lineup_Jan_Week2.pdf', summary: 'AI 반도체·미국 배당 신규 ETF 상장 분석' },
-    { id: 'l2', title: '뉴 ETF 라인업 (12월 4주)', date: '2025.12.27', filename: 'New_ETF_Lineup_Dec_Week4.pdf', summary: '밸류업 지수 추종 ETF 및 커버드콜 상품 분석' },
-    { id: 'l3', title: '뉴 ETF 라인업 (12월 3주)', date: '2025.12.20', filename: 'New_ETF_Lineup_Dec_Week3.pdf', summary: '글로벌 원자력·양자컴퓨팅 테마 ETF 신규 상장' },
+    { id: 'l1', title: '뉴 ETF 라인업 (1월 2주)', date: '2026.01.10', filename: 'Kiwoom_New_ETF_Lineup_Jan_W2.pdf', summary: 'AI 반도체·미국 배당 신규 ETF 상장 분석' },
+    { id: 'l2', title: '뉴 ETF 라인업 (12월 4주)', date: '2025.12.27', filename: 'Kiwoom_New_ETF_Lineup_Dec_W4.pdf', summary: '밸류업 지수 추종 ETF 및 커버드콜 상품 분석' },
+    { id: 'l3', title: '뉴 ETF 라인업 (12월 3주)', date: '2025.12.20', filename: 'Kiwoom_New_ETF_Lineup_Dec_W3.pdf', summary: '글로벌 원자력·양자컴퓨팅 테마 ETF 신규 상장' },
   ],
 }
 
