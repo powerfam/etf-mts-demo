@@ -223,13 +223,30 @@ export function InvestInfoPage({
                     목록으로
                   </button>
 
-                  {/* PDF 뷰어 */}
+                  {/* PDF 뷰어 - object 태그 + fallback */}
                   <div className="bg-[#2d2640] border border-[#3d3650] rounded-xl overflow-hidden">
-                    <iframe
-                      src={`/pdf/${encodeURIComponent(selectedPDF)}#toolbar=0&navpanes=0&view=FitH`}
+                    <object
+                      data={`/pdf/${selectedPDF}#toolbar=1&navpanes=0&view=FitH`}
+                      type="application/pdf"
                       className="w-full h-[calc(100vh-280px)] min-h-[500px]"
-                      title="PDF Viewer"
-                    />
+                    >
+                      {/* PDF를 표시할 수 없는 경우 fallback */}
+                      <div className="flex flex-col items-center justify-center h-[400px] text-center p-6">
+                        <FileText className="h-16 w-16 text-gray-500 mb-4" />
+                        <p className="text-gray-400 mb-4">
+                          PDF를 미리보기 할 수 없습니다.<br />
+                          아래 버튼으로 열어주세요.
+                        </p>
+                        <a
+                          href={`/pdf/${selectedPDF}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-6 py-3 bg-[#d64f79] rounded-lg text-white hover:bg-[#b33d5f] transition-colors"
+                        >
+                          PDF 열기
+                        </a>
+                      </div>
+                    </object>
                   </div>
 
                   {/* 하단 액션 버튼 */}
