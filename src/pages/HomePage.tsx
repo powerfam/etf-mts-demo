@@ -1,9 +1,7 @@
-import { TrendingUp, Rocket, Coins, Shield, DollarSign, Gem, Zap, Wallet, ChevronRight, AlertTriangle, Bell, Star, ArrowRight } from 'lucide-react'
+import { TrendingUp, Rocket, Coins, Shield, DollarSign, Gem, Zap, Wallet, ChevronRight, AlertTriangle, Bell, ArrowRight, BookOpen } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
-import { ETFCard } from '@/components/ETFCard'
 import { mockETFs, themes, portfolioETFs } from '@/data/mockData'
 import { formatNumber, formatPercent } from '@/lib/utils'
 import type { ETF } from '@/data/mockData'
@@ -37,12 +35,6 @@ export function HomePage({ accountType, onSelectETF, onNavigate }: HomePageProps
   const popularETFs = [...mockETFs]
     .sort((a, b) => b.adtv - a.adtv)
     .slice(0, 5)
-
-  // Top performing ETFs for recommendations (건전성 상위)
-  const recommendedETFs = mockETFs
-    .filter(etf => etf.healthScore >= 85 && !etf.isLeveraged && !etf.isInverse)
-    .sort((a, b) => b.healthScore - a.healthScore)
-    .slice(0, 4)
 
   return (
     <div className="pb-20">
@@ -129,63 +121,72 @@ export function HomePage({ accountType, onSelectETF, onNavigate }: HomePageProps
         </div>
       </div>
 
-      {/* Hot ETFs - Horizontal Scroll */}
-      <div className="py-4">
-        <div className="flex items-center justify-between px-4 mb-3">
-          <h2 className="text-base font-semibold text-white">실시간 인기</h2>
-          <Button variant="ghost" size="sm" className="text-xs text-gray-400">
+      {/* Hot ETFs - Wave Animation Ticker Board */}
+      <div className="px-4 py-4">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <h2 className="text-base font-semibold text-white">실시간 인기</h2>
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#d64f79] opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#d64f79]"></span>
+            </span>
+          </div>
+          <Button variant="ghost" size="sm" className="text-xs text-gray-400" onClick={() => onNavigate('discover')}>
             더보기 <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
-        <ScrollArea className="w-full whitespace-nowrap">
-          <div className="flex gap-3 px-4">
+
+        {/* Wave-style ticker board */}
+        <div className="relative overflow-hidden rounded-xl bg-[#1f1a2e] border border-[#2d2640]">
+          {/* Wave animation overlay */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-[#d64f79]/10 to-transparent"
+              style={{
+                animation: 'shimmer 3s ease-in-out infinite',
+              }}
+            />
+          </div>
+          <style>{`
+            @keyframes shimmer {
+              0% { transform: translateX(-100%); }
+              100% { transform: translateX(100%); }
+            }
+          `}</style>
+
+          {/* ETF List */}
+          <div className="divide-y divide-[#2d2640]">
             {popularETFs.map((etf, index) => (
               <div
                 key={etf.id}
                 onClick={() => onSelectETF(etf)}
-                className="w-[160px] shrink-0 cursor-pointer"
+                className="flex items-center px-4 py-3 cursor-pointer hover:bg-[#2a2438] transition-colors"
               >
-                <Card className="hover:border-[#d64f79]/50 transition-colors">
-                  <CardContent className="p-3">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-[#d64f79]/20 text-[#d64f79] text-xs font-bold">
-                        {index + 1}
-                      </div>
-                      <span className="text-[10px] text-gray-400">{etf.ticker}</span>
-                    </div>
-                    <div className="text-sm font-medium text-white truncate mb-1">
-                      {etf.shortName}
-                    </div>
-                    <div className="text-base font-bold text-white">
-                      {formatNumber(etf.price)}
-                    </div>
-                    <div className={`text-xs ${etf.change >= 0 ? 'text-up' : 'text-down'}`}>
-                      {formatPercent(etf.changePercent)}
-                    </div>
-                  </CardContent>
-                </Card>
+                {/* Rank */}
+                <div className="flex items-center justify-center w-6 h-6 rounded-full bg-[#d64f79]/20 text-[#d64f79] text-xs font-bold mr-3">
+                  {index + 1}
+                </div>
+
+                {/* ETF Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-medium text-white truncate">
+                    {etf.shortName}
+                  </div>
+                  <div className="text-[10px] text-gray-500">{etf.ticker}</div>
+                </div>
+
+                {/* Price & Change */}
+                <div className="text-right ml-3">
+                  <div className="text-sm font-bold text-white">
+                    {formatNumber(etf.price)}
+                  </div>
+                  <div className={`text-xs font-medium ${etf.change >= 0 ? 'text-up' : 'text-down'}`}>
+                    {etf.change >= 0 ? '+' : ''}{formatPercent(etf.changePercent)}
+                  </div>
+                </div>
               </div>
             ))}
           </div>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
-      </div>
-
-      {/* Recommended for You */}
-      <div className="px-4 py-2">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <h2 className="text-base font-semibold text-white">추천 ETF</h2>
-            <Badge variant="outline" className="text-[10px]">
-              <Star className="h-3 w-3 mr-1" />
-              건전성 상위
-            </Badge>
-          </div>
-        </div>
-        <div className="grid gap-3">
-          {recommendedETFs.map((etf) => (
-            <ETFCard key={etf.id} etf={etf} onClick={() => onSelectETF(etf)} />
-          ))}
         </div>
       </div>
 
@@ -224,21 +225,30 @@ export function HomePage({ accountType, onSelectETF, onNavigate }: HomePageProps
         </div>
       </div>
 
-      {/* Educational Content */}
+      {/* ETF 101 Guide */}
       <div className="px-4 py-2 mb-4">
-        <Card className="bg-gradient-to-r from-[#2a1f3d] to-[#1f1a2e]">
+        <Card className="bg-gradient-to-r from-[#2a1f3d] to-[#1f1a2e] border-[#d64f79]/30">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
-              <div>
-                <Badge className="mb-2 text-[10px]">초보 가이드</Badge>
-                <h3 className="text-sm font-medium text-white mb-1">
-                  ETF 투자, 어떻게 시작할까요?
-                </h3>
-                <p className="text-xs text-gray-400">
-                  3분만에 배우는 ETF 기초
-                </p>
+              <div className="flex items-center gap-3">
+                <div className="rounded-full bg-[#d64f79]/20 p-2.5">
+                  <BookOpen className="h-5 w-5 text-[#d64f79]" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium text-white mb-0.5">
+                    ETF 101 - 기초부터 배우기
+                  </h3>
+                  <p className="text-xs text-gray-400">
+                    ETF란? 수수료, 괴리율, 건전성 지표 완벽 가이드
+                  </p>
+                </div>
               </div>
-              <Button variant="outline" size="sm">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onNavigate('invest')}
+                className="shrink-0"
+              >
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </div>
