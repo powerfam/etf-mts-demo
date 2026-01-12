@@ -121,9 +121,9 @@ export function HomePage({ accountType, onSelectETF, onNavigate }: HomePageProps
         </div>
       </div>
 
-      {/* Hot ETFs - Wave Animation Ticker Board */}
-      <div className="px-4 py-4">
-        <div className="flex items-center justify-between mb-3">
+      {/* Hot ETFs - Horizontal Wave Ticker (증권사 티커 스타일) */}
+      <div className="py-4">
+        <div className="flex items-center justify-between mb-3 px-4">
           <div className="flex items-center gap-2">
             <h2 className="text-base font-semibold text-white">실시간 인기</h2>
             <span className="relative flex h-2 w-2">
@@ -136,51 +136,48 @@ export function HomePage({ accountType, onSelectETF, onNavigate }: HomePageProps
           </Button>
         </div>
 
-        {/* Wave-style ticker board */}
-        <div className="relative overflow-hidden rounded-xl bg-[#1f1a2e] border border-[#2d2640]">
-          {/* Wave animation overlay */}
-          <div className="absolute inset-0 pointer-events-none">
-            <div
-              className="absolute inset-0 bg-gradient-to-r from-transparent via-[#d64f79]/10 to-transparent"
-              style={{
-                animation: 'shimmer 3s ease-in-out infinite',
-              }}
-            />
-          </div>
+        {/* Horizontal Wave Ticker - 우측으로 물결 흐르듯 */}
+        <div className="relative overflow-hidden">
           <style>{`
-            @keyframes shimmer {
-              0% { transform: translateX(-100%); }
-              100% { transform: translateX(100%); }
+            @keyframes tickerWave {
+              0% { transform: translateX(0); }
+              100% { transform: translateX(-50%); }
+            }
+            .ticker-wave {
+              animation: tickerWave 25s linear infinite;
+            }
+            .ticker-wave:hover {
+              animation-play-state: paused;
             }
           `}</style>
 
-          {/* ETF List */}
-          <div className="divide-y divide-[#2d2640]">
-            {popularETFs.map((etf, index) => (
+          <div className="ticker-wave flex gap-3 py-2">
+            {/* 두 번 반복하여 무한 루프 효과 */}
+            {[...popularETFs, ...popularETFs].map((etf, index) => (
               <div
-                key={etf.id}
+                key={`${etf.id}-${index}`}
                 onClick={() => onSelectETF(etf)}
-                className="flex items-center px-4 py-3 cursor-pointer hover:bg-[#2a2438] transition-colors"
+                className="flex-shrink-0 w-[160px] bg-[#1f1a2e] border border-[#2d2640] rounded-xl p-3 cursor-pointer hover:border-[#d64f79]/50 transition-all hover:scale-105"
               >
-                {/* Rank */}
-                <div className="flex items-center justify-center w-6 h-6 rounded-full bg-[#d64f79]/20 text-[#d64f79] text-xs font-bold mr-3">
-                  {index + 1}
-                </div>
-
-                {/* ETF Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium text-white truncate">
-                    {etf.shortName}
+                {/* Rank Badge */}
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="flex items-center justify-center w-5 h-5 rounded-full bg-[#d64f79]/20 text-[#d64f79] text-[10px] font-bold">
+                    {(index % popularETFs.length) + 1}
                   </div>
                   <div className="text-[10px] text-gray-500">{etf.ticker}</div>
                 </div>
 
+                {/* ETF Name */}
+                <div className="text-sm font-medium text-white truncate mb-2">
+                  {etf.shortName}
+                </div>
+
                 {/* Price & Change */}
-                <div className="text-right ml-3">
+                <div className="flex items-end justify-between">
                   <div className="text-sm font-bold text-white">
                     {formatNumber(etf.price)}
                   </div>
-                  <div className={`text-xs font-medium ${etf.change >= 0 ? 'text-up' : 'text-down'}`}>
+                  <div className={`text-xs font-medium px-1.5 py-0.5 rounded ${etf.change >= 0 ? 'bg-up/20 text-up' : 'bg-down/20 text-down'}`}>
                     {etf.change >= 0 ? '+' : ''}{formatPercent(etf.changePercent)}
                   </div>
                 </div>
@@ -190,42 +187,72 @@ export function HomePage({ accountType, onSelectETF, onNavigate }: HomePageProps
         </div>
       </div>
 
-      {/* Market Overview */}
-      <div className="px-4 py-4">
-        <h2 className="text-base font-semibold text-white mb-3">시장 현황</h2>
-        <div className="grid grid-cols-2 gap-3">
-          <Card>
-            <CardContent className="p-3">
-              <div className="text-xs text-gray-400 mb-1">KOSPI</div>
-              <div className="text-lg font-bold text-white">2,542.38</div>
-              <div className="text-xs text-up">+0.42%</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-3">
-              <div className="text-xs text-gray-400 mb-1">S&P 500</div>
-              <div className="text-lg font-bold text-white">6,042.12</div>
-              <div className="text-xs text-up">+0.58%</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-3">
-              <div className="text-xs text-gray-400 mb-1">USD/KRW</div>
-              <div className="text-lg font-bold text-white">1,438.50</div>
-              <div className="text-xs text-down">-0.12%</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-3">
-              <div className="text-xs text-gray-400 mb-1">국채 3년</div>
-              <div className="text-lg font-bold text-white">2.85%</div>
-              <div className="text-xs text-down">-0.02%p</div>
-            </CardContent>
-          </Card>
+      {/* Market Overview - Horizontal Wave Ticker */}
+      <div className="py-4">
+        <h2 className="text-base font-semibold text-white mb-3 px-4">시장 현황</h2>
+
+        {/* Market Ticker - 우측으로 물결 흐르듯 */}
+        <div className="relative overflow-hidden">
+          <style>{`
+            @keyframes marketWave {
+              0% { transform: translateX(0); }
+              100% { transform: translateX(-50%); }
+            }
+            .market-wave {
+              animation: marketWave 30s linear infinite;
+            }
+            .market-wave:hover {
+              animation-play-state: paused;
+            }
+          `}</style>
+
+          <div className="market-wave flex gap-3 py-2 pl-4">
+            {/* 시장 데이터 - 두 번 반복하여 무한 루프 */}
+            {[
+              { name: 'KOSPI', value: '2,542.38', change: '+0.42%', isUp: true, flag: '🇰🇷' },
+              { name: 'KOSDAQ', value: '721.56', change: '+0.31%', isUp: true, flag: '🇰🇷' },
+              { name: 'S&P 500', value: '6,042.12', change: '+0.58%', isUp: true, flag: '🇺🇸' },
+              { name: 'NASDAQ', value: '19,478.88', change: '+0.73%', isUp: true, flag: '🇺🇸' },
+              { name: 'Nikkei 225', value: '38,451.46', change: '-0.28%', isUp: false, flag: '🇯🇵' },
+              { name: 'Hang Seng', value: '19,229.57', change: '+1.24%', isUp: true, flag: '🇭🇰' },
+              { name: 'USD/KRW', value: '1,438.50', change: '-0.12%', isUp: false, flag: '💱' },
+              { name: '국채 3년', value: '2.85%', change: '-0.02%p', isUp: false, flag: '📊' },
+              // 반복
+              { name: 'KOSPI', value: '2,542.38', change: '+0.42%', isUp: true, flag: '🇰🇷' },
+              { name: 'KOSDAQ', value: '721.56', change: '+0.31%', isUp: true, flag: '🇰🇷' },
+              { name: 'S&P 500', value: '6,042.12', change: '+0.58%', isUp: true, flag: '🇺🇸' },
+              { name: 'NASDAQ', value: '19,478.88', change: '+0.73%', isUp: true, flag: '🇺🇸' },
+              { name: 'Nikkei 225', value: '38,451.46', change: '-0.28%', isUp: false, flag: '🇯🇵' },
+              { name: 'Hang Seng', value: '19,229.57', change: '+1.24%', isUp: true, flag: '🇭🇰' },
+              { name: 'USD/KRW', value: '1,438.50', change: '-0.12%', isUp: false, flag: '💱' },
+              { name: '국채 3년', value: '2.85%', change: '-0.02%p', isUp: false, flag: '📊' },
+            ].map((market, index) => (
+              <div
+                key={`${market.name}-${index}`}
+                className="flex-shrink-0 w-[140px] bg-[#1f1a2e] border border-[#2d2640] rounded-xl p-3 hover:border-[#d64f79]/30 transition-colors"
+              >
+                {/* Market Name with Flag */}
+                <div className="flex items-center gap-1.5 mb-2">
+                  <span className="text-sm">{market.flag}</span>
+                  <div className="text-xs text-gray-400 truncate">{market.name}</div>
+                </div>
+
+                {/* Value */}
+                <div className="text-base font-bold text-white mb-1">
+                  {market.value}
+                </div>
+
+                {/* Change */}
+                <div className={`text-xs font-medium inline-block px-1.5 py-0.5 rounded ${market.isUp ? 'bg-up/20 text-up' : 'bg-down/20 text-down'}`}>
+                  {market.change}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* ETF 101 Guide */}
+      {/* ETF 101 Guide - 탐색 페이지로 연결 */}
       <div className="px-4 py-2 mb-4">
         <Card className="bg-gradient-to-r from-[#2a1f3d] to-[#1f1a2e] border-[#d64f79]/30">
           <CardContent className="p-4">
@@ -246,7 +273,7 @@ export function HomePage({ accountType, onSelectETF, onNavigate }: HomePageProps
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => onNavigate('invest')}
+                onClick={() => onNavigate('discover')}
                 className="shrink-0"
               >
                 <ArrowRight className="h-4 w-4" />
