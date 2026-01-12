@@ -1,26 +1,16 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "routes": [
+  "headers": [
     {
-      "src": "/pdf/(.*)",
-      "dest": "/pdf/$1",
-      "headers": {
-        "Content-Type": "application/pdf",
-        "Cache-Control": "public, max-age=31536000"
-      }
-    },
-    {
-      "src": "/assets/(.*)",
-      "dest": "/assets/$1"
-    },
-    {
-      "src": "/(.*\\.(js|css|ico|png|jpg|jpeg|svg|webp|woff|woff2|json))",
-      "dest": "/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/pdf/(.*)",
+      "headers": [
+        { "key": "Content-Type", "value": "application/pdf" },
+        { "key": "Cache-Control", "value": "public, max-age=31536000" }
+      ]
     }
+  ],
+  "rewrites": [
+    { "source": "/((?!pdf/).*)", "destination": "/index.html" }
   ]
 }
