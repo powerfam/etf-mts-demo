@@ -10,10 +10,14 @@ import { PortfolioPage } from './pages/PortfolioPage'
 import { ComparePage } from './pages/ComparePage'
 import { InvestInfoPage } from './pages/InvestInfoPage'
 import { InvestInfoDetailPage } from './pages/InvestInfoDetailPage'
+import { LoginPage } from './pages/LoginPage'
 import type { ETF } from './data/mockData'
 import type { InvestContent } from './data/investInfoData'
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return sessionStorage.getItem('etf-mts-auth') === 'authenticated'
+  })
   const [activeTab, setActiveTab] = useState('home')
   const [accountType, setAccountType] = useState('general')
   const [selectedETF, setSelectedETF] = useState<ETF | null>(null)
@@ -68,6 +72,11 @@ function App() {
   // 챗봇에서 용어사전으로 이동
   const handleNavigateToGlossary = () => {
     setActiveTab('investinfo')
+  }
+
+  // Show login page if not authenticated
+  if (!isAuthenticated) {
+    return <LoginPage onLogin={() => setIsAuthenticated(true)} />
   }
 
   // Show trade page

@@ -15,11 +15,24 @@
 
 ## 기술 스택
 
-- **Framework**: React 18 + TypeScript
-- **Build Tool**: Vite
-- **Styling**: TailwindCSS + shadcn/ui 컴포넌트
-- **Icons**: Lucide React
-- **State Management**: React useState (로컬 상태)
+| 구분 | 기술 | 설명 |
+|------|------|------|
+| **언어** | TypeScript | JavaScript + 타입 (버그 방지) |
+| **프레임워크** | React 18 | 개발 뼈대/틀 (컴포넌트 기반 UI) |
+| **빌드** | Vite | 코드를 브라우저용으로 변환/압축 |
+| **스타일** | TailwindCSS | 유틸리티 기반 CSS 프레임워크 |
+| **UI** | shadcn/ui | 미리 만들어진 버튼, 카드 등 컴포넌트 |
+| **아이콘** | Lucide React | 아이콘 라이브러리 |
+| **차트** | Recharts | 파이 차트, 스파크라인 |
+| **배포** | Vercel | 서버리스 호스팅 |
+
+### 기술 스택 개념 정리
+
+- **언어**: 코드 작성하는 문법 (TypeScript, JavaScript, Python 등)
+- **프레임워크**: 개발 뼈대/틀 (미리 만들어진 구조 위에서 개발)
+- **빌드**: 개발용 코드 → 배포용 파일로 변환/압축
+- **스타일**: 화면 디자인 (색상, 크기, 배치)
+- **UI 라이브러리**: 미리 디자인된 버튼, 카드 등 부품
 
 ---
 
@@ -28,31 +41,37 @@
 ```
 src/
 ├── components/
-│   ├── ui/              # shadcn/ui 기반 공통 컴포넌트
+│   ├── ui/                  # shadcn/ui 기반 공통 컴포넌트
 │   │   ├── button.tsx
 │   │   ├── card.tsx
 │   │   ├── badge.tsx
 │   │   ├── tabs.tsx
 │   │   └── ...
-│   ├── Header.tsx       # 상단 헤더 (계좌 타입 선택)
-│   ├── BottomNav.tsx    # 하단 네비게이션 (홈/탐색/투자정보/비교/보유)
-│   └── ETFCard.tsx      # ETF 정보 카드 컴포넌트
+│   ├── Header.tsx           # 상단 헤더 (계좌 타입 선택: 일반/연금/ISA)
+│   ├── BottomNav.tsx        # 하단 네비게이션 (홈/탐색/투자정보/비교/보유)
+│   ├── FloatingChatbot.tsx  # 전역 플로팅 챗봇 (검색 기능 포함)
+│   └── ETFCard.tsx          # ETF 정보 카드 컴포넌트
 ├── pages/
-│   ├── HomePage.tsx         # 홈 화면 (포트폴리오 요약, 인기 ETF, 시장 현황)
+│   ├── HomePage.tsx         # 홈 화면 (포트폴리오 요약, 인기 ETF, 히트맵, 시장 현황)
 │   ├── DiscoverPage.tsx     # 탐색 화면 (ETF 검색, 필터링, 정렬)
 │   ├── ETFDetailPage.tsx    # ETF 상세 화면
 │   ├── TradePage.tsx        # 매매 화면
 │   ├── PortfolioPage.tsx    # 보유현황 화면
 │   ├── ComparePage.tsx      # ETF 비교 화면
-│   ├── InvestInfoPage.tsx   # 투자정보 (ETF 101, 용어사전, 리서치)
+│   ├── InvestInfoPage.tsx   # 투자정보 (ETF 101, 용어사전, 리서치 PDF)
 │   └── InvestInfoDetailPage.tsx
 ├── data/
-│   ├── mockData.ts          # ETF 목업 데이터 (50+ 종목)
+│   ├── mockData.ts          # ETF 목업 데이터 (50+ 종목) + 계좌별 포트폴리오
 │   └── investInfoData.ts    # 투자정보 콘텐츠 데이터
 ├── lib/
 │   └── utils.ts             # 유틸리티 함수 (cn, formatNumber 등)
 ├── App.tsx                  # 메인 앱 (라우팅, 상태 관리)
 └── main.tsx                 # 엔트리 포인트
+
+pdf/                         # 리서치 PDF 파일
+├── new_etf_25_12_3w.pdf
+├── etf_weekly_25_12_3w.pdf
+└── ...
 ```
 
 ---
@@ -61,12 +80,18 @@ src/
 
 ### 1. 홈 화면 (HomePage)
 
-- **내 ETF 평가금액**: 포트폴리오 총 가치 및 수익률 표시
-- **계좌 타입별 세금 정보**: 일반/ISA/연금계좌별 세율 안내
+- **계좌별 포트폴리오**: 일반/연금/ISA 계좌 선택 시 각각 다른 평가금액 표시
+  - 일반계좌: 약 2,500만원 (공격적 - 성장주, 레버리지 포함)
+  - 연금계좌: 약 4,200만원 (안정적 - 배당, 채권 중심)
+  - ISA계좌: 약 1,800만원 (균형 - 성장+배당 혼합)
+- **계좌 타입별 세금 정보**: 일반(15.4%)/ISA(9.9%)/연금(5.5%) 세율 안내
 - **목적별 탐색**: 시장대표, 글로벌, 배당, 채권, 통화, 원자재, 레버리지, 연금 카테고리
-- **실시간 인기 ETF**: 거래대금 기준 TOP 10 (우측 물결 흐름 횡스크롤 애니메이션)
-- **시장 현황**: KOSPI, KOSDAQ, S&P500, NASDAQ, 니케이225, 항셍지수, 환율, 국채 (우측 횡스크롤)
-- **ETF 101 바로가기**: 기초 학습 콘텐츠로 연결 (탐색 페이지)
+- **실시간 인기 ETF**: 거래대금 기준 TOP 5 (우측 물결 흐름 횡스크롤 애니메이션)
+  - ETF 분류 배지: 국내/해외 + 자산분류(주식/채권/원자재 등) 표시
+- **주간 테마 히트맵**: 12개 테마별 주간 수익률 (상승=빨강, 하락=파랑)
+- **수익률 상하위 TOP5**: 레버리지/인버스 제외한 상승/하락 TOP 5
+- **시장 현황**: KOSPI, KOSDAQ, S&P500, NASDAQ, 니케이225, 항셍지수, 환율, 국채 (횡스크롤)
+- **ETF 탐색하기 / ETF 101 바로가기**: 각 페이지로 연결
 
 ### 2. 탐색 화면 (DiscoverPage)
 
@@ -83,6 +108,7 @@ src/
 
 - 가격 차트 (스파크라인)
 - 건전성 점수 (Health Score)
+- ETF 분류 배지: 국내/해외 + 자산분류
 - 상품 개요, 지수 설명, 운용 전략
 - TER, 괴리율, 스프레드, 거래대금 지표
 - 배당수익률, 변동성, 추적오차
@@ -93,18 +119,30 @@ src/
 - **ETF 101**: ETF 기초 개념, 계좌 종류, 투자 전략, 세금
 - **용어사전**: NAV, AP, LP, TER, 괴리율 등 전문 용어 설명
 - **리서치**: ETF Weekly 보고서, 신규 ETF 라인업 분석 PDF
-- **챗봇**: 자주 묻는 질문 빠른 접근
+  - Google Docs Viewer 사용하여 PDF 표시
+- **챗봇**: 자주 묻는 질문 빠른 접근 + 검색 기능
 
 ### 5. 비교 화면 (ComparePage)
 
-- 최대 3개 ETF 동시 비교
+- 최대 3개 ETF 동시 비교 (+ 버튼으로 검색 추가)
 - TER, 괴리율, 스프레드, 건전성 점수 비교
+- 주문 버튼 제거됨 (비교 전용)
 
 ### 6. 보유현황 화면 (PortfolioPage)
 
-- 보유 ETF 목록
+- **계좌별 보유 ETF**: 계좌 타입에 따라 다른 종목/평가금액 표시
+- 자산 배분 파이 차트
 - 평가금액, 수익률, 매입단가
-- 계좌 타입별 세금 예상
+- 계좌 타입별 세금 예상 및 절감액 표시
+- 리스크 알림 (건전성/괴리율 주의)
+- 리밸런싱 제안
+
+### 7. 전역 플로팅 챗봇 (FloatingChatbot)
+
+- 모든 페이지에서 접근 가능 (투자정보 페이지 제외 - 자체 챗봇 있음)
+- ETF 관련 질문 검색 기능
+- 투자정보 콘텐츠 바로가기
+- 용어사전 연결
 
 ---
 
@@ -119,9 +157,25 @@ src/
 
 ### 애니메이션
 
-- **실시간 인기 ETF**: 우측으로 물결 흐르는 횡스크롤 애니메이션 (`tickerWave`)
+- **실시간 인기 ETF**: 우측으로 물결 흐르는 횡스크롤 애니메이션 (`tickerWave`) + Shimmer 효과
 - **시장 현황**: 우측 횡스크롤 물결 애니메이션 (`marketWave`)
 - **라이브 표시**: 핑크색 핑 애니메이션
+
+### ETF 분류 배지
+
+- **시장분류**: 국내(초록) / 해외(파랑)
+- **자산분류**: 주식, 채권, 원자재, 통화 등 (회색)
+
+### 히트맵 색상
+
+- **상승**: 빨강 계열 (rgba 239, 68, 68)
+  - +3% 이상: 진한 빨강
+  - +1.5% ~ +3%: 중간 빨강
+  - 0% ~ +1.5%: 연한 빨강
+- **하락**: 파랑 계열 (rgba 59, 130, 246)
+  - 0% ~ -1.5%: 연한 파랑
+  - -1.5% ~ -3%: 중간 파랑
+  - -3% 이하: 진한 파랑
 
 ---
 
@@ -161,9 +215,20 @@ interface ETF {
   issuer: string          // 운용사
   listedDate: string      // 상장일
   indexProvider: string   // 지수 제공자
-  assetClass: string      // 자산군
-  marketClass: string     // 시장구분
+  assetClass: string      // 자산군 (주식/채권/원자재/통화)
+  marketClass: string     // 시장구분 (국내/해외)
 }
+```
+
+### 계좌별 포트폴리오
+
+```typescript
+// 계좌 타입별 포트폴리오 가져오기
+getPortfolioByAccountType(accountType: string) => PortfolioETF[]
+
+// 일반계좌: generalPortfolioETFs (공격적)
+// 연금계좌: pensionPortfolioETFs (안정적)
+// ISA계좌: isaPortfolioETFs (균형)
 ```
 
 ---
@@ -180,6 +245,46 @@ interface ETF {
 
 ---
 
+## 배포
+
+### Vercel 배포
+
+```bash
+# 프로덕션 배포
+npx vercel --prod
+
+# 배포 URL
+https://etf-mts-demo.vercel.app
+```
+
+### vercel.json 설정
+
+```json
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "headers": [
+    {
+      "source": "/pdf/(.*)",
+      "headers": [
+        { "key": "Content-Type", "value": "application/pdf" },
+        { "key": "Cache-Control", "value": "public, max-age=31536000" }
+      ]
+    }
+  ],
+  "rewrites": [
+    { "source": "/((?!pdf/).*)", "destination": "/index.html" }
+  ]
+}
+```
+
+### PDF 표시 방식
+
+- Google Docs Viewer 사용
+- URL 형식: `https://docs.google.com/viewer?url=${encodeURIComponent(pdfUrl)}&embedded=true`
+
+---
+
 ## 실행 방법
 
 ```bash
@@ -191,6 +296,9 @@ npm run dev
 
 # 프로덕션 빌드
 npm run build
+
+# 빌드 미리보기
+npm run preview
 ```
 
 ---
