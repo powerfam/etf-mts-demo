@@ -128,7 +128,7 @@ export function InvestInfoPage({
           </div>
 
           {/* 메인 탭 */}
-          <div className="flex bg-[#2d2640] rounded-lg p-1">
+          <div className="flex bg-[#2d2640] rounded-lg p-1" data-tour="etf-101">
             <button
               onClick={() => handleTabChange('concepts')}
               className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-all ${
@@ -146,6 +146,7 @@ export function InvestInfoPage({
                   ? 'bg-[#d64f79] text-white'
                   : 'text-gray-400 hover:text-gray-200'
               }`}
+              data-tour="glossary"
             >
               용어사전
             </button>
@@ -156,6 +157,7 @@ export function InvestInfoPage({
                   ? 'bg-[#d64f79] text-white'
                   : 'text-gray-400 hover:text-gray-200'
               }`}
+              data-tour="research"
             >
               리서치
             </button>
@@ -439,6 +441,7 @@ export function InvestInfoPage({
         <button
           onClick={() => setIsChatbotOpen(true)}
           className="fixed bottom-24 right-4 w-14 h-14 bg-gradient-to-r from-[#d64f79] to-[#8B5CF6] rounded-full shadow-lg flex items-center justify-center hover:scale-105 transition-transform z-50"
+          data-tour="chatbot"
         >
           <MessageCircle className="h-6 w-6 text-white" />
         </button>

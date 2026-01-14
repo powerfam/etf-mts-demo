@@ -52,9 +52,9 @@ export function LoginPage({ onLogin }: LoginPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-[#191322] flex flex-col lg:flex-row">
+    <div className="min-h-screen lg:h-screen bg-[#191322] flex flex-col lg:flex-row overflow-auto">
       {/* Mobile: Top Visual Section / Desktop: Right Side */}
-      <div className="order-1 lg:order-2 w-full lg:w-1/2 relative overflow-hidden h-[35vh] lg:h-auto">
+      <div className="order-1 lg:order-2 w-full lg:w-1/2 relative overflow-hidden h-[40vh] min-h-[200px] lg:h-full flex-shrink-0">
         {/* Background Hero Image */}
         <div className="absolute inset-0">
           <img
@@ -148,7 +148,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
       </div>
 
       {/* Mobile: Bottom Login Form / Desktop: Left Side */}
-      <div className="order-2 lg:order-1 w-full lg:w-1/2 flex items-center justify-center p-4 lg:p-8 relative z-10 flex-1 lg:flex-none">
+      <div className="order-2 lg:order-1 w-full lg:w-1/2 flex items-center justify-center p-4 py-8 lg:p-8 relative z-10 flex-shrink-0">
         <Card className="w-full max-w-sm bg-[#1f1a2e]/95 border-[#2d2640] backdrop-blur-sm">
           <CardHeader className="text-center space-y-2 pb-4">
             <div className="mx-auto w-12 h-12 lg:w-16 lg:h-16 bg-[#d64f79]/20 rounded-full flex items-center justify-center mb-2">

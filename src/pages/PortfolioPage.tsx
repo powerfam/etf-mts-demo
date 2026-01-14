@@ -75,7 +75,7 @@ export function PortfolioPage({ accountType, onSelectETF }: PortfolioPageProps) 
         </div>
 
         {/* Tax Summary */}
-        <div className={`mt-4 p-3 rounded-lg ${accountType !== 'general' ? 'bg-emerald-500/10 border border-emerald-500/30' : 'bg-[#1f1a2e]'}`}>
+        <div className={`mt-4 p-3 rounded-lg ${accountType !== 'general' ? 'bg-emerald-500/10 border border-emerald-500/30' : 'bg-[#1f1a2e]'}`} data-tour="tax-info">
           <div className="flex items-center justify-between text-sm">
             <span className="text-gray-400">예상 세금 ({taxInfo.rate}%)</span>
             <span className="text-white">{formatNumber(Math.round(taxInfo.tax))}원</span>
@@ -89,7 +89,7 @@ export function PortfolioPage({ accountType, onSelectETF }: PortfolioPageProps) 
       </div>
 
       {/* Portfolio Allocation Chart */}
-      <div className="px-4 py-4">
+      <div className="px-4 py-4" data-tour="portfolio-chart">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm">자산 배분</CardTitle>
@@ -182,7 +182,7 @@ export function PortfolioPage({ accountType, onSelectETF }: PortfolioPageProps) 
       </div>
 
       {/* Holdings List */}
-      <div className="px-4">
+      <div className="px-4" data-tour="holdings-list">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-semibold text-white">보유 종목</h2>
           <div className="flex gap-2">

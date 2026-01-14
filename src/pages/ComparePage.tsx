@@ -160,7 +160,7 @@ export function ComparePage({ onSelectETF: _onSelectETF }: ComparePageProps) {
       </div>
 
       {/* Selected ETFs Header */}
-      <div className="px-4 py-3 border-b border-[#2d2640]">
+      <div className="px-4 py-3 border-b border-[#2d2640]" data-tour="compare-slots">
         <ScrollArea className="w-full whitespace-nowrap">
           <div className="flex gap-3">
             {selectedETFs.map((etf) => (
@@ -339,7 +339,7 @@ export function ComparePage({ onSelectETF: _onSelectETF }: ComparePageProps) {
       )}
 
       {/* Comparison Table */}
-      <div className="px-4 py-4">
+      <div className="px-4 py-4" data-tour="compare-table">
         {compareMetrics.map((category) => (
           <Card key={category.category} className="mb-4">
             <CardHeader className="py-2 px-3">

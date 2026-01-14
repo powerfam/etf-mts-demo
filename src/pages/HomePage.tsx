@@ -54,7 +54,7 @@ export function HomePage({ accountType, onSelectETF, onNavigate }: HomePageProps
   return (
     <div className="pb-20">
       {/* Hero Section - My Portfolio Summary */}
-      <div className="bg-gradient-to-b from-[#2a1f3d] to-[#191322] px-4 py-6">
+      <div className="bg-gradient-to-b from-[#2a1f3d] to-[#191322] px-4 py-6" data-tour="portfolio-summary">
         <div className="mb-4">
           <div className="flex items-center gap-2 mb-2">
             <Badge variant="outline" className="text-[10px]">{taxInfo.label}</Badge>
@@ -110,7 +110,7 @@ export function HomePage({ accountType, onSelectETF, onNavigate }: HomePageProps
       </div>
 
       {/* Theme/Category Grid */}
-      <div className="px-4 py-2">
+      <div className="px-4 py-2" data-tour="category-buttons">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-base font-semibold text-white">목적별 탐색</h2>
           <Button variant="ghost" size="sm" className="text-xs text-gray-400" onClick={() => onNavigate('discover')}>
@@ -137,7 +137,7 @@ export function HomePage({ accountType, onSelectETF, onNavigate }: HomePageProps
       </div>
 
       {/* Hot ETFs - Horizontal Wave Ticker (증권사 티커 스타일) */}
-      <div className="py-4">
+      <div className="py-4" data-tour="popular-etf">
         <div className="flex items-center justify-between mb-3 px-4">
           <div className="flex items-center gap-2">
             <h2 className="text-base font-semibold text-white">실시간 인기</h2>
@@ -229,7 +229,7 @@ export function HomePage({ accountType, onSelectETF, onNavigate }: HomePageProps
       </div>
 
       {/* 주간 테마 히트맵 */}
-      <div className="px-4 py-4">
+      <div className="px-4 py-4" data-tour="heatmap">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-base font-semibold text-white">주간 테마 히트맵</h2>
           <span className="text-[10px] text-gray-500">레버리지/인버스 제외</span>
@@ -310,7 +310,7 @@ export function HomePage({ accountType, onSelectETF, onNavigate }: HomePageProps
 
         <div className="grid grid-cols-2 gap-3">
           {/* 상승 TOP5 */}
-          <div className="bg-[#1f1a2e] border border-[#2d2640] rounded-xl p-3">
+          <div className="bg-[#1f1a2e] border border-[#2d2640] rounded-xl p-3" data-tour="top-gainers">
             <div className="flex items-center gap-1.5 mb-3">
               <span className="text-sm">📈</span>
               <span className="text-xs font-medium text-up">상승 TOP 5</span>
@@ -335,7 +335,7 @@ export function HomePage({ accountType, onSelectETF, onNavigate }: HomePageProps
           </div>
 
           {/* 하락 TOP5 */}
-          <div className="bg-[#1f1a2e] border border-[#2d2640] rounded-xl p-3">
+          <div className="bg-[#1f1a2e] border border-[#2d2640] rounded-xl p-3" data-tour="top-losers">
             <div className="flex items-center gap-1.5 mb-3">
               <span className="text-sm">📉</span>
               <span className="text-xs font-medium text-down">하락 TOP 5</span>
@@ -362,7 +362,7 @@ export function HomePage({ accountType, onSelectETF, onNavigate }: HomePageProps
       </div>
 
       {/* Market Overview - Horizontal Wave Ticker */}
-      <div className="py-4">
+      <div className="py-4" data-tour="market-status">
         <h2 className="text-base font-semibold text-white mb-3 px-4">시장 현황</h2>
 
         {/* Market Ticker - 우측으로 물결 흐르듯 */}
@@ -427,7 +427,7 @@ export function HomePage({ accountType, onSelectETF, onNavigate }: HomePageProps
       </div>
 
       {/* ETF 탐색하기 - 탐색 페이지로 연결 */}
-      <div className="px-4 py-2">
+      <div className="px-4 py-2" data-tour="quick-links">
         <Card className="bg-gradient-to-r from-[#2a1f3d] to-[#1f1a2e] border-[#d64f79]/30">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">

@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Header } from './components/Header'
 import { BottomNav } from './components/BottomNav'
 import { FloatingChatbot } from './components/FloatingChatbot'
+import { OnboardingTour } from './components/OnboardingTour'
 import { HomePage } from './pages/HomePage'
 import { DiscoverPage } from './pages/DiscoverPage'
 import { ETFDetailPage } from './pages/ETFDetailPage'
@@ -13,6 +14,7 @@ import { InvestInfoDetailPage } from './pages/InvestInfoDetailPage'
 import { LoginPage } from './pages/LoginPage'
 import type { ETF } from './data/mockData'
 import type { InvestContent } from './data/investInfoData'
+import { tourStepsByPage } from './data/tourSteps'
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -26,6 +28,42 @@ function App() {
   const [selectedContent, setSelectedContent] = useState<InvestContent | null>(null)
   const [showContentDetail, setShowContentDetail] = useState(false)
   const [isChatbotOpen, setIsChatbotOpen] = useState(false)
+
+  // 온보딩 투어 상태
+  const [showTour, setShowTour] = useState(false)
+  const [tourType, setTourType] = useState<string>('welcome')
+
+  // 첫 방문 시 웰컴 투어 표시
+  useEffect(() => {
+    const hasSeenWelcomeTour = localStorage.getItem('etf-mts-welcome-tour')
+    if (!hasSeenWelcomeTour && isAuthenticated) {
+      // 첫 로그인 후 약간의 딜레이를 주고 투어 시작
+      const timer = setTimeout(() => {
+        setTourType('welcome')
+        setShowTour(true)
+      }, 500)
+      return () => clearTimeout(timer)
+    }
+  }, [isAuthenticated])
+
+  const handleStartTour = (type: string) => {
+    setTourType(type)
+    setShowTour(true)
+  }
+
+  const handleTourComplete = () => {
+    setShowTour(false)
+    if (tourType === 'welcome') {
+      localStorage.setItem('etf-mts-welcome-tour', 'completed')
+    }
+  }
+
+  const handleTourClose = () => {
+    setShowTour(false)
+    if (tourType === 'welcome') {
+      localStorage.setItem('etf-mts-welcome-tour', 'skipped')
+    }
+  }
 
   const handleSelectETF = (etf: ETF) => {
     setSelectedETF(etf)
@@ -51,6 +89,8 @@ function App() {
     setShowDetail(false)
     setShowTrade(false)
     setShowContentDetail(false)
+    // 탭 변경 시 스크롤을 맨 위로 초기화
+    window.scrollTo(0, 0)
   }
 
   const handleSelectContent = (content: InvestContent) => {
@@ -152,7 +192,7 @@ function App() {
       )}
 
       {activeTab === 'discover' && (
-        <DiscoverPage onSelectETF={handleSelectETF} />
+        <DiscoverPage onSelectETF={handleSelectETF} accountType={accountType} />
       )}
 
       {activeTab === 'compare' && (
@@ -183,6 +223,23 @@ function App() {
           onNavigateToGlossary={handleNavigateToGlossary}
         />
       )}
+
+      {/* 온보딩 투어 */}
+      <OnboardingTour
+        steps={tourStepsByPage[tourType] || tourStepsByPage.welcome}
+        isOpen={showTour}
+        onClose={handleTourClose}
+        onComplete={handleTourComplete}
+      />
+
+      {/* 투어 시작 버튼 (개발/데모용) */}
+      <button
+        onClick={() => handleStartTour(activeTab)}
+        className="fixed bottom-24 left-4 px-3 py-2 bg-[#2d2640] border border-[#3d3650] rounded-full text-xs text-gray-400 hover:text-white hover:border-[#d64f79] transition-colors z-40"
+        title="이 페이지 투어 시작"
+      >
+        🎯 가이드
+      </button>
     </div>
   )
 }

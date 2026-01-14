@@ -14,17 +14,22 @@ const iconMap: Record<string, React.ElementType> = {
 
 interface DiscoverPageProps {
   onSelectETF: (etf: ETF) => void
+  accountType?: string
 }
 
 const INITIAL_DISPLAY_COUNT = 20
 
-export function DiscoverPage({ onSelectETF }: DiscoverPageProps) {
+export function DiscoverPage({ onSelectETF, accountType = 'general' }: DiscoverPageProps) {
   const [selectedTheme, setSelectedTheme] = useState<string>('all')
   const [sortBy, setSortBy] = useState<string>('health')
   const [mode, setMode] = useState<string>('discover')
   const [searchQuery, setSearchQuery] = useState<string>('')
   const [showAll, setShowAll] = useState<boolean>(false)
-  const [pensionMode, setPensionMode] = useState<boolean>(false)
+  const [pensionModeManual, setPensionModeManual] = useState<boolean>(false)
+
+  // 연금/ISA 계좌 선택 시 자동으로 레버리지/인버스 필터링
+  const isPensionAccount = accountType === 'pension' || accountType === 'isa'
+  const pensionMode = isPensionAccount || pensionModeManual
 
   const filteredETFs = mockETFs.filter(etf => {
     const query = searchQuery.toLowerCase().trim()
@@ -70,17 +75,21 @@ export function DiscoverPage({ onSelectETF }: DiscoverPageProps) {
   return (
     <div className="pb-20">
       <div className="sticky top-[52px] z-40 bg-[#191322] px-4 py-3 border-b border-[#2d2640]">
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-sm text-gray-400">연금계좌 적합 상품만</span>
+        <div className="flex items-center justify-between mb-3" data-tour="pension-filter">
+          <span className="text-sm text-gray-400">
+            연금계좌 적합 상품만
+            {isPensionAccount && <span className="ml-1 text-xs text-[#d64f79]">(연금/ISA 계좌)</span>}
+          </span>
           <button
-            onClick={() => setPensionMode(!pensionMode)}
-            className={`relative w-11 h-6 rounded-full transition-colors ${pensionMode ? 'bg-[#d64f79]' : 'bg-[#3d3650]'}`}
+            onClick={() => !isPensionAccount && setPensionModeManual(!pensionModeManual)}
+            disabled={isPensionAccount}
+            className={`relative w-11 h-6 rounded-full transition-colors ${pensionMode ? 'bg-[#d64f79]' : 'bg-[#3d3650]'} ${isPensionAccount ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
             <span className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${pensionMode ? 'translate-x-5' : 'translate-x-0'}`} />
           </button>
         </div>
         <div className="flex gap-2">
-          <div className="flex-1 flex items-center gap-2 bg-[#1f1a2e] rounded-lg px-3 py-2 border border-[#2d2640]">
+          <div className="flex-1 flex items-center gap-2 bg-[#1f1a2e] rounded-lg px-3 py-2 border border-[#2d2640]" data-tour="search-input">
             <Search className="h-4 w-4 text-gray-400" />
             <input
               type="text"
@@ -96,7 +105,7 @@ export function DiscoverPage({ onSelectETF }: DiscoverPageProps) {
         </div>
       </div>
 
-      <div className="px-4 py-3">
+      <div className="px-4 py-3" data-tour="mode-tabs">
         <Tabs value={mode} onValueChange={setMode}>
           <TabsList className="w-full grid grid-cols-3">
             <TabsTrigger value="discover">탐색</TabsTrigger>
@@ -106,7 +115,7 @@ export function DiscoverPage({ onSelectETF }: DiscoverPageProps) {
         </Tabs>
       </div>
 
-      <div className="px-4 pb-3">
+      <div className="px-4 pb-3" data-tour="theme-filter">
         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
           <Button
             variant={selectedTheme === 'all' ? 'default' : 'outline'}
@@ -134,7 +143,7 @@ export function DiscoverPage({ onSelectETF }: DiscoverPageProps) {
         </div>
       </div>
 
-      <div className="px-4 pb-3 flex items-center justify-between">
+      <div className="px-4 pb-3 flex items-center justify-between" data-tour="sort-options">
         <div className="text-sm text-gray-400">{sortedETFs.length}개 ETF</div>
         <div className="flex gap-2">
           {['health', 'ter', 'liquidity', 'return'].map((sort) => (

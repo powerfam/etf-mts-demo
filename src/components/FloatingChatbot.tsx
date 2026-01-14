@@ -57,6 +57,7 @@ export function FloatingChatbot({ onSelectContent, onNavigateToGlossary }: Float
         <button
           onClick={() => setIsOpen(true)}
           className="fixed bottom-24 right-4 w-14 h-14 bg-gradient-to-r from-[#d64f79] to-[#8B5CF6] rounded-full shadow-lg flex items-center justify-center hover:scale-105 transition-transform z-50"
+          data-tour="chatbot-button"
         >
           <MessageCircle className="h-6 w-6 text-white" />
         </button>

@@ -45,6 +45,7 @@ export function ETFCard({ etf, onClick }: ETFCardProps) {
     <Card
       className="cursor-pointer transition-all hover:border-[#d64f79]/50 hover:shadow-lg hover:shadow-[#d64f79]/10"
       onClick={onClick}
+      data-tour="etf-card"
     >
       <div className="p-4">
         {/* Header */}
