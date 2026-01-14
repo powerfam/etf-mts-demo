@@ -130,7 +130,7 @@ export const mockETFs: ETF[] = [
     issuer: '삼성자산운용', listedDate: '2009/09/25', indexProvider: 'KRX', assetClass: '주식', marketClass: '국내',
   },
   {
-    id: '8', ticker: '161510', name: 'ARIRANG 고배당주', shortName: 'ARIRANG 고배당주',
+    id: '8', ticker: '161510', name: 'RISE 고배당', shortName: 'RISE 고배당',
     price: 12850, prevClose: 12780, change: 70, changePercent: 0.55,
     iNav: 12845, discrepancy: 0.04, ter: 0.23, spread: 0.08,
     adtv: 45000000000, aum: 320000000000, trackingError: 0.08, volatility: 10.2, dividendYield: 5.2,
@@ -139,7 +139,7 @@ export const mockETFs: ETF[] = [
     overview: '국내 고배당 종목으로 구성된 ETF',
     indexDescription: 'FnGuide 고배당주 지수 추종',
     strategy: '보수 0.23%, 배당성장률 기반 종목 선별',
-    issuer: '한화자산운용', listedDate: '2012/08/29', indexProvider: 'FnGuide', assetClass: '주식', marketClass: '국내',
+    issuer: '케이비자산운용', listedDate: '2012/08/29', indexProvider: 'FnGuide', assetClass: '주식', marketClass: '국내',
   },
   {
     id: '9', ticker: '153130', name: 'KODEX 단기채권', shortName: 'KODEX 단기채권',
@@ -1273,8 +1273,8 @@ export const generalPortfolioETFs = [
 export const pensionPortfolioETFs = [
   createPortfolioETF(mockETFs[0], 300, 0.90),   // KODEX 200
   createPortfolioETF(mockETFs[1], 400, 0.85),   // TIGER 미국S&P500
-  createPortfolioETF(mockETFs[6], 200, 0.95),   // KODEX 배당성장
-  createPortfolioETF(mockETFs[10], 150, 0.92),  // TIGER 미국배당다우존스
+  createPortfolioETF(mockETFs[7], 200, 0.95),   // RISE 고배당
+  createPortfolioETF(mockETFs[15], 150, 0.92),  // ACE 미국배당다우존스
   createPortfolioETF(mockETFs[44], 100, 0.98),  // TIGER 국채3년 (채권)
 ]
 

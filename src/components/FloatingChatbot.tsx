@@ -118,7 +118,6 @@ export function FloatingChatbot({ onSelectContent, onNavigateToGlossary }: Float
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 bg-[#2d2640] border border-[#3d3650] rounded-lg text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-[#d64f79]/50 transition-all"
-                  autoFocus
                 />
               </div>
             </div>

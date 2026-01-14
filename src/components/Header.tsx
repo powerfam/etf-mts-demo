@@ -80,12 +80,12 @@ export function Header({ accountType, onAccountTypeChange }: HeaderProps) {
       </div>
 
       {/* Mobile Account Toggle */}
-      <div className="flex justify-center pb-2 sm:hidden" data-tour="account-toggle-mobile">
+      <div className="flex justify-center pb-2 sm:hidden">
         <ToggleGroup
           type="single"
           value={accountType}
           onValueChange={(value) => value && onAccountTypeChange(value)}
-          data-tour="account-toggle"
+          data-tour="account-toggle-mobile"
         >
           <ToggleGroupItem value="general" className="text-xs">
             일반
