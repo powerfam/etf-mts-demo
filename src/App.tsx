@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Header } from './components/Header'
 import { BottomNav } from './components/BottomNav'
 import { FloatingChatbot } from './components/FloatingChatbot'
+import { CompareSlot } from './components/CompareSlot'
 import { OnboardingTour } from './components/OnboardingTour'
 import { HomePage } from './pages/HomePage'
 import { DiscoverPage } from './pages/DiscoverPage'
@@ -28,6 +29,12 @@ function App() {
   const [selectedContent, setSelectedContent] = useState<InvestContent | null>(null)
   const [showContentDetail, setShowContentDetail] = useState(false)
   const [isChatbotOpen, setIsChatbotOpen] = useState(false)
+
+  // 탐색 페이지 필터 상태
+  const [selectedTheme, setSelectedTheme] = useState<string>('all')
+
+  // 비교 ETF 목록 (최대 4개)
+  const [compareETFs, setCompareETFs] = useState<ETF[]>([])
 
   // 온보딩 투어 상태
   const [showTour, setShowTour] = useState(false)
@@ -84,13 +91,50 @@ function App() {
     setShowTrade(false)
   }
 
-  const handleNavigate = (tab: string) => {
+  const handleNavigate = (tab: string, theme?: string) => {
     setActiveTab(tab)
     setShowDetail(false)
     setShowTrade(false)
     setShowContentDetail(false)
+    // 테마가 전달되면 탐색 페이지 필터 설정
+    if (theme) {
+      setSelectedTheme(theme)
+    }
     // 탭 변경 시 스크롤을 맨 위로 초기화
     window.scrollTo(0, 0)
+  }
+
+  // 비교 목록에 ETF 추가 (롱프레스)
+  const handleAddToCompare = (etf: ETF) => {
+    setCompareETFs(prev => {
+      if (prev.find(e => e.id === etf.id)) return prev // 이미 있으면 무시
+      if (prev.length >= 4) return prev // 최대 4개
+      return [...prev, etf]
+    })
+  }
+
+  // 비교 목록에서 ETF 제거
+  const handleRemoveFromCompare = (etfId: string) => {
+    setCompareETFs(prev => prev.filter(e => e.id !== etfId))
+  }
+
+  // 비교하기 버튼 클릭 시 비교 탭으로 이동
+  const handleGoToCompare = () => {
+    setActiveTab('compare')
+    window.scrollTo(0, 0)
+  }
+
+  // 상세 페이지에서 비교하기 클릭 시 (ETF 추가 + 비교 탭 이동)
+  const handleAddToCompareAndNavigate = (etf: ETF) => {
+    handleAddToCompare(etf)
+    setShowDetail(false)
+    setActiveTab('compare')
+    window.scrollTo(0, 0)
+  }
+
+  // 비교 목록 초기화
+  const handleClearCompare = () => {
+    setCompareETFs([])
   }
 
   const handleSelectContent = (content: InvestContent) => {
@@ -132,6 +176,7 @@ function App() {
         <FloatingChatbot
           onSelectContent={handleChatbotContentSelect}
           onNavigateToGlossary={handleNavigateToGlossary}
+          hasCompareSlot={compareETFs.length > 0}
         />
       </div>
     )
@@ -147,11 +192,13 @@ function App() {
           accountType={accountType}
           onBack={handleBackFromDetail}
           onTrade={handleTrade}
+          onAddToCompare={handleAddToCompareAndNavigate}
         />
         <BottomNav activeTab={activeTab} onTabChange={handleNavigate} />
         <FloatingChatbot
           onSelectContent={handleChatbotContentSelect}
           onNavigateToGlossary={handleNavigateToGlossary}
+          hasCompareSlot={compareETFs.length > 0}
         />
       </div>
     )
@@ -174,6 +221,7 @@ function App() {
         <FloatingChatbot
           onSelectContent={handleChatbotContentSelect}
           onNavigateToGlossary={handleNavigateToGlossary}
+          hasCompareSlot={compareETFs.length > 0}
         />
       </div>
     )
@@ -181,22 +229,34 @@ function App() {
 
   return (
     <div className="min-h-screen bg-[#191322]">
-      <Header accountType={accountType} onAccountTypeChange={setAccountType} />
+      <Header onSelectETF={handleSelectETF} />
 
       {activeTab === 'home' && (
         <HomePage
           accountType={accountType}
           onSelectETF={handleSelectETF}
           onNavigate={handleNavigate}
+          onLongPressETF={handleAddToCompare}
+          onAccountTypeChange={setAccountType}
         />
       )}
 
       {activeTab === 'discover' && (
-        <DiscoverPage onSelectETF={handleSelectETF} accountType={accountType} />
+        <DiscoverPage
+          onSelectETF={handleSelectETF}
+          accountType={accountType}
+          selectedTheme={selectedTheme}
+          onThemeChange={setSelectedTheme}
+          onLongPressETF={handleAddToCompare}
+        />
       )}
 
       {activeTab === 'compare' && (
-        <ComparePage onSelectETF={handleSelectETF} />
+        <ComparePage
+          onSelectETF={handleSelectETF}
+          initialETFs={compareETFs}
+          onClearInitialETFs={handleClearCompare}
+        />
       )}
 
       {activeTab === 'investinfo' && (
@@ -211,8 +271,18 @@ function App() {
         <PortfolioPage
           accountType={accountType}
           onSelectETF={handleSelectETF}
+          onLongPressETF={handleAddToCompare}
+          onAccountTypeChange={setAccountType}
         />
       )}
+
+      {/* 비교 슬롯 UI */}
+      <CompareSlot
+        compareETFs={compareETFs}
+        onRemove={handleRemoveFromCompare}
+        onClear={handleClearCompare}
+        onGoToCompare={handleGoToCompare}
+      />
 
       <BottomNav activeTab={activeTab} onTabChange={handleNavigate} />
 
@@ -221,6 +291,7 @@ function App() {
         <FloatingChatbot
           onSelectContent={handleChatbotContentSelect}
           onNavigateToGlossary={handleNavigateToGlossary}
+          hasCompareSlot={compareETFs.length > 0}
         />
       )}
 

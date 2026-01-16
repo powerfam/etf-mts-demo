@@ -14,6 +14,7 @@ interface ETFDetailPageProps {
   accountType: string
   onBack: () => void
   onTrade: () => void
+  onAddToCompare?: (etf: ETF) => void
 }
 
 const generateChartData = (etf: ETF) => {
@@ -27,7 +28,7 @@ const generateChartData = (etf: ETF) => {
   return data
 }
 
-export function ETFDetailPage({ etf, accountType, onBack, onTrade }: ETFDetailPageProps) {
+export function ETFDetailPage({ etf, accountType, onBack, onTrade, onAddToCompare }: ETFDetailPageProps) {
   const [tab, setTab] = useState('summary')
   const [showHealthInfo, setShowHealthInfo] = useState(false)
   const isUp = etf.change >= 0
@@ -201,7 +202,7 @@ export function ETFDetailPage({ etf, accountType, onBack, onTrade }: ETFDetailPa
       </Tabs>
 
       <div className="fixed bottom-16 left-0 right-0 px-4 py-3 bg-[#191322]/95 backdrop-blur border-t border-[#2d2640]">
-        <div className="flex gap-3"><Button variant="outline" className="flex-1">비교하기</Button><Button className="flex-1" onClick={onTrade}>주문하기</Button></div>
+        <div className="flex gap-3"><Button variant="outline" className="flex-1" onClick={() => onAddToCompare?.(etf)}>비교하기</Button><Button className="flex-1" onClick={onTrade}>주문하기</Button></div>
       </div>
     </div>
   )

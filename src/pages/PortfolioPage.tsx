@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts'
-import { TrendingUp, TrendingDown, AlertTriangle, RefreshCw, ChevronRight, Settings } from 'lucide-react'
+import { TrendingUp, TrendingDown, AlertTriangle, RefreshCw, ChevronRight, ChevronDown, Wallet } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -8,15 +8,52 @@ import { getPortfolioByAccountType } from '@/data/mockData'
 import { formatNumber, formatPercent } from '@/lib/utils'
 import type { ETF } from '@/data/mockData'
 
+// 계좌 목록 데이터 (데모용)
+const accountList = [
+  { id: 'general-1', number: '8012-1234-5678', type: 'general', label: '일반' },
+  { id: 'pension-1', number: '8012-5678-1234', type: 'pension', label: '연금' },
+  { id: 'isa-1', number: '8012-9012-3456', type: 'isa', label: 'ISA' },
+]
+
+// 계좌 타입별 아이콘 (동일한 Wallet 아이콘 사용)
+const accountTypeIcons: Record<string, React.ElementType> = {
+  general: Wallet,
+  pension: Wallet,
+  isa: Wallet,
+}
+
 interface PortfolioPageProps {
   accountType: string
   onSelectETF: (etf: ETF) => void
+  onLongPressETF?: (etf: ETF) => void
+  onAccountTypeChange?: (type: string) => void
 }
 
 const COLORS = ['#d64f79', '#796ec2', '#4ade80', '#f59e0b', '#06b6d4']
 
-export function PortfolioPage({ accountType, onSelectETF }: PortfolioPageProps) {
+export function PortfolioPage({ accountType, onSelectETF, onLongPressETF, onAccountTypeChange }: PortfolioPageProps) {
   const [selectedFilter, setSelectedFilter] = useState<string>('all')
+  const [showAccountDropdown, setShowAccountDropdown] = useState(false)
+
+  // 현재 선택된 계좌 정보
+  const currentAccount = accountList.find(acc => acc.type === accountType) || accountList[0]
+  const AccountIcon = accountTypeIcons[accountType] || Wallet
+
+  // 롱프레스 처리를 위한 타이머
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const handleLongPressStart = (etf: ETF) => {
+    longPressTimer.current = setTimeout(() => {
+      onLongPressETF?.(etf)
+    }, 500)
+  }
+
+  const handleLongPressEnd = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current)
+      longPressTimer.current = null
+    }
+  }
 
   // 계좌 타입에 따른 포트폴리오 데이터 가져오기
   const currentPortfolio = getPortfolioByAccountType(accountType)
@@ -56,11 +93,62 @@ export function PortfolioPage({ accountType, onSelectETF }: PortfolioPageProps) 
     <div className="pb-20">
       {/* Portfolio Summary Header */}
       <div className="bg-gradient-to-b from-[#2a1f3d] to-[#191322] px-4 py-6">
-        <div className="flex items-center justify-between mb-2">
-          <Badge variant="outline" className="text-xs">{taxInfo.label}계좌</Badge>
-          <Button variant="ghost" size="icon">
-            <Settings className="h-4 w-4" />
-          </Button>
+        {/* 계좌 선택 드롭다운 */}
+        <div className="relative mb-4" data-tour="account-selector">
+          <button
+            onClick={() => setShowAccountDropdown(!showAccountDropdown)}
+            className="flex items-center gap-2 bg-[#1f1a2e] border border-[#3d3650] rounded-lg px-3 py-2 w-full"
+          >
+            <AccountIcon className="h-4 w-4 text-[#d64f79]" />
+            <div className="flex-1 text-left">
+              <div className="text-xs text-gray-400">{currentAccount.label}계좌</div>
+              <div className="text-sm text-white">{currentAccount.number}</div>
+            </div>
+            <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${showAccountDropdown ? 'rotate-180' : ''}`} />
+          </button>
+
+          {/* 드롭다운 메뉴 */}
+          {showAccountDropdown && (
+            <div className="absolute top-full left-0 right-0 mt-1 bg-[#1f1a2e] border border-[#3d3650] rounded-lg overflow-hidden z-50 shadow-xl">
+              {accountList.map((account) => {
+                const Icon = accountTypeIcons[account.type] || Wallet
+                const isSelected = account.type === accountType
+                return (
+                  <button
+                    key={account.id}
+                    onClick={() => {
+                      onAccountTypeChange?.(account.type)
+                      setShowAccountDropdown(false)
+                    }}
+                    className={`flex items-center gap-2 w-full px-3 py-2.5 text-left transition-colors ${
+                      isSelected ? 'bg-[#d64f79]/20' : 'hover:bg-[#2d2640]'
+                    }`}
+                  >
+                    <Icon className={`h-4 w-4 ${isSelected ? 'text-[#d64f79]' : 'text-gray-400'}`} />
+                    <div className="flex-1">
+                      <div className="text-xs text-gray-400">{account.label}계좌</div>
+                      <div className="text-sm text-white">{account.number}</div>
+                    </div>
+                    {isSelected && (
+                      <div className="w-2 h-2 rounded-full bg-[#d64f79]" />
+                    )}
+                  </button>
+                )
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* 계좌 타입 아이콘 표시 */}
+        <div className="flex items-center gap-2 mb-2" data-tour="account-type-badge">
+          <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
+            accountType === 'general' ? 'bg-gray-500/20 text-gray-300' :
+            accountType === 'pension' ? 'bg-emerald-500/20 text-emerald-400' :
+            'bg-blue-500/20 text-blue-400'
+          }`}>
+            <AccountIcon className="h-3.5 w-3.5" />
+            <span>{taxInfo.label}</span>
+          </div>
         </div>
         <div className="text-sm text-gray-400">ETF 포트폴리오</div>
         <div className="text-3xl font-bold text-white mt-1">
@@ -221,7 +309,16 @@ export function PortfolioPage({ accountType, onSelectETF }: PortfolioPageProps) 
               return true
             })
             .map((etf) => (
-              <Card key={etf.id} className="cursor-pointer hover:border-[#d64f79]/50" onClick={() => onSelectETF(etf)}>
+              <Card
+                key={etf.id}
+                className="cursor-pointer hover:border-[#d64f79]/50 select-none"
+                onClick={() => onSelectETF(etf)}
+                onMouseDown={() => handleLongPressStart(etf)}
+                onMouseUp={handleLongPressEnd}
+                onMouseLeave={handleLongPressEnd}
+                onTouchStart={() => handleLongPressStart(etf)}
+                onTouchEnd={handleLongPressEnd}
+              >
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between mb-3">
                     <div>

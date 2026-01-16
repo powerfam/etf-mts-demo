@@ -1,13 +1,56 @@
 import { useState } from 'react'
-import { Search, Bell, Menu, FileText, ChevronDown, ChevronUp } from 'lucide-react'
-import { ToggleGroup, ToggleGroupItem } from './ui/toggle-group'
+import { Search, Bell, Menu, FileText, ChevronDown, ChevronUp, X, AlertTriangle, TrendingDown, RefreshCw, Shield } from 'lucide-react'
 import { Button } from './ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog'
+import { mockETFs, type ETF } from '@/data/mockData'
 
 interface HeaderProps {
-  accountType: string
-  onAccountTypeChange: (value: string) => void
+  onSelectETF?: (etf: ETF) => void
 }
+
+// 데모 알림 데이터
+const demoNotifications = [
+  {
+    id: 1,
+    type: 'warning',
+    icon: AlertTriangle,
+    title: '건전성 주의',
+    message: 'KODEX 레버리지의 괴리율이 0.15%로 상승했습니다.',
+    time: '10분 전',
+    color: 'text-amber-400',
+    bgColor: 'bg-amber-500/10',
+  },
+  {
+    id: 2,
+    type: 'rebalance',
+    icon: RefreshCw,
+    title: '리밸런싱 알림',
+    message: '포트폴리오 배분이 목표 대비 7% 이탈했습니다.',
+    time: '1시간 전',
+    color: 'text-blue-400',
+    bgColor: 'bg-blue-500/10',
+  },
+  {
+    id: 3,
+    type: 'drop',
+    icon: TrendingDown,
+    title: '급락 알림',
+    message: 'TIGER 반도체가 전일 대비 -3.2% 하락했습니다.',
+    time: '2시간 전',
+    color: 'text-red-400',
+    bgColor: 'bg-red-500/10',
+  },
+  {
+    id: 4,
+    type: 'safety',
+    icon: Shield,
+    title: '안전 알림',
+    message: '연금계좌에 부적합 상품(레버리지) 매수 시도가 차단되었습니다.',
+    time: '어제',
+    color: 'text-emerald-400',
+    bgColor: 'bg-emerald-500/10',
+  },
+]
 
 // 제품소개서 섹션 컴포넌트
 function ProductInfoSection({ title, children, defaultOpen = false }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) {
@@ -26,8 +69,26 @@ function ProductInfoSection({ title, children, defaultOpen = false }: { title: s
   )
 }
 
-export function Header({ accountType, onAccountTypeChange }: HeaderProps) {
+export function Header({ onSelectETF }: HeaderProps) {
   const [showProductInfo, setShowProductInfo] = useState(false)
+  const [showSearch, setShowSearch] = useState(false)
+  const [showNotifications, setShowNotifications] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+
+  // 검색 결과
+  const searchResults = searchQuery.trim().length >= 1
+    ? mockETFs.filter(etf =>
+        etf.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        etf.shortName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        etf.ticker.includes(searchQuery)
+      ).slice(0, 10)
+    : []
+
+  const handleSelectETF = (etf: ETF) => {
+    onSelectETF?.(etf)
+    setShowSearch(false)
+    setSearchQuery('')
+  }
 
   return (
     <>
@@ -40,30 +101,11 @@ export function Header({ accountType, onAccountTypeChange }: HeaderProps) {
           <h1 className="text-lg font-bold text-white">ETF</h1>
         </div>
 
-        {/* Account Context Toggle */}
-        <ToggleGroup
-          type="single"
-          value={accountType}
-          onValueChange={(value) => value && onAccountTypeChange(value)}
-          className="hidden sm:flex"
-          data-tour="account-toggle"
-        >
-          <ToggleGroupItem value="general" className="text-xs">
-            일반
-          </ToggleGroupItem>
-          <ToggleGroupItem value="pension" className="text-xs">
-            연금
-          </ToggleGroupItem>
-          <ToggleGroupItem value="isa" className="text-xs">
-            ISA
-          </ToggleGroupItem>
-        </ToggleGroup>
-
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" onClick={() => setShowSearch(true)}>
             <Search className="h-5 w-5" />
           </Button>
-          <Button variant="ghost" size="icon" className="relative">
+          <Button variant="ghost" size="icon" className="relative" onClick={() => setShowNotifications(true)}>
             <Bell className="h-5 w-5" />
             <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-[#d64f79]" />
           </Button>
@@ -78,27 +120,115 @@ export function Header({ accountType, onAccountTypeChange }: HeaderProps) {
           </Button>
         </div>
       </div>
-
-      {/* Mobile Account Toggle */}
-      <div className="flex justify-center pb-2 sm:hidden">
-        <ToggleGroup
-          type="single"
-          value={accountType}
-          onValueChange={(value) => value && onAccountTypeChange(value)}
-          data-tour="account-toggle-mobile"
-        >
-          <ToggleGroupItem value="general" className="text-xs">
-            일반
-          </ToggleGroupItem>
-          <ToggleGroupItem value="pension" className="text-xs">
-            연금
-          </ToggleGroupItem>
-          <ToggleGroupItem value="isa" className="text-xs">
-            ISA
-          </ToggleGroupItem>
-        </ToggleGroup>
-      </div>
     </header>
+
+    {/* 검색 모달 */}
+    <Dialog open={showSearch} onOpenChange={setShowSearch}>
+      <DialogContent className="max-w-md bg-[#1f1a2e] border-[#2d2640] p-0">
+        <div className="p-4 border-b border-[#2d2640]">
+          <div className="flex items-center gap-3 bg-[#2d2640] rounded-lg px-3 py-2">
+            <Search className="h-5 w-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="종목명 또는 티커 검색..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="flex-1 bg-transparent text-white placeholder:text-gray-500 outline-none"
+              autoFocus
+            />
+            {searchQuery && (
+              <button onClick={() => setSearchQuery('')}>
+                <X className="h-4 w-4 text-gray-500 hover:text-white" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className="max-h-[60vh] overflow-y-auto">
+          {searchQuery.trim() === '' ? (
+            <div className="p-4 text-center text-gray-500 text-sm">
+              종목명 또는 티커를 입력하세요
+            </div>
+          ) : searchResults.length === 0 ? (
+            <div className="p-4 text-center text-gray-500 text-sm">
+              검색 결과가 없습니다
+            </div>
+          ) : (
+            <div className="p-2">
+              {searchResults.map((etf) => (
+                <button
+                  key={etf.id}
+                  onClick={() => handleSelectETF(etf)}
+                  className="w-full flex items-center justify-between p-3 hover:bg-[#2d2640] rounded-lg transition-colors"
+                >
+                  <div className="text-left">
+                    <div className="text-sm text-white font-medium">{etf.shortName}</div>
+                    <div className="text-xs text-gray-500">{etf.ticker}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm text-white">{etf.price.toLocaleString()}원</div>
+                    <div className={`text-xs ${etf.changePercent >= 0 ? 'text-[#d64f79]' : 'text-[#796ec2]'}`}>
+                      {etf.changePercent >= 0 ? '+' : ''}{etf.changePercent.toFixed(2)}%
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+
+    {/* 알림 모달 */}
+    <Dialog open={showNotifications} onOpenChange={setShowNotifications}>
+      <DialogContent className="max-w-md bg-[#1f1a2e] border-[#2d2640]">
+        <DialogHeader>
+          <DialogTitle className="text-lg text-white flex items-center gap-2">
+            알림
+            <span className="text-xs bg-[#d64f79] text-white px-2 py-0.5 rounded-full">
+              {demoNotifications.length}
+            </span>
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-3 max-h-[60vh] overflow-y-auto">
+          {demoNotifications.map((notification) => {
+            const Icon = notification.icon
+            return (
+              <div
+                key={notification.id}
+                className={`${notification.bgColor} rounded-lg p-3 border border-transparent hover:border-[#3d3650] transition-colors cursor-pointer`}
+              >
+                <div className="flex gap-3">
+                  <div className={`shrink-0 ${notification.color}`}>
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className={`text-sm font-medium ${notification.color}`}>
+                        {notification.title}
+                      </span>
+                      <span className="text-[10px] text-gray-500 shrink-0">
+                        {notification.time}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-400 mt-1">
+                      {notification.message}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        <div className="pt-2 border-t border-[#2d2640]">
+          <button className="w-full text-center text-xs text-gray-500 hover:text-gray-300 py-2">
+            모든 알림 지우기
+          </button>
+        </div>
+      </DialogContent>
+    </Dialog>
 
     {/* 제품소개서 모달 */}
     <Dialog open={showProductInfo} onOpenChange={setShowProductInfo}>
@@ -156,13 +286,13 @@ export function Header({ accountType, onAccountTypeChange }: HeaderProps) {
                 <p className="text-gray-400 text-xs">괴리율, 스프레드, TER, 거래대금 한눈에</p>
               </div>
               <div>
-                <p className="text-white font-medium mb-1">2. 계좌 맞춤형 안전장치</p>
-                <p className="text-gray-400 text-xs">연금계좌: 레버리지/인버스 자동 필터링</p>
-                <p className="text-gray-400 text-xs">계좌별 예상 세금 자동 계산 (5.5%/9.9%/15.4%)</p>
+                <p className="text-white font-medium mb-1">2. 연금계좌 안전장치</p>
+                <p className="text-gray-400 text-xs">레버리지/인버스 자동 필터링</p>
+                <p className="text-gray-400 text-xs">연금적합 상품 필터로 안전한 투자</p>
               </div>
               <div>
                 <p className="text-white font-medium mb-1">3. 쉬운 비교, 빠른 결정</p>
-                <p className="text-gray-400 text-xs">최대 3개 ETF 동시 비교</p>
+                <p className="text-gray-400 text-xs">최대 4개 ETF 동시 비교</p>
                 <p className="text-gray-400 text-xs">데이터 기반 선택, 비교 시간 90% 단축</p>
               </div>
               <div>
@@ -232,7 +362,7 @@ export function Header({ accountType, onAccountTypeChange }: HeaderProps) {
               </div>
               <div>
                 <p className="text-white font-medium">비교</p>
-                <p className="text-gray-400">최대 3개 ETF 비교</p>
+                <p className="text-gray-400">최대 4개 ETF 비교</p>
               </div>
               <div>
                 <p className="text-white font-medium">투자정보</p>

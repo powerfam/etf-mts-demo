@@ -1,4 +1,5 @@
-import { TrendingUp, Rocket, Coins, Shield, DollarSign, Gem, Zap, Wallet, ChevronRight, AlertTriangle, Bell, ArrowRight, BookOpen, Search } from 'lucide-react'
+import React, { useState } from 'react'
+import { TrendingUp, Rocket, Coins, Shield, DollarSign, Gem, Zap, Wallet, Layers, ChevronRight, AlertTriangle, Bell, ArrowRight, BookOpen, Search, ChevronDown } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -7,16 +8,46 @@ import { formatNumber, formatPercent } from '@/lib/utils'
 import type { ETF } from '@/data/mockData'
 
 const iconMap: Record<string, React.ElementType> = {
-  TrendingUp, Rocket, Coins, Shield, DollarSign, Gem, Zap, Wallet
+  TrendingUp, Rocket, Coins, Shield, DollarSign, Gem, Zap, Wallet, Layers
 }
+
+// 계좌 목록 데이터 (데모용)
+const accountList = [
+  { id: 'general-1', number: '8012-1234-5678', type: 'general', label: '일반' },
+  { id: 'pension-1', number: '8012-5678-1234', type: 'pension', label: '연금' },
+  { id: 'isa-1', number: '8012-9012-3456', type: 'isa', label: 'ISA' },
+]
 
 interface HomePageProps {
   accountType: string
   onSelectETF: (etf: ETF) => void
-  onNavigate: (tab: string) => void
+  onNavigate: (tab: string, theme?: string) => void
+  onLongPressETF?: (etf: ETF) => void
+  onAccountTypeChange?: (type: string) => void
 }
 
-export function HomePage({ accountType, onSelectETF, onNavigate }: HomePageProps) {
+export function HomePage({ accountType, onSelectETF, onNavigate, onLongPressETF, onAccountTypeChange }: HomePageProps) {
+  // 계좌 선택 드롭다운 상태
+  const [showAccountDropdown, setShowAccountDropdown] = useState(false)
+
+  // 현재 선택된 계좌 정보
+  const currentAccount = accountList.find(acc => acc.type === accountType) || accountList[0]
+
+  // 롱프레스 처리를 위한 타이머
+  const longPressTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const handleLongPressStart = (etf: ETF) => {
+    longPressTimer.current = setTimeout(() => {
+      onLongPressETF?.(etf)
+    }, 500)
+  }
+
+  const handleLongPressEnd = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current)
+      longPressTimer.current = null
+    }
+  }
   // 계좌 타입에 따른 포트폴리오 데이터 가져오기
   const currentPortfolio = getPortfolioByAccountType(accountType)
   const totalValue = currentPortfolio.reduce((sum, etf) => sum + etf.totalValue, 0)
@@ -55,6 +86,51 @@ export function HomePage({ accountType, onSelectETF, onNavigate }: HomePageProps
     <div className="pb-20">
       {/* Hero Section - My Portfolio Summary */}
       <div className="bg-gradient-to-b from-[#2a1f3d] to-[#191322] px-4 py-6" data-tour="portfolio-summary">
+        {/* 계좌 선택 드롭다운 */}
+        <div className="relative mb-4">
+          <button
+            onClick={() => setShowAccountDropdown(!showAccountDropdown)}
+            className="flex items-center gap-2 bg-[#1f1a2e] border border-[#3d3650] rounded-lg px-3 py-2 w-full"
+          >
+            <Wallet className="h-4 w-4 text-[#d64f79]" />
+            <div className="flex-1 text-left">
+              <div className="text-xs text-gray-400">{currentAccount.label}계좌</div>
+              <div className="text-sm text-white">{currentAccount.number}</div>
+            </div>
+            <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${showAccountDropdown ? 'rotate-180' : ''}`} />
+          </button>
+
+          {/* 드롭다운 메뉴 */}
+          {showAccountDropdown && (
+            <div className="absolute top-full left-0 right-0 mt-1 bg-[#1f1a2e] border border-[#3d3650] rounded-lg overflow-hidden z-50 shadow-xl">
+              {accountList.map((account) => {
+                const isSelected = account.type === accountType
+                return (
+                  <button
+                    key={account.id}
+                    onClick={() => {
+                      onAccountTypeChange?.(account.type)
+                      setShowAccountDropdown(false)
+                    }}
+                    className={`flex items-center gap-2 w-full px-3 py-2.5 text-left transition-colors ${
+                      isSelected ? 'bg-[#d64f79]/20' : 'hover:bg-[#2d2640]'
+                    }`}
+                  >
+                    <Wallet className={`h-4 w-4 ${isSelected ? 'text-[#d64f79]' : 'text-gray-400'}`} />
+                    <div className="flex-1">
+                      <div className="text-xs text-gray-400">{account.label}계좌</div>
+                      <div className="text-sm text-white">{account.number}</div>
+                    </div>
+                    {isSelected && (
+                      <div className="w-2 h-2 rounded-full bg-[#d64f79]" />
+                    )}
+                  </button>
+                )
+              })}
+            </div>
+          )}
+        </div>
+
         <div className="mb-4">
           <div className="flex items-center gap-2 mb-2">
             <Badge variant="outline" className="text-[10px]">{taxInfo.label}</Badge>
@@ -76,15 +152,6 @@ export function HomePage({ accountType, onSelectETF, onNavigate }: HomePageProps
           </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="flex gap-2">
-          <Button size="sm" className="flex-1" onClick={() => onNavigate('discover')}>
-            ETF 탐색
-          </Button>
-          <Button size="sm" variant="outline" className="flex-1" onClick={() => onNavigate('portfolio')}>
-            보유현황
-          </Button>
-        </div>
       </div>
 
       {/* Alerts Section */}
@@ -112,18 +179,18 @@ export function HomePage({ accountType, onSelectETF, onNavigate }: HomePageProps
       {/* Theme/Category Grid */}
       <div className="px-4 py-2" data-tour="category-buttons">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-base font-semibold text-white">목적별 탐색</h2>
+          <h2 className="text-base font-semibold text-white">유형별 탐색</h2>
           <Button variant="ghost" size="sm" className="text-xs text-gray-400" onClick={() => onNavigate('discover')}>
             전체보기 <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
         <div className="grid grid-cols-4 gap-2">
-          {themes.slice(0, 8).map((theme) => {
+          {themes.map((theme) => {
             const Icon = iconMap[theme.icon] || TrendingUp
             return (
               <button
                 key={theme.id}
-                onClick={() => onNavigate('discover')}
+                onClick={() => onNavigate('discover', theme.id)}
                 className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-[#1f1a2e] border border-[#2d2640] hover:border-[#d64f79]/50 transition-colors"
               >
                 <div className="rounded-full bg-[#2a2438] p-2">
@@ -188,7 +255,12 @@ export function HomePage({ accountType, onSelectETF, onNavigate }: HomePageProps
               <div
                 key={`${etf.id}-${index}`}
                 onClick={() => onSelectETF(etf)}
-                className="shimmer-card flex-shrink-0 w-[160px] bg-[#1f1a2e] border border-[#2d2640] rounded-xl p-3 cursor-pointer hover:border-[#d64f79]/50 transition-all hover:scale-105"
+                onMouseDown={() => handleLongPressStart(etf)}
+                onMouseUp={handleLongPressEnd}
+                onMouseLeave={handleLongPressEnd}
+                onTouchStart={() => handleLongPressStart(etf)}
+                onTouchEnd={handleLongPressEnd}
+                className="shimmer-card flex-shrink-0 w-[160px] bg-[#1f1a2e] border border-[#2d2640] rounded-xl p-3 cursor-pointer hover:border-[#d64f79]/50 transition-all hover:scale-105 select-none"
               >
                 {/* Rank Badge */}
                 <div className="flex items-center gap-2 mb-2">
@@ -320,13 +392,22 @@ export function HomePage({ accountType, onSelectETF, onNavigate }: HomePageProps
                 <div
                   key={etf.id}
                   onClick={() => onSelectETF(etf)}
-                  className="flex items-center justify-between cursor-pointer hover:bg-[#2a2438] rounded px-1 py-0.5 transition-colors"
+                  onMouseDown={() => handleLongPressStart(etf)}
+                  onMouseUp={handleLongPressEnd}
+                  onMouseLeave={handleLongPressEnd}
+                  onTouchStart={() => handleLongPressStart(etf)}
+                  onTouchEnd={handleLongPressEnd}
+                  className="group flex items-center justify-between cursor-pointer hover:bg-[#2a2438] rounded px-1 py-0.5 transition-colors select-none"
                 >
-                  <div className="flex items-center gap-2 min-w-0">
-                    <span className="text-[10px] text-gray-500 w-3">{index + 1}</span>
-                    <span className="text-xs text-white truncate">{etf.shortName}</span>
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <span className="text-[10px] text-gray-500 w-3 shrink-0">{index + 1}</span>
+                    <div className="marquee-wrapper">
+                      <span className="marquee-text text-xs text-white">
+                        {etf.shortName}
+                      </span>
+                    </div>
                   </div>
-                  <span className="text-xs font-medium text-up shrink-0">
+                  <span className="text-xs font-medium text-up shrink-0 ml-2">
                     {formatPercent(etf.changePercent)}
                   </span>
                 </div>
@@ -345,13 +426,22 @@ export function HomePage({ accountType, onSelectETF, onNavigate }: HomePageProps
                 <div
                   key={etf.id}
                   onClick={() => onSelectETF(etf)}
-                  className="flex items-center justify-between cursor-pointer hover:bg-[#2a2438] rounded px-1 py-0.5 transition-colors"
+                  onMouseDown={() => handleLongPressStart(etf)}
+                  onMouseUp={handleLongPressEnd}
+                  onMouseLeave={handleLongPressEnd}
+                  onTouchStart={() => handleLongPressStart(etf)}
+                  onTouchEnd={handleLongPressEnd}
+                  className="group flex items-center justify-between cursor-pointer hover:bg-[#2a2438] rounded px-1 py-0.5 transition-colors select-none"
                 >
-                  <div className="flex items-center gap-2 min-w-0">
-                    <span className="text-[10px] text-gray-500 w-3">{index + 1}</span>
-                    <span className="text-xs text-white truncate">{etf.shortName}</span>
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <span className="text-[10px] text-gray-500 w-3 shrink-0">{index + 1}</span>
+                    <div className="marquee-wrapper">
+                      <span className="marquee-text text-xs text-white">
+                        {etf.shortName}
+                      </span>
+                    </div>
                   </div>
-                  <span className="text-xs font-medium text-down shrink-0">
+                  <span className="text-xs font-medium text-down shrink-0 ml-2">
                     {formatPercent(etf.changePercent)}
                   </span>
                 </div>

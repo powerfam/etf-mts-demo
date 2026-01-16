@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Plus, X, CheckCircle2, Info, Radar as RadarIcon, Search } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -19,13 +19,23 @@ import {
 
 interface ComparePageProps {
   onSelectETF: (etf: ETF) => void
+  initialETFs?: ETF[]
+  onClearInitialETFs?: () => void
 }
 
-export function ComparePage({ onSelectETF: _onSelectETF }: ComparePageProps) {
+export function ComparePage({ onSelectETF: _onSelectETF, initialETFs, onClearInitialETFs }: ComparePageProps) {
   void _onSelectETF // 미사용 경고 방지
   const [selectedETFs, setSelectedETFs] = useState<ETF[]>([mockETFs[0], mockETFs[1], mockETFs[2]])
   const [showSelector, setShowSelector] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+
+  // 외부에서 전달된 비교 목록 적용
+  useEffect(() => {
+    if (initialETFs && initialETFs.length > 0) {
+      setSelectedETFs(initialETFs)
+      onClearInitialETFs?.() // 적용 후 초기화
+    }
+  }, [initialETFs, onClearInitialETFs])
 
   const addETF = (etf: ETF) => {
     if (selectedETFs.length < 5 && !selectedETFs.find(e => e.id === etf.id)) {

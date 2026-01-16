@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { TrendingUp, TrendingDown, AlertTriangle, Zap, ArrowDownUp, Shield } from 'lucide-react'
 import { Card } from './ui/card'
 import { Badge } from './ui/badge'
@@ -7,9 +8,26 @@ import { formatNumber, formatPercent, formatCurrency } from '@/lib/utils'
 interface ETFCardProps {
   etf: ETF
   onClick?: () => void
+  onLongPress?: () => void
 }
 
-export function ETFCard({ etf, onClick }: ETFCardProps) {
+export function ETFCard({ etf, onClick, onLongPress }: ETFCardProps) {
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const handlePressStart = () => {
+    if (onLongPress) {
+      longPressTimer.current = setTimeout(() => {
+        onLongPress()
+      }, 500)
+    }
+  }
+
+  const handlePressEnd = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current)
+      longPressTimer.current = null
+    }
+  }
   const isUp = etf.change >= 0
 
   // Determine risk level badges
@@ -43,8 +61,13 @@ export function ETFCard({ etf, onClick }: ETFCardProps) {
 
   return (
     <Card
-      className="cursor-pointer transition-all hover:border-[#d64f79]/50 hover:shadow-lg hover:shadow-[#d64f79]/10"
+      className="cursor-pointer transition-all hover:border-[#d64f79]/50 hover:shadow-lg hover:shadow-[#d64f79]/10 select-none"
       onClick={onClick}
+      onMouseDown={handlePressStart}
+      onMouseUp={handlePressEnd}
+      onMouseLeave={handlePressEnd}
+      onTouchStart={handlePressStart}
+      onTouchEnd={handlePressEnd}
       data-tour="etf-card"
     >
       <div className="p-4">

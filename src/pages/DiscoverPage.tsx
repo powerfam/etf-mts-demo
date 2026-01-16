@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Search, TrendingUp, Rocket, Coins, Shield, DollarSign, Gem, Zap, Wallet, SlidersHorizontal, ChevronDown } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Search, TrendingUp, Rocket, Coins, Shield, DollarSign, Gem, Zap, Wallet, Layers, SlidersHorizontal, ChevronDown } from 'lucide-react'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -9,23 +9,44 @@ import { mockETFs, themes } from '@/data/mockData'
 import type { ETF } from '@/data/mockData'
 
 const iconMap: Record<string, React.ElementType> = {
-  TrendingUp, Rocket, Coins, Shield, DollarSign, Gem, Zap, Wallet
+  TrendingUp, Rocket, Coins, Shield, DollarSign, Gem, Zap, Wallet, Layers
 }
 
 interface DiscoverPageProps {
   onSelectETF: (etf: ETF) => void
   accountType?: string
+  selectedTheme?: string
+  onThemeChange?: (theme: string) => void
+  onLongPressETF?: (etf: ETF) => void
 }
 
 const INITIAL_DISPLAY_COUNT = 20
 
-export function DiscoverPage({ onSelectETF, accountType = 'general' }: DiscoverPageProps) {
-  const [selectedTheme, setSelectedTheme] = useState<string>('all')
-  const [sortBy, setSortBy] = useState<string>('health')
+export function DiscoverPage({
+  onSelectETF,
+  accountType = 'general',
+  selectedTheme: externalTheme = 'all',
+  onThemeChange,
+  onLongPressETF
+}: DiscoverPageProps) {
+  const [internalTheme, setInternalTheme] = useState<string>(externalTheme)
+  const [sortBy, setSortBy] = useState<string>('return')
   const [mode, setMode] = useState<string>('discover')
   const [searchQuery, setSearchQuery] = useState<string>('')
   const [showAll, setShowAll] = useState<boolean>(false)
   const [pensionModeManual, setPensionModeManual] = useState<boolean>(false)
+  const [marketFilter, setMarketFilter] = useState<string>('all') // 국내/해외/전체
+
+  // 외부 테마 변경 시 내부 상태 동기화
+  useEffect(() => {
+    setInternalTheme(externalTheme)
+  }, [externalTheme])
+
+  const selectedTheme = internalTheme
+  const setSelectedTheme = (theme: string) => {
+    setInternalTheme(theme)
+    onThemeChange?.(theme)
+  }
 
   // 연금/ISA 계좌 선택 시 자동으로 레버리지/인버스 필터링
   const isPensionAccount = accountType === 'pension' || accountType === 'isa'
@@ -41,21 +62,25 @@ export function DiscoverPage({ onSelectETF, accountType = 'general' }: DiscoverP
 
     const matchesTheme = selectedTheme === 'all' || (() => {
       const themeMapping: Record<string, string[]> = {
-        market: ['시장대표'],
-        growth: ['글로벌'],
-        dividend: ['배당'],
+        index: ['시장지수'],
         bond: ['채권'],
+        dividend: ['배당'],
+        strategy: ['전략'],
         currency: ['통화'],
         commodity: ['원자재'],
-        leverage: ['레버리지', '인버스'],
-        pension: ['배당', '채권'],
+        leverage: ['레버리지'],
       }
       return themeMapping[selectedTheme]?.some(cat => etf.category.includes(cat)) || false
     })()
 
     const matchesPensionMode = !pensionMode || (!etf.isLeveraged && !etf.isInverse)
 
-    return matchesSearch && matchesTheme && matchesPensionMode
+    // 국내/해외 필터
+    const matchesMarket = marketFilter === 'all' ||
+      (marketFilter === 'domestic' && etf.marketClass === '국내') ||
+      (marketFilter === 'overseas' && etf.marketClass === '해외')
+
+    return matchesSearch && matchesTheme && matchesPensionMode && matchesMarket
   })
 
   const sortedETFs = [...filteredETFs].sort((a, b) => {
@@ -75,20 +100,8 @@ export function DiscoverPage({ onSelectETF, accountType = 'general' }: DiscoverP
   return (
     <div className="pb-20">
       <div className="sticky top-[52px] z-40 bg-[#191322] px-4 py-3 border-b border-[#2d2640]">
-        <div className="flex items-center justify-between mb-3" data-tour="pension-filter">
-          <span className="text-sm text-gray-400">
-            연금계좌 적합 상품만
-            {isPensionAccount && <span className="ml-1 text-xs text-[#d64f79]">(연금/ISA 계좌)</span>}
-          </span>
-          <button
-            onClick={() => !isPensionAccount && setPensionModeManual(!pensionModeManual)}
-            disabled={isPensionAccount}
-            className={`relative w-11 h-6 rounded-full transition-colors ${pensionMode ? 'bg-[#d64f79]' : 'bg-[#3d3650]'} ${isPensionAccount ? 'opacity-70 cursor-not-allowed' : ''}`}
-          >
-            <span className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${pensionMode ? 'translate-x-5' : 'translate-x-0'}`} />
-          </button>
-        </div>
-        <div className="flex gap-2">
+        {/* 검색바 (최상단) */}
+        <div className="flex gap-2 mb-3">
           <div className="flex-1 flex items-center gap-2 bg-[#1f1a2e] rounded-lg px-3 py-2 border border-[#2d2640]" data-tour="search-input">
             <Search className="h-4 w-4 text-gray-400" />
             <input
@@ -102,6 +115,43 @@ export function DiscoverPage({ onSelectETF, accountType = 'general' }: DiscoverP
           <Button variant="outline" size="icon">
             <SlidersHorizontal className="h-4 w-4" />
           </Button>
+        </div>
+        {/* 연금계좌 적합 상품만 */}
+        <div className="flex items-center justify-between mb-2" data-tour="pension-filter">
+          <span className="text-sm text-gray-400">
+            연금계좌 적합 상품만
+            {isPensionAccount && <span className="ml-1 text-xs text-[#d64f79]">(연금/ISA 계좌)</span>}
+          </span>
+          <button
+            onClick={() => !isPensionAccount && setPensionModeManual(!pensionModeManual)}
+            disabled={isPensionAccount}
+            className={`relative w-11 h-6 rounded-full transition-colors ${pensionMode ? 'bg-[#d64f79]' : 'bg-[#3d3650]'} ${isPensionAccount ? 'opacity-70 cursor-not-allowed' : ''}`}
+          >
+            <span className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${pensionMode ? 'translate-x-5' : 'translate-x-0'}`} />
+          </button>
+        </div>
+        {/* 시장 선택 */}
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-gray-500">시장:</span>
+          <div className="flex gap-1">
+            {[
+              { id: 'all', label: '전체' },
+              { id: 'domestic', label: '국내' },
+              { id: 'overseas', label: '해외' },
+            ].map((option) => (
+              <button
+                key={option.id}
+                onClick={() => setMarketFilter(option.id)}
+                className={`px-3 py-1 text-xs rounded-full transition-colors ${
+                  marketFilter === option.id
+                    ? 'bg-[#d64f79] text-white'
+                    : 'bg-[#2d2640] text-gray-400 hover:bg-[#3d3650]'
+                }`}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -146,7 +196,7 @@ export function DiscoverPage({ onSelectETF, accountType = 'general' }: DiscoverP
       <div className="px-4 pb-3 flex items-center justify-between" data-tour="sort-options">
         <div className="text-sm text-gray-400">{sortedETFs.length}개 ETF</div>
         <div className="flex gap-2">
-          {['health', 'ter', 'liquidity', 'return'].map((sort) => (
+          {['return', 'liquidity', 'ter', 'health'].map((sort) => (
             <Button
               key={sort}
               variant="ghost"
@@ -154,7 +204,7 @@ export function DiscoverPage({ onSelectETF, accountType = 'general' }: DiscoverP
               className={`text-xs ${sortBy === sort ? 'text-[#d64f79]' : 'text-gray-400'}`}
               onClick={() => setSortBy(sort)}
             >
-              {sort === 'health' ? '건전성순' : sort === 'ter' ? '저비용순' : sort === 'liquidity' ? '유동성순' : '수익률순'}
+              {sort === 'return' ? '수익률순' : sort === 'liquidity' ? '유동성순' : sort === 'ter' ? '저비용순' : '건전성순'}
             </Button>
           ))}
         </div>
@@ -163,7 +213,7 @@ export function DiscoverPage({ onSelectETF, accountType = 'general' }: DiscoverP
       {mode === 'discover' && (
         <div className="px-4 space-y-3">
           {displayedETFs.map((etf) => (
-            <ETFCard key={etf.id} etf={etf} onClick={() => onSelectETF(etf)} />
+            <ETFCard key={etf.id} etf={etf} onClick={() => onSelectETF(etf)} onLongPress={() => onLongPressETF?.(etf)} />
           ))}
           {hasMoreETFs && !showAll && (
             <button onClick={() => setShowAll(true)} className="w-full py-3 flex items-center justify-center gap-2 bg-[#2d2640] hover:bg-[#3d3650] rounded-xl text-sm text-gray-300 transition-colors">

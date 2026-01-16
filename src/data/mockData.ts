@@ -34,17 +34,83 @@ export interface ETF {
 }
 
 export const themes = [
-  { id: 'market', name: '시장대표', icon: 'TrendingUp' },
-  { id: 'growth', name: '글로벌', icon: 'Rocket' },
-  { id: 'dividend', name: '배당', icon: 'Coins' },
+  { id: 'index', name: '시장지수', icon: 'TrendingUp' },
   { id: 'bond', name: '채권', icon: 'Shield' },
+  { id: 'dividend', name: '배당', icon: 'Coins' },
+  { id: 'strategy', name: '전략', icon: 'Rocket' },
   { id: 'currency', name: '통화', icon: 'DollarSign' },
   { id: 'commodity', name: '원자재', icon: 'Gem' },
   { id: 'leverage', name: '레버리지', icon: 'Zap' },
-  { id: 'pension', name: '연금', icon: 'Wallet' },
+  { id: 'all', name: '전체', icon: 'Layers' },
 ]
 
+// ETF 종목명 기반 자동 분류 함수
+export function classifyETF(shortName: string): string {
+  const name = shortName.toUpperCase()
+
+  // 1. 레버리지/인버스 (우선순위 최상)
+  if (name.includes('레버리지') || name.includes('인버스') || name.includes('2X')) {
+    return '레버리지'
+  }
+
+  // 2. 채권
+  if (name.includes('채권') || name.includes('국채') || name.includes('국고채') ||
+      name.includes('회사채') || name.includes('단기채') || name.includes('통안채') ||
+      name.includes('금리') || name.includes('CD금리') || name.includes('KOFR') ||
+      name.includes('TRF') || name.includes('머니마켓')) {
+    return '채권'
+  }
+
+  // 3. 배당/커버드콜
+  if (name.includes('배당') || name.includes('커버드콜') || name.includes('인컴') ||
+      name.includes('배당귀족') || name.includes('배당킹')) {
+    return '배당'
+  }
+
+  // 4. 통화
+  if (name.includes('달러') || name.includes('엔화') || name.includes('유로') ||
+      name.includes('환') || name.includes('통화')) {
+    return '통화'
+  }
+
+  // 5. 원자재
+  if (name.includes('금') || name.includes('골드') || name.includes('은') ||
+      name.includes('원유') || name.includes('WTI') || name.includes('농산물') ||
+      name.includes('구리') || name.includes('실물') || name.includes('금은')) {
+    return '원자재'
+  }
+
+  // 6. 전략 (테마/섹터/액티브)
+  if (name.includes('액티브') || name.includes('모멘텀') || name.includes('퀄리티') ||
+      name.includes('가치') || name.includes('ESG') || name.includes('펀더멘털') ||
+      name.includes('경기방어') || name.includes('리츠') || name.includes('부동산') ||
+      name.includes('혼합') || name.includes('밸류체인') || name.includes('그룹') ||
+      name.includes('2차전지') || name.includes('반도체') || name.includes('AI') ||
+      name.includes('게임') || name.includes('메타버스') || name.includes('신재생') ||
+      name.includes('바이오') || name.includes('원자력') || name.includes('로봇') ||
+      name.includes('콘텐츠') || name.includes('IT') || name.includes('테크') ||
+      name.includes('비만') || name.includes('TOP') || name.includes('파운드리') ||
+      name.includes('라틴')) {
+    return '전략'
+  }
+
+  // 7. 시장지수 (기본값)
+  return '시장지수'
+}
+
 export const mockETFs: ETF[] = [
+  {
+    id: '101', ticker: '0103T0', name: '1Q K소버린AI증권상장지수투자신탁(주식)', shortName: '1Q K소버린AI',
+    price: 11250, prevClose: 11100, change: 150, changePercent: 1.35,
+    iNav: 11245, discrepancy: 0.04, ter: 0.45, spread: 0.08,
+    adtv: 15800000000, aum: 85000000000, trackingError: 0.12, volatility: 22.5, dividendYield: 0.3,
+    category: '전략', tags: ['국내', 'AI', '소버린AI', '패시브'], healthScore: 82,
+    sparkline: [10800, 10950, 11020, 10980, 11080, 11100, 11250],
+    overview: '국내 AI 관련 기업에 집중 투자하는 패시브 ETF',
+    indexDescription: 'iSelect K소버린AI 지수: 자체 AI 기술을 개발하고 사업화를 추진하는 기업 및 AI 관련 기업의 성장을 지원하는 전문 투자기업으로 구성',
+    strategy: '글로벌 AI 경쟁 가속화 과정에서 부각되는 국산 AI의 전략적 가치에 투자',
+    issuer: '원큐자산운용', listedDate: '2025/03/15', indexProvider: 'NH투자증권', assetClass: '주식', marketClass: '국내',
+  },
   {
     id: '1', ticker: '069500', name: 'KODEX 200', shortName: 'KODEX 200',
     price: 35420, prevClose: 35200, change: 220, changePercent: 0.63,
@@ -1250,6 +1316,11 @@ export const mockETFs: ETF[] = [
     issuer: '삼성자산운용', listedDate: '2016/01/27', indexProvider: 'KRX', assetClass: '주식', marketClass: '국내',
   },
 ]
+
+// ETF category 자동 분류 적용
+mockETFs.forEach(etf => {
+  etf.category = classifyETF(etf.shortName)
+})
 
 // 포트폴리오 ETF 생성 헬퍼 함수
 const createPortfolioETF = (etf: ETF, quantity: number, avgPriceMultiplier: number) => {

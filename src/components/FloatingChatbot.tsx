@@ -26,9 +26,10 @@ const iconMap: Record<string, React.ElementType> = {
 interface FloatingChatbotProps {
   onSelectContent: (content: InvestContent) => void
   onNavigateToGlossary: () => void
+  hasCompareSlot?: boolean
 }
 
-export function FloatingChatbot({ onSelectContent, onNavigateToGlossary }: FloatingChatbotProps) {
+export function FloatingChatbot({ onSelectContent, onNavigateToGlossary, hasCompareSlot = false }: FloatingChatbotProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [showChatbot, setShowChatbot] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
@@ -56,7 +57,9 @@ export function FloatingChatbot({ onSelectContent, onNavigateToGlossary }: Float
       {showChatbot && !isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-24 right-4 w-14 h-14 bg-gradient-to-r from-[#d64f79] to-[#8B5CF6] rounded-full shadow-lg flex items-center justify-center hover:scale-105 transition-transform z-50"
+          className={`fixed right-4 w-14 h-14 bg-gradient-to-r from-[#d64f79] to-[#8B5CF6] rounded-full shadow-lg flex items-center justify-center hover:scale-105 transition-all duration-300 z-50 ${
+            hasCompareSlot ? 'bottom-36' : 'bottom-24'
+          }`}
           data-tour="chatbot-button"
         >
           <MessageCircle className="h-6 w-6 text-white" />
@@ -251,31 +254,29 @@ export function FloatingChatbot({ onSelectContent, onNavigateToGlossary }: Float
   )
 }
 
-// 의도 기반 버튼
+// 의도 기반 버튼 - 홈 유형별 탐색 스타일과 통일
 function IntentButton({
   icon: Icon,
   title,
   subtitle,
-  color,
   onClick,
 }: {
   icon: React.ElementType
   title: string
   subtitle: string
-  color: string
+  color?: string  // 더 이상 사용하지 않음
   onClick: () => void
 }) {
   return (
     <button
       onClick={onClick}
-      className="flex flex-col items-center gap-1 p-3 rounded-xl border border-[#3d3650] hover:border-opacity-50 transition-all active:scale-[0.98]"
-      style={{ backgroundColor: `${color}10`, borderColor: `${color}30` }}
+      className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-[#1f1a2e] border border-[#2d2640] hover:border-[#d64f79]/50 hover:bg-[#2a2438] transition-all active:scale-[0.98]"
     >
-      <div className="rounded-full p-2" style={{ backgroundColor: `${color}20` }}>
-        <Icon className="h-5 w-5" style={{ color }} />
+      <div className="rounded-full p-2 bg-[#d64f79]/20">
+        <Icon className="h-5 w-5 text-[#d64f79]" />
       </div>
       <span className="text-sm font-medium text-white">{title}</span>
-      <span className="text-[11px] text-gray-500">{subtitle}</span>
+      <span className="text-[11px] text-gray-400">{subtitle}</span>
     </button>
   )
 }
