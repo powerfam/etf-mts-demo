@@ -3,9 +3,26 @@ import { TrendingUp, Rocket, Coins, Shield, DollarSign, Gem, Zap, Wallet, Layers
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { mockETFs, themes, getPortfolioByAccountType } from '@/data/mockData'
 import { formatNumber, formatPercent } from '@/lib/utils'
 import type { ETF } from '@/data/mockData'
+
+// 히트맵 테마 키워드 매핑 (ETF shortName 기반 필터링)
+const themeKeywords: Record<string, string[]> = {
+  'AI/반도체': ['AI', '반도체', '파운드리', 'HBM', '시스템반도체', '메모리', '칩', 'SOX'],
+  '2차전지': ['2차전지', '배터리', '전기차', 'EV', '리튬', '양극재', '음극재'],
+  '배당': ['배당', '고배당', '인컴', '커버드콜', '배당귀족', '배당킹', '월배당'],
+  '바이오': ['바이오', '헬스케어', '제약', '의료', '비만', '신약'],
+  '금융': ['금융', '은행', '보험', '증권'],
+  '게임': ['게임', '엔터', 'K-콘텐츠', '미디어'],
+  '메타버스': ['메타버스', 'VR', 'AR', '가상현실'],
+  '신재생': ['신재생', '친환경', '클린에너지', '태양광', '풍력', '수소', '탄소'],
+  '원자재': ['골드', 'Gold', '원유', 'WTI', '구리', '원자재', '농산물', '금선물', '은선물'],
+  '중국': ['중국', '차이나', 'CSI', '항셍', '홍콩'],
+  '미국': ['미국', 'S&P', '나스닥', 'NASDAQ', '다우', '필라델피아'],
+  '채권': ['채권', '국채', '회사채', '단기채', '금리', 'KOFR', 'CD금리', '머니마켓'],
+}
 
 const iconMap: Record<string, React.ElementType> = {
   TrendingUp, Rocket, Coins, Shield, DollarSign, Gem, Zap, Wallet, Layers
@@ -32,6 +49,26 @@ export function HomePage({ accountType, onSelectETF, onNavigate, onLongPressETF,
 
   // 현재 선택된 계좌 정보
   const currentAccount = accountList.find(acc => acc.type === accountType) || accountList[0]
+
+  // 히트맵 테마 모달 상태
+  const [selectedTheme, setSelectedTheme] = useState<{ theme: string; weeklyReturn: number } | null>(null)
+
+  // 테마별 ETF 필터링 함수
+  const getETFsByTheme = (themeName: string): ETF[] => {
+    const keywords = themeKeywords[themeName] || []
+    if (keywords.length === 0) return []
+
+    return mockETFs
+      .filter(etf => {
+        // 레버리지/인버스 제외
+        if (etf.isLeveraged || etf.isInverse) return false
+        // 키워드 매칭
+        const name = etf.shortName.toUpperCase()
+        return keywords.some(keyword => name.toUpperCase().includes(keyword.toUpperCase()))
+      })
+      .sort((a, b) => b.changePercent - a.changePercent) // 수익률 순 정렬
+      .slice(0, 10) // TOP 10
+  }
 
   // 롱프레스 처리를 위한 타이머
   const longPressTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -341,7 +378,7 @@ export function HomePage({ accountType, onSelectETF, onNavigate, onLongPressETF,
                 key={item.theme}
                 className="relative p-2 rounded-lg cursor-pointer transition-all hover:scale-105"
                 style={getHeatStyle(item.weeklyReturn)}
-                onClick={() => onNavigate('discover')}
+                onClick={() => setSelectedTheme(item)}
               >
                 <div className="text-[10px] font-medium truncate">{item.theme}</div>
                 <div className="text-xs font-bold mt-0.5">
@@ -577,6 +614,89 @@ export function HomePage({ accountType, onSelectETF, onNavigate, onLongPressETF,
           </CardContent>
         </Card>
       </div>
+
+      {/* 테마 TOP 10 모달 */}
+      <Dialog open={!!selectedTheme} onOpenChange={() => setSelectedTheme(null)}>
+        <DialogContent className="bg-[#1f1a2e] border-[#2d2640] max-w-md max-h-[80vh] overflow-hidden">
+          <DialogHeader className="pb-2">
+            <DialogTitle className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-white">{selectedTheme?.theme}</span>
+                <span className={`text-sm font-medium px-2 py-0.5 rounded ${
+                  (selectedTheme?.weeklyReturn || 0) >= 0
+                    ? 'bg-up/20 text-up'
+                    : 'bg-down/20 text-down'
+                }`}>
+                  {(selectedTheme?.weeklyReturn || 0) >= 0 ? '+' : ''}
+                  {selectedTheme?.weeklyReturn?.toFixed(2)}%
+                </span>
+              </div>
+            </DialogTitle>
+            <p className="text-xs text-gray-400">주간 수익률 기준 TOP 10</p>
+          </DialogHeader>
+
+          <div className="overflow-y-auto max-h-[calc(80vh-100px)] -mx-2 px-2">
+            {selectedTheme && getETFsByTheme(selectedTheme.theme).length > 0 ? (
+              <div className="space-y-2">
+                {getETFsByTheme(selectedTheme.theme).map((etf, index) => (
+                  <div
+                    key={etf.id}
+                    onClick={() => {
+                      setSelectedTheme(null)
+                      onSelectETF(etf)
+                    }}
+                    className="flex items-center gap-3 p-3 bg-[#2a2438] rounded-lg cursor-pointer hover:bg-[#3d3650] transition-colors"
+                  >
+                    {/* 순위 */}
+                    <div className={`flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${
+                      index < 3 ? 'bg-[#d64f79]/20 text-[#d64f79]' : 'bg-gray-600/20 text-gray-400'
+                    }`}>
+                      {index + 1}
+                    </div>
+
+                    {/* ETF 정보 */}
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium text-white truncate">{etf.shortName}</div>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        <span className="text-[10px] text-gray-500">{etf.ticker}</span>
+                        <span className={`text-[9px] px-1.5 py-0.5 rounded ${
+                          etf.marketClass === '해외' ? 'bg-blue-500/20 text-blue-400' : 'bg-emerald-500/20 text-emerald-400'
+                        }`}>
+                          {etf.marketClass}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* 가격 & 수익률 */}
+                    <div className="text-right shrink-0">
+                      <div className="text-sm font-bold text-white">{formatNumber(etf.price)}</div>
+                      <div className={`text-xs ${etf.changePercent >= 0 ? 'text-up' : 'text-down'}`}>
+                        {etf.changePercent >= 0 ? '+' : ''}{formatPercent(etf.changePercent)}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <Search className="h-10 w-10 text-gray-600 mb-3" />
+                <p className="text-sm text-gray-400">해당 테마의 ETF가 없습니다</p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mt-4"
+                  onClick={() => {
+                    setSelectedTheme(null)
+                    onNavigate('discover')
+                  }}
+                >
+                  탐색 페이지로 이동
+                </Button>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

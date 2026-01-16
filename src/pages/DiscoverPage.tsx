@@ -25,7 +25,7 @@ const INITIAL_DISPLAY_COUNT = 20
 export function DiscoverPage({
   onSelectETF,
   accountType = 'general',
-  selectedTheme: externalTheme = 'all',
+  selectedTheme: externalTheme = 'none',
   onThemeChange,
   onLongPressETF
 }: DiscoverPageProps) {
@@ -52,7 +52,10 @@ export function DiscoverPage({
   const isPensionAccount = accountType === 'pension' || accountType === 'isa'
   const pensionMode = isPensionAccount || pensionModeManual
 
-  const filteredETFs = mockETFs.filter(etf => {
+  // 'none' 테마이고 검색어도 없으면 빈 리스트 표시
+  const isEmptyState = selectedTheme === 'none' && searchQuery.trim() === ''
+
+  const filteredETFs = isEmptyState ? [] : mockETFs.filter(etf => {
     const query = searchQuery.toLowerCase().trim()
     const matchesSearch = !query ||
       etf.name.toLowerCase().includes(query) ||
@@ -60,7 +63,7 @@ export function DiscoverPage({
       etf.ticker.includes(query) ||
       etf.category.toLowerCase().includes(query)
 
-    const matchesTheme = selectedTheme === 'all' || (() => {
+    const matchesTheme = selectedTheme === 'all' || selectedTheme === 'none' || (() => {
       const themeMapping: Record<string, string[]> = {
         index: ['시장지수'],
         bond: ['채권'],
@@ -93,7 +96,7 @@ export function DiscoverPage({
     }
   })
 
-  const isFiltering = searchQuery.trim() !== '' || selectedTheme !== 'all'
+  const isFiltering = searchQuery.trim() !== '' || (selectedTheme !== 'all' && selectedTheme !== 'none')
   const displayedETFs = (showAll || isFiltering) ? sortedETFs : sortedETFs.slice(0, INITIAL_DISPLAY_COUNT)
   const hasMoreETFs = sortedETFs.length > INITIAL_DISPLAY_COUNT && !isFiltering
 
@@ -166,16 +169,25 @@ export function DiscoverPage({
       </div>
 
       <div className="px-4 pb-3" data-tour="theme-filter">
+        {/* 빈 상태일 때 안내 메시지 */}
+        {isEmptyState && (
+          <div className="text-sm text-[#d64f79] mb-2 font-medium">
+            👇 테마를 선택하거나 검색어를 입력하세요
+          </div>
+        )}
         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+          {/* 전체 버튼을 맨 앞에 (아이콘 포함) */}
           <Button
             variant={selectedTheme === 'all' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setSelectedTheme('all')}
             className="shrink-0"
           >
+            <Layers className="h-3 w-3 mr-1" />
             전체
           </Button>
-          {themes.map((theme) => {
+          {/* 나머지 테마 (전체 제외) */}
+          {themes.filter(theme => theme.id !== 'all').map((theme) => {
             const Icon = iconMap[theme.icon] || TrendingUp
             return (
               <Button
@@ -212,6 +224,15 @@ export function DiscoverPage({
 
       {mode === 'discover' && (
         <div className="px-4 space-y-3">
+          {isEmptyState && (
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <Search className="h-12 w-12 text-gray-600 mb-4" />
+              <h3 className="text-lg font-medium text-white mb-2">ETF를 탐색해보세요</h3>
+              <p className="text-sm text-gray-400 max-w-[240px]">
+                상단의 테마 버튼을 선택하거나<br />검색어를 입력해주세요
+              </p>
+            </div>
+          )}
           {displayedETFs.map((etf) => (
             <ETFCard key={etf.id} etf={etf} onClick={() => onSelectETF(etf)} onLongPress={() => onLongPressETF?.(etf)} />
           ))}
@@ -232,60 +253,84 @@ export function DiscoverPage({
 
       {mode === 'check' && (
         <div className="px-4">
-          <Card className="mb-4">
-            <CardContent className="p-4">
-              <h3 className="text-sm font-semibold text-white mb-3">빠른 비교 체크리스트</h3>
-              <div className="space-y-2">
-                {[['TER (총보수)', '0.05% 이하 권장'], ['괴리율', '±0.1% 이내 권장'], ['스프레드', '0.05% 이하 권장'], ['거래대금', '100억 이상 권장']].map(([label, value]) => (
-                  <div key={label} className="flex items-center justify-between text-xs">
-                    <span className="text-gray-400">{label}</span>
-                    <span className="text-emerald-400">{value}</span>
+          {isEmptyState && (
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <Search className="h-12 w-12 text-gray-600 mb-4" />
+              <h3 className="text-lg font-medium text-white mb-2">ETF를 탐색해보세요</h3>
+              <p className="text-sm text-gray-400 max-w-[240px]">
+                상단의 테마 버튼을 선택하거나<br />검색어를 입력해주세요
+              </p>
+            </div>
+          )}
+          {!isEmptyState && (
+            <>
+              <Card className="mb-4">
+                <CardContent className="p-4">
+                  <h3 className="text-sm font-semibold text-white mb-3">빠른 비교 체크리스트</h3>
+                  <div className="space-y-2">
+                    {[['TER (총보수)', '0.05% 이하 권장'], ['괴리율', '±0.1% 이내 권장'], ['스프레드', '0.05% 이하 권장'], ['거래대금', '100억 이상 권장']].map(([label, value]) => (
+                      <div key={label} className="flex items-center justify-between text-xs">
+                        <span className="text-gray-400">{label}</span>
+                        <span className="text-emerald-400">{value}</span>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                </CardContent>
+              </Card>
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="border-b border-[#2d2640]">
+                      {['종목', 'TER', '괴리율', '스프레드', '건전성'].map((h) => (
+                        <th key={h} className={`py-2 text-gray-400 font-medium ${h === '종목' ? 'text-left' : 'text-right'}`}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {displayedETFs.map((etf) => (
+                      <tr key={etf.id} className="border-b border-[#2d2640] cursor-pointer hover:bg-[#1f1a2e]" onClick={() => onSelectETF(etf)}>
+                        <td className="py-3">
+                          <div className="font-medium text-white">{etf.shortName}</div>
+                          <div className="text-gray-500">{etf.ticker}</div>
+                        </td>
+                        <td className={`text-right ${etf.ter <= 0.05 ? 'text-emerald-400' : etf.ter <= 0.1 ? 'text-amber-400' : 'text-red-400'}`}>{etf.ter.toFixed(2)}%</td>
+                        <td className={`text-right ${Math.abs(etf.discrepancy) <= 0.1 ? 'text-emerald-400' : 'text-amber-400'}`}>{etf.discrepancy >= 0 ? '+' : ''}{etf.discrepancy.toFixed(2)}%</td>
+                        <td className={`text-right ${etf.spread <= 0.05 ? 'text-emerald-400' : 'text-amber-400'}`}>{etf.spread.toFixed(2)}%</td>
+                        <td className="text-right"><Badge variant={etf.healthScore >= 90 ? 'success' : etf.healthScore >= 75 ? 'warning' : 'danger'}>{etf.healthScore}</Badge></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-            </CardContent>
-          </Card>
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs">
-              <thead>
-                <tr className="border-b border-[#2d2640]">
-                  {['종목', 'TER', '괴리율', '스프레드', '건전성'].map((h) => (
-                    <th key={h} className={`py-2 text-gray-400 font-medium ${h === '종목' ? 'text-left' : 'text-right'}`}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {displayedETFs.map((etf) => (
-                  <tr key={etf.id} className="border-b border-[#2d2640] cursor-pointer hover:bg-[#1f1a2e]" onClick={() => onSelectETF(etf)}>
-                    <td className="py-3">
-                      <div className="font-medium text-white">{etf.shortName}</div>
-                      <div className="text-gray-500">{etf.ticker}</div>
-                    </td>
-                    <td className={`text-right ${etf.ter <= 0.05 ? 'text-emerald-400' : etf.ter <= 0.1 ? 'text-amber-400' : 'text-red-400'}`}>{etf.ter.toFixed(2)}%</td>
-                    <td className={`text-right ${Math.abs(etf.discrepancy) <= 0.1 ? 'text-emerald-400' : 'text-amber-400'}`}>{etf.discrepancy >= 0 ? '+' : ''}{etf.discrepancy.toFixed(2)}%</td>
-                    <td className={`text-right ${etf.spread <= 0.05 ? 'text-emerald-400' : 'text-amber-400'}`}>{etf.spread.toFixed(2)}%</td>
-                    <td className="text-right"><Badge variant={etf.healthScore >= 90 ? 'success' : etf.healthScore >= 75 ? 'warning' : 'danger'}>{etf.healthScore}</Badge></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+            </>
+          )}
         </div>
       )}
 
       {mode === 'trade' && (
         <div className="px-4 space-y-3">
-          <Card className="border-[#d64f79]/30 bg-[#d64f79]/5">
-            <CardContent className="p-4">
-              <h3 className="text-sm font-semibold text-white mb-2">안전 주문 가이드</h3>
-              <ul className="text-xs text-gray-400 space-y-1">
-                <li>• 지정가 주문으로 슬리피지를 방지하세요</li>
-                <li>• 괴리율이 높을 때는 매매를 피하세요</li>
-                <li>• 대량 주문은 분할 매매를 권장합니다</li>
-              </ul>
-            </CardContent>
-          </Card>
-          {displayedETFs.map((etf) => (
+          {isEmptyState && (
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <Search className="h-12 w-12 text-gray-600 mb-4" />
+              <h3 className="text-lg font-medium text-white mb-2">ETF를 탐색해보세요</h3>
+              <p className="text-sm text-gray-400 max-w-[240px]">
+                상단의 테마 버튼을 선택하거나<br />검색어를 입력해주세요
+              </p>
+            </div>
+          )}
+          {!isEmptyState && (
+            <>
+              <Card className="border-[#d64f79]/30 bg-[#d64f79]/5">
+                <CardContent className="p-4">
+                  <h3 className="text-sm font-semibold text-white mb-2">안전 주문 가이드</h3>
+                  <ul className="text-xs text-gray-400 space-y-1">
+                    <li>• 지정가 주문으로 슬리피지를 방지하세요</li>
+                    <li>• 괴리율이 높을 때는 매매를 피하세요</li>
+                    <li>• 대량 주문은 분할 매매를 권장합니다</li>
+                  </ul>
+                </CardContent>
+              </Card>
+              {displayedETFs.map((etf) => (
             <Card key={etf.id} className="cursor-pointer hover:border-[#d64f79]/50" onClick={() => onSelectETF(etf)}>
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-2">
@@ -324,6 +369,8 @@ export function DiscoverPage({
               </CardContent>
             </Card>
           ))}
+            </>
+          )}
         </div>
       )}
     </div>

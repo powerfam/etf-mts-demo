@@ -30,8 +30,8 @@ function App() {
   const [showContentDetail, setShowContentDetail] = useState(false)
   const [isChatbotOpen, setIsChatbotOpen] = useState(false)
 
-  // 탐색 페이지 필터 상태
-  const [selectedTheme, setSelectedTheme] = useState<string>('all')
+  // 탐색 페이지 필터 상태 (기본값: 'none' - 아무것도 선택되지 않음)
+  const [selectedTheme, setSelectedTheme] = useState<string>('none')
 
   // 비교 ETF 목록 (최대 4개)
   const [compareETFs, setCompareETFs] = useState<ETF[]>([])
@@ -229,7 +229,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-[#191322]">
-      <Header onSelectETF={handleSelectETF} />
+      <Header onSelectETF={handleSelectETF} accountType={accountType} />
 
       {activeTab === 'home' && (
         <HomePage

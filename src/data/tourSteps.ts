@@ -3,6 +3,12 @@ import type { TourStep } from '../components/OnboardingTour'
 // 홈 화면 투어
 export const homeTourSteps: TourStep[] = [
   {
+    target: '[data-tour="dividend-calendar"]',
+    title: '분배금 캘린더',
+    content: '달력 아이콘을 누르면 ETF 분배금 지급 일정을 확인할 수 있습니다. 내가 보유한 ETF는 강조 표시됩니다.',
+    placement: 'bottom',
+  },
+  {
     target: '[data-tour="portfolio-summary"]',
     title: '포트폴리오 요약',
     content: '내 ETF 포트폴리오의 총 평가금액과 수익률을 한눈에 확인할 수 있습니다.',
@@ -210,6 +216,12 @@ export const welcomeTourSteps: TourStep[] = [
     target: '[data-tour="portfolio-summary"]',
     title: '환영합니다!',
     content: 'ETF MTS Demo에 오신 것을 환영합니다. 주요 기능을 안내해드릴게요.',
+    placement: 'bottom',
+  },
+  {
+    target: '[data-tour="dividend-calendar"]',
+    title: '분배금 캘린더',
+    content: '달력 아이콘을 누르면 ETF 분배금 지급 일정과 보유 ETF의 배당 스케줄을 확인할 수 있습니다.',
     placement: 'bottom',
   },
   {

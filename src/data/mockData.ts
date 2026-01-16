@@ -1315,6 +1315,189 @@ export const mockETFs: ETF[] = [
     strategy: '초대형주 집중 투자',
     issuer: '삼성자산운용', listedDate: '2016/01/27', indexProvider: 'KRX', assetClass: '주식', marketClass: '국내',
   },
+  // === 금융 테마 ETF ===
+  {
+    id: '101', ticker: '091170', name: 'KODEX 은행', shortName: 'KODEX 은행',
+    price: 8250, prevClose: 8180, change: 70, changePercent: 0.86,
+    iNav: 8245, discrepancy: 0.06, ter: 0.45, spread: 0.08,
+    adtv: 25000000000, aum: 500000000000, trackingError: 0.08, volatility: 18.5, dividendYield: 4.2,
+    category: '전략', tags: ['국내', '금융', '은행'], healthScore: 82,
+    sparkline: [8050, 8080, 8120, 8150, 8170, 8180, 8250],
+    overview: '국내 은행업종에 집중 투자',
+    indexDescription: 'KRX 은행 지수',
+    strategy: '시중은행, 지방은행 등 은행주 투자',
+    issuer: '삼성자산운용', listedDate: '2006/06/27', indexProvider: 'KRX', assetClass: '주식', marketClass: '국내',
+  },
+  {
+    id: '102', ticker: '102970', name: 'KODEX 증권', shortName: 'KODEX 증권',
+    price: 5850, prevClose: 5780, change: 70, changePercent: 1.21,
+    iNav: 5845, discrepancy: 0.09, ter: 0.45, spread: 0.10,
+    adtv: 18000000000, aum: 360000000000, trackingError: 0.10, volatility: 25.5, dividendYield: 2.8,
+    category: '전략', tags: ['국내', '금융', '증권'], healthScore: 78,
+    sparkline: [5650, 5700, 5720, 5750, 5770, 5780, 5850],
+    overview: '국내 증권업종에 집중 투자',
+    indexDescription: 'KRX 증권 지수',
+    strategy: '대형 증권사 중심 투자',
+    issuer: '삼성자산운용', listedDate: '2007/05/22', indexProvider: 'KRX', assetClass: '주식', marketClass: '국내',
+  },
+  {
+    id: '103', ticker: '140700', name: 'KODEX 보험', shortName: 'KODEX 보험',
+    price: 12350, prevClose: 12250, change: 100, changePercent: 0.82,
+    iNav: 12345, discrepancy: 0.04, ter: 0.45, spread: 0.07,
+    adtv: 12000000000, aum: 240000000000, trackingError: 0.08, volatility: 16.5, dividendYield: 3.5,
+    category: '전략', tags: ['국내', '금융', '보험'], healthScore: 84,
+    sparkline: [12050, 12100, 12150, 12200, 12230, 12250, 12350],
+    overview: '국내 보험업종에 집중 투자',
+    indexDescription: 'KRX 보험 지수',
+    strategy: '생명보험, 손해보험사 투자',
+    issuer: '삼성자산운용', listedDate: '2011/04/06', indexProvider: 'KRX', assetClass: '주식', marketClass: '국내',
+  },
+  {
+    id: '104', ticker: '284980', name: 'RISE 200금융', shortName: 'RISE 200금융',
+    price: 6850, prevClose: 6780, change: 70, changePercent: 1.03,
+    iNav: 6845, discrepancy: 0.07, ter: 0.19, spread: 0.09,
+    adtv: 9200000000, aum: 184000000000, trackingError: 0.09, volatility: 20.5, dividendYield: 3.8,
+    category: '전략', tags: ['국내', '금융', 'KOSPI200'], healthScore: 80,
+    sparkline: [6600, 6650, 6700, 6740, 6760, 6780, 6850],
+    overview: 'KOSPI200 금융 섹터 투자',
+    indexDescription: 'KOSPI 200 금융 지수',
+    strategy: '금융 섹터 대형주 집중 투자',
+    issuer: '케이비자산운용', listedDate: '2017/12/08', indexProvider: 'KRX', assetClass: '주식', marketClass: '국내',
+  },
+  {
+    id: '105', ticker: '315270', name: 'TIGER 금융Top10', shortName: 'TIGER 금융Top10',
+    price: 7450, prevClose: 7380, change: 70, changePercent: 0.95,
+    iNav: 7445, discrepancy: 0.07, ter: 0.40, spread: 0.08,
+    adtv: 15000000000, aum: 300000000000, trackingError: 0.08, volatility: 19.5, dividendYield: 4.0,
+    category: '전략', tags: ['국내', '금융', 'TOP10'], healthScore: 81,
+    sparkline: [7200, 7250, 7300, 7340, 7360, 7380, 7450],
+    overview: '국내 금융 TOP10 기업 투자',
+    indexDescription: 'FnGuide 금융 Top10 지수',
+    strategy: '금융업종 핵심 종목 집중 투자',
+    issuer: '미래에셋자산운용', listedDate: '2019/01/10', indexProvider: 'FnGuide', assetClass: '주식', marketClass: '국내',
+  },
+  // === 바이오/헬스케어 테마 ETF ===
+  {
+    id: '106', ticker: '244580', name: 'KODEX 바이오', shortName: 'KODEX 바이오',
+    price: 6850, prevClose: 6680, change: 170, changePercent: 2.54,
+    iNav: 6845, discrepancy: 0.07, ter: 0.45, spread: 0.12,
+    adtv: 45000000000, aum: 900000000000, trackingError: 0.15, volatility: 32.5, dividendYield: 0.1,
+    category: '전략', tags: ['국내', '바이오', '헬스케어'], healthScore: 75,
+    sparkline: [6500, 6550, 6600, 6650, 6670, 6680, 6850],
+    overview: '국내 바이오/제약 업종에 투자',
+    indexDescription: 'KRX 바이오 지수',
+    strategy: '신약개발, 바이오시밀러 기업 투자',
+    issuer: '삼성자산운용', listedDate: '2016/06/28', indexProvider: 'KRX', assetClass: '주식', marketClass: '국내',
+  },
+  {
+    id: '107', ticker: '227540', name: 'TIGER 헬스케어', shortName: 'TIGER 헬스케어',
+    price: 7250, prevClose: 7100, change: 150, changePercent: 2.11,
+    iNav: 7245, discrepancy: 0.07, ter: 0.40, spread: 0.10,
+    adtv: 28000000000, aum: 560000000000, trackingError: 0.12, volatility: 28.5, dividendYield: 0.5,
+    category: '전략', tags: ['국내', '바이오', '헬스케어'], healthScore: 79,
+    sparkline: [6900, 6950, 7000, 7050, 7080, 7100, 7250],
+    overview: '헬스케어 산업 전반에 투자',
+    indexDescription: 'FnGuide 헬스케어 지수',
+    strategy: '제약, 의료기기, 바이오 종합 투자',
+    issuer: '미래에셋자산운용', listedDate: '2015/09/24', indexProvider: 'FnGuide', assetClass: '주식', marketClass: '국내',
+  },
+  {
+    id: '108', ticker: '143860', name: 'TIGER 제약바이오', shortName: 'TIGER 제약바이오',
+    price: 8150, prevClose: 7980, change: 170, changePercent: 2.13,
+    iNav: 8145, discrepancy: 0.06, ter: 0.40, spread: 0.09,
+    adtv: 32000000000, aum: 640000000000, trackingError: 0.10, volatility: 26.5, dividendYield: 0.3,
+    category: '전략', tags: ['국내', '바이오', '제약'], healthScore: 81,
+    sparkline: [7750, 7800, 7880, 7920, 7960, 7980, 8150],
+    overview: '국내 제약/바이오 업종 투자',
+    indexDescription: 'FnGuide 제약바이오 지수',
+    strategy: '대형 제약사 및 바이오벤처 투자',
+    issuer: '미래에셋자산운용', listedDate: '2011/06/23', indexProvider: 'FnGuide', assetClass: '주식', marketClass: '국내',
+  },
+  {
+    id: '109', ticker: '244620', name: 'KODEX 헬스케어', shortName: 'KODEX 헬스케어',
+    price: 7650, prevClose: 7480, change: 170, changePercent: 2.27,
+    iNav: 7645, discrepancy: 0.07, ter: 0.45, spread: 0.10,
+    adtv: 22000000000, aum: 440000000000, trackingError: 0.12, volatility: 27.5, dividendYield: 0.4,
+    category: '전략', tags: ['국내', '바이오', '헬스케어'], healthScore: 78,
+    sparkline: [7250, 7320, 7380, 7430, 7460, 7480, 7650],
+    overview: 'KOSPI200 헬스케어 섹터 투자',
+    indexDescription: 'KOSPI 200 헬스케어 지수',
+    strategy: '헬스케어 대형주 집중 투자',
+    issuer: '삼성자산운용', listedDate: '2016/06/28', indexProvider: 'KRX', assetClass: '주식', marketClass: '국내',
+  },
+  {
+    id: '110', ticker: '145670', name: 'ACE 바이오TOP10', shortName: 'ACE 바이오TOP10',
+    price: 5850, prevClose: 5720, change: 130, changePercent: 2.27,
+    iNav: 5845, discrepancy: 0.09, ter: 0.40, spread: 0.12,
+    adtv: 18000000000, aum: 360000000000, trackingError: 0.14, volatility: 30.5, dividendYield: 0.2,
+    category: '전략', tags: ['국내', '바이오', 'TOP10'], healthScore: 74,
+    sparkline: [5550, 5600, 5650, 5680, 5700, 5720, 5850],
+    overview: '국내 바이오 TOP10 종목 투자',
+    indexDescription: 'FnGuide 바이오 Top10 지수',
+    strategy: '바이오 핵심 종목 집중 투자',
+    issuer: '한국투자신탁운용', listedDate: '2011/09/22', indexProvider: 'FnGuide', assetClass: '주식', marketClass: '국내',
+  },
+  // === 중국 테마 ETF ===
+  {
+    id: '111', ticker: '192090', name: 'TIGER 차이나CSI300', shortName: 'TIGER 차이나CSI300',
+    price: 9250, prevClose: 9520, change: -270, changePercent: -2.84,
+    iNav: 9245, discrepancy: 0.05, ter: 0.65, spread: 0.12,
+    adtv: 68000000000, aum: 1360000000000, trackingError: 0.12, volatility: 28.5, dividendYield: 1.5,
+    category: '글로벌', tags: ['중국', 'CSI300', '대형주'], healthScore: 72,
+    sparkline: [9650, 9600, 9550, 9500, 9480, 9520, 9250],
+    overview: '중국 본토 CSI300 지수 추종',
+    indexDescription: 'CSI 300 지수 (상해+심천 300대 종목)',
+    strategy: '중국 본토 대형주 직접 투자',
+    issuer: '미래에셋자산운용', listedDate: '2014/02/06', indexProvider: 'CSI', assetClass: '주식', marketClass: '해외',
+  },
+  {
+    id: '112', ticker: '099140', name: 'KODEX 차이나H', shortName: 'KODEX 차이나H',
+    price: 22850, prevClose: 23500, change: -650, changePercent: -2.77,
+    iNav: 22845, discrepancy: 0.02, ter: 0.65, spread: 0.08,
+    adtv: 82000000000, aum: 1640000000000, trackingError: 0.10, volatility: 26.5, dividendYield: 2.0,
+    category: '글로벌', tags: ['중국', '항셍', 'H주'], healthScore: 74,
+    sparkline: [23800, 23600, 23450, 23350, 23400, 23500, 22850],
+    overview: '중국 H주(홍콩상장 중국기업) 투자',
+    indexDescription: 'Hang Seng China Enterprises Index',
+    strategy: '홍콩 상장 중국 본토 기업 투자',
+    issuer: '삼성자산운용', listedDate: '2007/09/07', indexProvider: 'Hang Seng', assetClass: '주식', marketClass: '해외',
+  },
+  {
+    id: '113', ticker: '168580', name: 'KODEX 차이나심천ChiNext', shortName: 'KODEX 차이나심천ChiNext',
+    price: 4850, prevClose: 5050, change: -200, changePercent: -3.96,
+    iNav: 4845, discrepancy: 0.10, ter: 0.65, spread: 0.15,
+    adtv: 15000000000, aum: 300000000000, trackingError: 0.18, volatility: 35.5, dividendYield: 0.3,
+    category: '글로벌', tags: ['중국', '심천', 'ChiNext'], healthScore: 65,
+    sparkline: [5200, 5150, 5100, 5050, 5030, 5050, 4850],
+    overview: '중국 심천 ChiNext(창업판) 투자',
+    indexDescription: 'ChiNext Price Index',
+    strategy: '중국 기술주/성장주 집중 투자',
+    issuer: '삼성자산운용', listedDate: '2012/12/20', indexProvider: 'CSI', assetClass: '주식', marketClass: '해외',
+  },
+  {
+    id: '114', ticker: '159960', name: 'ACE 차이나전기차SOLACTIVE', shortName: 'ACE 차이나전기차SOLACTIVE',
+    price: 8750, prevClose: 9100, change: -350, changePercent: -3.85,
+    iNav: 8745, discrepancy: 0.06, ter: 0.49, spread: 0.10,
+    adtv: 22000000000, aum: 440000000000, trackingError: 0.15, volatility: 32.0, dividendYield: 0.5,
+    category: '글로벌', tags: ['중국', '전기차', '2차전지'], healthScore: 70,
+    sparkline: [9350, 9280, 9200, 9150, 9080, 9100, 8750],
+    overview: '중국 전기차 밸류체인 투자',
+    indexDescription: 'Solactive China Electric Vehicle 지수',
+    strategy: '중국 전기차/배터리 기업 투자',
+    issuer: '한국투자신탁운용', listedDate: '2021/01/15', indexProvider: 'Solactive', assetClass: '주식', marketClass: '해외',
+  },
+  {
+    id: '115', ticker: '117690', name: 'TIGER 차이나A300', shortName: 'TIGER 차이나A300',
+    price: 10250, prevClose: 10550, change: -300, changePercent: -2.84,
+    iNav: 10245, discrepancy: 0.05, ter: 0.58, spread: 0.10,
+    adtv: 35000000000, aum: 700000000000, trackingError: 0.12, volatility: 27.5, dividendYield: 1.2,
+    category: '글로벌', tags: ['중국', 'A주', 'CSI'], healthScore: 73,
+    sparkline: [10700, 10650, 10600, 10550, 10520, 10550, 10250],
+    overview: '중국 A주 시장에 투자',
+    indexDescription: 'CSI 300 지수',
+    strategy: '중국 본토 A주 대형주 투자',
+    issuer: '미래에셋자산운용', listedDate: '2010/03/12', indexProvider: 'CSI', assetClass: '주식', marketClass: '해외',
+  },
 ]
 
 // ETF category 자동 분류 적용
@@ -1344,7 +1527,7 @@ export const generalPortfolioETFs = [
 export const pensionPortfolioETFs = [
   createPortfolioETF(mockETFs[0], 300, 0.90),   // KODEX 200
   createPortfolioETF(mockETFs[1], 400, 0.85),   // TIGER 미국S&P500
-  createPortfolioETF(mockETFs[7], 200, 0.95),   // RISE 고배당
+  createPortfolioETF(mockETFs[8], 200, 0.95),   // RISE 고배당 (id: '8')
   createPortfolioETF(mockETFs[15], 150, 0.92),  // ACE 미국배당다우존스
   createPortfolioETF(mockETFs[44], 100, 0.98),  // TIGER 국채3년 (채권)
 ]
@@ -1353,7 +1536,7 @@ export const pensionPortfolioETFs = [
 export const isaPortfolioETFs = [
   createPortfolioETF(mockETFs[1], 200, 0.88),   // TIGER 미국S&P500
   createPortfolioETF(mockETFs[3], 100, 0.91),   // TIGER 200
-  createPortfolioETF(mockETFs[6], 150, 0.93),   // KODEX 배당성장
+  createPortfolioETF(mockETFs[15], 150, 0.93),  // ACE 미국배당다우존스 (id: '16')
   createPortfolioETF(mockETFs[9], 80, 0.87),    // KODEX 미국반도체MV
 ]
 
@@ -1368,3 +1551,84 @@ export const getPortfolioByAccountType = (accountType: string) => {
 
 // 기존 호환성 유지
 export const portfolioETFs = generalPortfolioETFs
+
+// 분배금 일정 데이터 (2026년 1월 기준)
+export interface DividendSchedule {
+  etfId: string
+  date: string // YYYY-MM-DD 형식
+  dividendPerShare: number // 주당 분배금 (원)
+  exDividendDate: string // 배당락일
+}
+
+export const dividendSchedules: DividendSchedule[] = [
+  // 1월 16일 (오늘) - 배당/커버드콜 위주
+  { etfId: '16', date: '2026-01-16', dividendPerShare: 120, exDividendDate: '2026-01-14' }, // ACE 미국배당다우존스
+  { etfId: '62', date: '2026-01-16', dividendPerShare: 850, exDividendDate: '2026-01-14' }, // TIGER 미국나스닥100커버드콜(합성)
+
+  // 1월 17일
+  { etfId: '8', date: '2026-01-17', dividendPerShare: 180, exDividendDate: '2026-01-15' }, // RISE 고배당
+  { etfId: '91', date: '2026-01-17', dividendPerShare: 1250, exDividendDate: '2026-01-15' }, // TIGER 미국AI빅테크10타겟데일리커버드콜
+
+  // 1월 20일
+  { etfId: '26', date: '2026-01-20', dividendPerShare: 200, exDividendDate: '2026-01-16' }, // TIGER 미국배당다우존스
+  { etfId: '92', date: '2026-01-20', dividendPerShare: 1100, exDividendDate: '2026-01-16' }, // RISE 미국테크100데일리고정커버드콜
+  { etfId: '93', date: '2026-01-20', dividendPerShare: 1050, exDividendDate: '2026-01-16' }, // RISE 미국배당100데일리고정커버드콜
+
+  // 1월 22일
+  { etfId: '94', date: '2026-01-22', dividendPerShare: 130, exDividendDate: '2026-01-20' }, // RISE 미국S&P배당킹
+  { etfId: '78', date: '2026-01-22', dividendPerShare: 420, exDividendDate: '2026-01-20' }, // TIGER MKF배당귀족
+
+  // 1월 24일
+  { etfId: '41', date: '2026-01-24', dividendPerShare: 280, exDividendDate: '2026-01-22' }, // TIGER 미국S&P500배당귀족
+  { etfId: '94', date: '2026-01-24', dividendPerShare: 320, exDividendDate: '2026-01-22' }, // RISE 미국S&P배당킹
+
+  // 1월 27일
+  { etfId: '29', date: '2026-01-27', dividendPerShare: 500, exDividendDate: '2026-01-23' }, // RISE 고배당
+
+  // 1월 29일
+  { etfId: '27', date: '2026-01-29', dividendPerShare: 450, exDividendDate: '2026-01-27' }, // TIGER 리츠부동산인프라
+
+  // 1월 31일
+  { etfId: '16', date: '2026-01-31', dividendPerShare: 125, exDividendDate: '2026-01-29' }, // ACE 미국배당다우존스 (월배당)
+  { etfId: '26', date: '2026-01-31', dividendPerShare: 205, exDividendDate: '2026-01-29' }, // TIGER 미국배당다우존스 (월배당)
+]
+
+// 특정 날짜의 분배금 ETF 목록 가져오기
+export const getDividendsByDate = (date: string): (DividendSchedule & { etf: ETF })[] => {
+  return dividendSchedules
+    .filter(schedule => schedule.date === date)
+    .map(schedule => {
+      const etf = mockETFs.find(e => e.id === schedule.etfId)
+      return etf ? { ...schedule, etf } : null
+    })
+    .filter((item): item is DividendSchedule & { etf: ETF } => item !== null)
+    .sort((a, b) => b.dividendPerShare - a.dividendPerShare)
+}
+
+// 분배금 일정이 있는 날짜 목록 가져오기
+export const getDividendDates = (): string[] => {
+  return [...new Set(dividendSchedules.map(s => s.date))].sort()
+}
+
+// 포트폴리오에 있는 ETF ID 목록 (계좌 타입별)
+export const getPortfolioETFIds = (accountType: string): string[] => {
+  const portfolio = getPortfolioByAccountType(accountType)
+  return portfolio.map(p => p.id)
+}
+
+// 특정 ETF를 보유한 계좌 유형 목록 가져오기
+export const getAccountTypesForETF = (etfId: string): string[] => {
+  const accountTypes: string[] = []
+
+  if (generalPortfolioETFs.some(p => p.id === etfId)) {
+    accountTypes.push('general')
+  }
+  if (pensionPortfolioETFs.some(p => p.id === etfId)) {
+    accountTypes.push('pension')
+  }
+  if (isaPortfolioETFs.some(p => p.id === etfId)) {
+    accountTypes.push('isa')
+  }
+
+  return accountTypes
+}

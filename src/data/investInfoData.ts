@@ -1471,7 +1471,7 @@ DCA = Dollar Cost Averaging (정기 정액 투자)
     id: 'covered-call-principal-erosion',
     category: 'strategy',
     title: '1세대 커버드콜 원금잠식',
-    question: '1세대 커버드콜 ETF가 원금을 갉아먹었다던데, 사실인가요?',
+    question: '1세대 커버드콜 ETF가 원금을 잠식했다던데, 사실인가요?',
     conclusion: 'yes',
     summary: [
       '초기 커버드콜 ETF는 원금 잠식 문제가 있었어요',
@@ -1480,7 +1480,7 @@ DCA = Dollar Cost Averaging (정기 정액 투자)
     ],
     body: `## 1세대 커버드콜 ETF의 원금잠식 문제
 
-1세대 커버드콜 ETF가 "원금을 갉아먹는다"는 비판을 받았던 건 사실이에요. 높은 분배금에 혹해서 투자했다가 원금이 녹아내린 분들이 많았어요.
+1세대 커버드콜 ETF가 "원금을 잠식한다"는 비판을 받았던 건 사실이에요. 높은 분배금에 투자했다가 원금이 감소한 분들이 많았어요.
 
 ### 무슨 일이 있었나요?
 

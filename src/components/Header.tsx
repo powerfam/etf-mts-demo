@@ -1,11 +1,13 @@
 import { useState } from 'react'
-import { Search, Bell, Menu, FileText, ChevronDown, ChevronUp, X, AlertTriangle, TrendingDown, RefreshCw, Shield } from 'lucide-react'
+import { Search, Bell, Menu, FileText, ChevronDown, ChevronUp, X, AlertTriangle, TrendingDown, RefreshCw, Shield, CalendarDays } from 'lucide-react'
 import { Button } from './ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog'
+import { DividendCalendar } from './DividendCalendar'
 import { mockETFs, type ETF } from '@/data/mockData'
 
 interface HeaderProps {
   onSelectETF?: (etf: ETF) => void
+  accountType?: string
 }
 
 // 데모 알림 데이터
@@ -69,10 +71,11 @@ function ProductInfoSection({ title, children, defaultOpen = false }: { title: s
   )
 }
 
-export function Header({ onSelectETF }: HeaderProps) {
+export function Header({ onSelectETF, accountType = 'general' }: HeaderProps) {
   const [showProductInfo, setShowProductInfo] = useState(false)
   const [showSearch, setShowSearch] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
+  const [showDividendCalendar, setShowDividendCalendar] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
 
   // 검색 결과
@@ -104,6 +107,15 @@ export function Header({ onSelectETF }: HeaderProps) {
         <div className="flex items-center gap-1">
           <Button variant="ghost" size="icon" onClick={() => setShowSearch(true)}>
             <Search className="h-5 w-5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setShowDividendCalendar(true)}
+            title="분배금 캘린더"
+            data-tour="dividend-calendar"
+          >
+            <CalendarDays className="h-5 w-5" />
           </Button>
           <Button variant="ghost" size="icon" className="relative" onClick={() => setShowNotifications(true)}>
             <Bell className="h-5 w-5" />
@@ -229,6 +241,14 @@ export function Header({ onSelectETF }: HeaderProps) {
         </div>
       </DialogContent>
     </Dialog>
+
+    {/* 분배금 캘린더 모달 */}
+    <DividendCalendar
+      isOpen={showDividendCalendar}
+      onClose={() => setShowDividendCalendar(false)}
+      accountType={accountType}
+      onSelectETF={onSelectETF}
+    />
 
     {/* 제품소개서 모달 */}
     <Dialog open={showProductInfo} onOpenChange={setShowProductInfo}>

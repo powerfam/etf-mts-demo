@@ -1,10 +1,11 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useMemo } from 'react'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts'
-import { TrendingUp, TrendingDown, AlertTriangle, RefreshCw, ChevronRight, ChevronDown, Wallet } from 'lucide-react'
+import { TrendingUp, TrendingDown, AlertTriangle, RefreshCw, ChevronRight, ChevronDown, Wallet, CalendarDays, Coins } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { getPortfolioByAccountType } from '@/data/mockData'
+import { getPortfolioByAccountType, getDividendsByDate, getPortfolioETFIds } from '@/data/mockData'
+import { DividendCalendar } from '@/components/DividendCalendar'
 import { formatNumber, formatPercent } from '@/lib/utils'
 import type { ETF } from '@/data/mockData'
 
@@ -34,6 +35,7 @@ const COLORS = ['#d64f79', '#796ec2', '#4ade80', '#f59e0b', '#06b6d4']
 export function PortfolioPage({ accountType, onSelectETF, onLongPressETF, onAccountTypeChange }: PortfolioPageProps) {
   const [selectedFilter, setSelectedFilter] = useState<string>('all')
   const [showAccountDropdown, setShowAccountDropdown] = useState(false)
+  const [showDividendCalendar, setShowDividendCalendar] = useState(false)
 
   // 현재 선택된 계좌 정보
   const currentAccount = accountList.find(acc => acc.type === accountType) || accountList[0]
@@ -88,6 +90,59 @@ export function PortfolioPage({ accountType, onSelectETF, onLongPressETF, onAcco
   const riskAlerts = currentPortfolio.filter(etf =>
     etf.healthScore < 75 || Math.abs(etf.discrepancy) > 0.1 || etf.spread > 0.1
   )
+
+  // 자산 클래스별 비중 계산
+  const assetClassData = useMemo(() => {
+    const classMap: Record<string, number> = {}
+    currentPortfolio.forEach(etf => {
+      const assetClass = etf.assetClass || '주식'
+      classMap[assetClass] = (classMap[assetClass] || 0) + etf.totalValue
+    })
+
+    const result = Object.entries(classMap).map(([name, value]) => ({
+      name,
+      value,
+      percent: (value / totalValue * 100).toFixed(1)
+    }))
+
+    return result.sort((a, b) => b.value - a.value)
+  }, [currentPortfolio, totalValue])
+
+  // 자산 클래스별 색상
+  const assetClassColors: Record<string, string> = {
+    '주식': '#d64f79',
+    '채권': '#4ade80',
+    '원자재': '#f59e0b',
+    '통화': '#06b6d4',
+    '혼합': '#796ec2',
+  }
+
+  // 다가오는 분배금 일정 (현재 계좌 보유 ETF 기준)
+  const upcomingDividends = useMemo(() => {
+    const portfolioIds = getPortfolioETFIds(accountType)
+    const today = new Date()
+    const results: { etf: ETF; date: string; dividendPerShare: number }[] = []
+
+    // 오늘부터 30일간 분배금 일정 확인
+    for (let i = 0; i < 30; i++) {
+      const checkDate = new Date(today)
+      checkDate.setDate(today.getDate() + i)
+      const dateStr = `${checkDate.getFullYear()}-${String(checkDate.getMonth() + 1).padStart(2, '0')}-${String(checkDate.getDate()).padStart(2, '0')}`
+
+      const dividends = getDividendsByDate(dateStr)
+      dividends.forEach(d => {
+        if (portfolioIds.includes(d.etfId)) {
+          results.push({
+            etf: d.etf,
+            date: dateStr,
+            dividendPerShare: d.dividendPerShare
+          })
+        }
+      })
+    }
+
+    return results.slice(0, 3) // 최대 3개만 표시
+  }, [accountType])
 
   return (
     <div className="pb-20">
@@ -205,9 +260,24 @@ export function PortfolioPage({ accountType, onSelectETF, onLongPressETF, onAcco
                         backgroundColor: '#1f1a2e',
                         border: '1px solid #3d3450',
                         borderRadius: '8px',
-                        color: 'white'
+                        padding: '8px 12px'
                       }}
-                      formatter={(value) => value !== undefined ? [`${formatNumber(value as number)}원`, ''] : ['', '']}
+                      itemStyle={{ color: 'white' }}
+                      labelStyle={{ color: 'white' }}
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          const data = payload[0].payload
+                          return (
+                            <div className="bg-[#1f1a2e] border border-[#3d3450] rounded-lg px-3 py-2">
+                              <p className="text-white text-sm font-medium">{data.name}</p>
+                              <p className="text-gray-300 text-xs mt-1">
+                                {formatNumber(data.value)}원 ({data.percent}%)
+                              </p>
+                            </div>
+                          )
+                        }
+                        return null
+                      }}
                     />
                   </PieChart>
                 </ResponsiveContainer>
@@ -218,6 +288,37 @@ export function PortfolioPage({ accountType, onSelectETF, onLongPressETF, onAcco
                     <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
                     <span className="text-xs text-gray-400 flex-1">{item.name}</span>
                     <span className="text-xs text-white">{item.percent}%</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 자산 클래스별 비중 바 */}
+            <div className="mt-4 pt-4 border-t border-[#2d2640]">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs text-gray-400">자산 클래스 비중</span>
+              </div>
+              <div className="h-3 rounded-full overflow-hidden flex bg-[#2d2640]">
+                {assetClassData.map((item, index) => (
+                  <div
+                    key={item.name}
+                    style={{
+                      width: `${item.percent}%`,
+                      backgroundColor: assetClassColors[item.name] || '#6b7280'
+                    }}
+                    className={`h-full ${index === 0 ? 'rounded-l-full' : ''} ${index === assetClassData.length - 1 ? 'rounded-r-full' : ''}`}
+                  />
+                ))}
+              </div>
+              <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2">
+                {assetClassData.map((item) => (
+                  <div key={item.name} className="flex items-center gap-1">
+                    <div
+                      className="w-2 h-2 rounded-full"
+                      style={{ backgroundColor: assetClassColors[item.name] || '#6b7280' }}
+                    />
+                    <span className="text-[10px] text-gray-400">{item.name}</span>
+                    <span className="text-[10px] text-white">{item.percent}%</span>
                   </div>
                 ))}
               </div>
@@ -265,6 +366,57 @@ export function PortfolioPage({ accountType, onSelectETF, onLongPressETF, onAcco
             <p className="text-xs text-gray-400 mt-2">
               현재 포트폴리오가 목표 배분과 5% 이상 차이납니다. 리밸런싱을 검토해보세요.
             </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* 분배금 일정 - 클릭 시 캘린더 모달 오픈 */}
+      <div className="px-4 pb-4">
+        <Card
+          className="border-[#d64f79]/20 bg-[#d64f79]/5 cursor-pointer hover:border-[#d64f79]/40 transition-colors"
+          onClick={() => setShowDividendCalendar(true)}
+        >
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Coins className="h-4 w-4 text-[#d64f79]" />
+                <span className="text-sm font-medium text-white">분배금 일정</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <CalendarDays className="h-3.5 w-3.5 text-gray-400" />
+                <ChevronRight className="h-4 w-4 text-gray-400" />
+              </div>
+            </div>
+
+            {upcomingDividends.length === 0 ? (
+              <p className="text-xs text-gray-500">
+                30일 내 예정된 분배금이 없습니다
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {upcomingDividends.map((dividend, index) => {
+                  const date = new Date(dividend.date)
+                  const dateStr = `${date.getMonth() + 1}월 ${date.getDate()}일`
+                  return (
+                    <div key={`${dividend.etf.id}-${index}`} className="flex items-center justify-between text-sm">
+                      <span className="text-gray-400">{dividend.etf.shortName}</span>
+                      <div className="text-right">
+                        <span className="text-white">{dateStr}</span>
+                        <span className="text-xs text-[#d64f79] ml-2 font-medium">
+                          {dividend.dividendPerShare.toLocaleString()}원/주
+                        </span>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+
+            <div className="mt-3 pt-3 border-t border-[#2d2640]">
+              <p className="text-[10px] text-gray-500 text-center">
+                탭하여 전체 분배금 캘린더 보기
+              </p>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -375,32 +527,16 @@ export function PortfolioPage({ accountType, onSelectETF, onLongPressETF, onAcco
         </div>
       </div>
 
-      {/* Distribution Calendar */}
-      <div className="px-4 py-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm">배당 일정</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-400">TIGER 배당다우</span>
-                <div className="text-right">
-                  <span className="text-white">1월 15일</span>
-                  <span className="text-xs text-gray-500 ml-2">예상 580원/주</span>
-                </div>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-400">KODEX 200</span>
-                <div className="text-right">
-                  <span className="text-white">1월 30일</span>
-                  <span className="text-xs text-gray-500 ml-2">예상 150원/주</span>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      {/* 분배금 캘린더 모달 */}
+      <DividendCalendar
+        isOpen={showDividendCalendar}
+        onClose={() => setShowDividendCalendar(false)}
+        accountType={accountType}
+        onSelectETF={(etf) => {
+          setShowDividendCalendar(false)
+          onSelectETF(etf)
+        }}
+      />
     </div>
   )
 }
