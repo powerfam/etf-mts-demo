@@ -24,6 +24,7 @@
 | **UI** | shadcn/ui | 미리 만들어진 버튼, 카드 등 컴포넌트 |
 | **아이콘** | Lucide React | 아이콘 라이브러리 |
 | **차트** | Recharts | 파이 차트, 스파크라인 |
+| **엑셀** | xlsx | 데이터 스키마 문서 생성 |
 | **배포** | Vercel | 서버리스 호스팅 |
 
 ### 기술 스택 개념 정리
@@ -46,27 +47,33 @@ src/
 │   │   ├── card.tsx
 │   │   ├── badge.tsx
 │   │   ├── tabs.tsx
+│   │   ├── dialog.tsx
 │   │   └── ...
-│   ├── Header.tsx           # 상단 헤더 (계좌 타입 선택: 일반/연금/ISA)
+│   ├── Header.tsx           # 상단 헤더 (계좌 타입 선택, 검색, 알림, 분배금 캘린더)
 │   ├── BottomNav.tsx        # 하단 네비게이션 (홈/탐색/투자정보/비교/보유)
 │   ├── FloatingChatbot.tsx  # 전역 플로팅 챗봇 (검색 기능 포함)
+│   ├── DividendCalendar.tsx # 분배금 캘린더 모달 컴포넌트
 │   └── ETFCard.tsx          # ETF 정보 카드 컴포넌트
 ├── pages/
 │   ├── HomePage.tsx         # 홈 화면 (포트폴리오 요약, 인기 ETF, 히트맵, 시장 현황)
 │   ├── DiscoverPage.tsx     # 탐색 화면 (ETF 검색, 필터링, 정렬)
 │   ├── ETFDetailPage.tsx    # ETF 상세 화면
 │   ├── TradePage.tsx        # 매매 화면
-│   ├── PortfolioPage.tsx    # 보유현황 화면
+│   ├── PortfolioPage.tsx    # 보유현황 화면 (자산배분, 분배금 일정, 리밸런싱)
 │   ├── ComparePage.tsx      # ETF 비교 화면
 │   ├── InvestInfoPage.tsx   # 투자정보 (ETF 101, 용어사전, 리서치 PDF)
 │   └── InvestInfoDetailPage.tsx
 ├── data/
-│   ├── mockData.ts          # ETF 목업 데이터 (65+ 종목) + 계좌별 포트폴리오 + 테마 분류
-│   └── investInfoData.ts    # 투자정보 콘텐츠 데이터
+│   ├── mockData.ts          # ETF 목업 데이터 (65+ 종목) + 계좌별 포트폴리오 + 테마 분류 + 분배금 일정
+│   ├── investInfoData.ts    # 투자정보 콘텐츠 데이터
+│   └── tourSteps.ts         # 가이드 투어 단계 정의
 ├── lib/
-│   └── utils.ts             # 유틸리티 함수 (cn, formatNumber 등)
+│   └── utils.ts             # 유틸리티 함수 (cn, formatNumber, formatPercent 등)
 ├── App.tsx                  # 메인 앱 (라우팅, 상태 관리)
 └── main.tsx                 # 엔트리 포인트
+
+scripts/
+└── generate-schema-excel.cjs  # 데이터 스키마 엑셀 문서 생성 스크립트
 
 pdf/                         # 리서치 PDF 파일
 ├── new_etf_25_12_3w.pdf
@@ -74,7 +81,10 @@ pdf/                         # 리서치 PDF 파일
 └── ...
 
 docs/                        # 프로젝트 문서
-└── feature_comparison.md    # 원안 대비 기능 비교 분석
+├── feature_comparison.md              # 원안 대비 기능 비교 분석
+├── ETF_MTS_데이터스키마_명세서.xlsx    # 데이터 스키마 명세서
+├── ETF_콘텐츠_데이터_분석_보고서.md
+└── ETF_투자정보_콘텐츠_기획안.md
 ```
 
 ---
@@ -100,11 +110,11 @@ docs/                        # 프로젝트 문서
 
 ### 2. 탐색 화면 (DiscoverPage)
 
-- **빈 상태 기본값**: 진입 시 테마/검색어 선택 전까지 빈 리스트 표시 (안내 메시지 제공)
+- **빈 상태 기본값**: 진입 시 테마/검색어 선택 전까지 빈 리스트 표시 (핑크색 안내 메시지)
 - **연금계좌 적합 필터**: 레버리지/인버스 제외 토글
 - **시장 필터**: 전체/국내/해외 선택
 - **검색**: 종목명, 티커, 카테고리 검색
-- **테마 필터**: 전체(아이콘 포함), 시장지수, 채권, 배당, 전략, 통화, 원자재, 레버리지
+- **테마 필터**: 전체(Layers 아이콘 포함), 시장지수, 채권, 배당, 전략, 통화, 원자재, 레버리지
 - **정렬 옵션**: 수익률순, 유동성순, 저비용순(TER), 건전성순 (정렬 변경해도 모든 지표 유지)
 - **3가지 모드**:
   - **탐색**: ETF 카드 리스트
@@ -139,12 +149,22 @@ docs/                        # 프로젝트 문서
 
 ### 6. 보유현황 화면 (PortfolioPage)
 
+- **계좌 선택 드롭다운**: 일반/연금/ISA 계좌 간 전환
 - **계좌별 보유 ETF**: 계좌 타입에 따라 다른 종목/평가금액 표시
-- 자산 배분 파이 차트
-- 평가금액, 수익률, 매입단가
-- 계좌 타입별 세금 예상 및 절감액 표시
-- 리스크 알림 (건전성/괴리율 주의)
-- 리밸런싱 제안
+- **자산 배분 파이 차트**:
+  - 종목별 비중 파이 차트
+  - 커스텀 툴팁 (종목명, 금액, 비중% 표시)
+- **자산 클래스 비중 바**:
+  - 주식(핑크), 채권(초록), 원자재(주황), 통화(시안), 혼합(보라)
+  - 막대 그래프 형태로 비중 시각화
+- **세금 정보**: 계좌 타입별 예상 세금 및 절감액 표시
+- **리스크 알림**: 건전성/괴리율 주의 종목 표시
+- **리밸런싱 제안**: 목표 배분 대비 차이 안내
+- **분배금 일정 섹션**:
+  - 보유 ETF 중 30일 내 분배금 예정 종목 표시
+  - 지급일, 주당 분배금 표시
+  - 탭하면 분배금 캘린더 모달 오픈
+- **보유 종목 리스트**: 전체/수익/손실 필터링
 
 ### 7. 전역 플로팅 챗봇 (FloatingChatbot)
 
@@ -155,13 +175,21 @@ docs/                        # 프로젝트 문서
 
 ### 8. 분배금 캘린더 (DividendCalendar)
 
-- **헤더 우측 달력 아이콘**으로 접근
-- 월별 달력 뷰 + 분배금 지급일 표시 (핑크색 점)
-- 오늘 날짜 은은한 핑크색 원 강조
-- 날짜 클릭 시 해당 일자 분배금 지급 ETF 목록 표시
-- **보유 ETF 구분**: 내 포트폴리오 ETF는 "보유중" 배지 + 핑크색 배경 강조
-- 주당 분배금 금액 표시
-- ETF 클릭 시 상세 페이지 이동
+- **접근 방식**:
+  - 헤더 우측 달력 아이콘
+  - 보유현황 페이지 분배금 일정 섹션 탭
+- **월별 달력 뷰**:
+  - 분배금 지급일 핑크색 점 표시
+  - 오늘 날짜 은은한 핑크색 원 강조
+  - 요일별 색상 구분 (일요일=빨강, 토요일=파랑)
+- **날짜별 분배금 ETF 목록**:
+  - 해당 일자 분배금 지급 ETF 표시
+  - 주당 분배금 금액 표시
+- **보유 ETF 계좌 타입 표시**:
+  - 일반(회색), 연금(초록), ISA(파랑) 배지
+  - 보유 ETF는 핑크색 배경 강조
+- **범례**: 오늘, 지급일, 보유계좌 타입 안내
+- ETF 클릭 시 상세 페이지 이동 (캘린더 유지)
 
 ---
 
@@ -173,6 +201,20 @@ docs/                        # 프로젝트 문서
 - **메인 컬러**: 핑크 `#d64f79`
 - **상승/하락**: 빨강 `text-up` / 파랑 `text-down`
 - **폰트**: Pretendard (웹폰트)
+
+### 계좌 타입별 색상
+
+- **일반계좌**: 회색 (`bg-gray-500`)
+- **연금계좌**: 초록 (`bg-emerald-500`)
+- **ISA계좌**: 파랑 (`bg-blue-500`)
+
+### 자산 클래스별 색상
+
+- **주식**: 핑크 (`#d64f79`)
+- **채권**: 초록 (`#4ade80`)
+- **원자재**: 주황 (`#f59e0b`)
+- **통화**: 시안 (`#06b6d4`)
+- **혼합**: 보라 (`#796ec2`)
 
 ### 애니메이션
 
@@ -239,6 +281,29 @@ interface ETF {
 }
 ```
 
+### DividendSchedule Interface
+
+```typescript
+interface DividendSchedule {
+  etfId: string           // ETF ID (FK → ETF.id)
+  date: string            // 지급일 (YYYY-MM-DD)
+  dividendPerShare: number // 주당 분배금 (원)
+  exDividendDate: string  // 배당락일 (YYYY-MM-DD)
+}
+```
+
+### PortfolioETF Interface
+
+```typescript
+interface PortfolioETF extends ETF {
+  quantity: number        // 보유 수량
+  avgPrice: number        // 평균 매입단가
+  totalValue: number      // 평가금액 (현재가 × 수량)
+  profitLoss: number      // 손익금액
+  profitLossPercent: number // 손익률 (%)
+}
+```
+
 ### 계좌별 포트폴리오
 
 ```typescript
@@ -246,8 +311,24 @@ interface ETF {
 getPortfolioByAccountType(accountType: string) => PortfolioETF[]
 
 // 일반계좌: generalPortfolioETFs (공격적)
-// 연금계좌: pensionPortfolioETFs (안정적)
-// ISA계좌: isaPortfolioETFs (균형)
+// 연금계좌: pensionPortfolioETFs (안정적 - 배당/채권 중심)
+// ISA계좌: isaPortfolioETFs (균형 - 성장+배당 혼합)
+```
+
+### 유틸리티 함수
+
+```typescript
+// 특정 날짜의 분배금 ETF 목록
+getDividendsByDate(date: string): (DividendSchedule & { etf: ETF })[]
+
+// 분배금 일정이 있는 날짜 목록
+getDividendDates(): string[]
+
+// 포트폴리오 ETF ID 목록
+getPortfolioETFIds(accountType: string): string[]
+
+// 특정 ETF를 보유한 계좌 유형 목록
+getAccountTypesForETF(etfId: string): string[]
 ```
 
 ---
@@ -261,6 +342,33 @@ getPortfolioByAccountType(accountType: string) => PortfolioETF[]
 | investinfo | 투자정보 | BookOpen | InvestInfoPage |
 | compare | 비교 | GitCompare | ComparePage |
 | portfolio | 보유 | Briefcase | PortfolioPage |
+
+---
+
+## 데이터 스키마 문서
+
+데이터 스키마 명세서: `docs/ETF_MTS_데이터스키마_명세서.xlsx`
+
+### 포함된 시트
+
+| 시트명 | 설명 |
+|--------|------|
+| ETF_마스터 | ETF 기본 정보 33개 필드 |
+| 포트폴리오_보유 | 보유 종목 데이터 15개 필드 |
+| 분배금_일정 | 분배금 일정 4개 필드 |
+| 테마_카테고리 | 테마 분류 3개 필드 |
+| 계좌_타입 | 계좌 유형 5개 필드 |
+| 투자정보_콘텐츠 | 투자정보 콘텐츠 18개 필드 |
+| 시장_지수 | 시장 지수 5개 필드 |
+| 히트맵_테마 | 주간 테마 히트맵 3개 필드 |
+| 코드_정의 | 코드값 정의 |
+| API_명세 | 향후 개발용 API 엔드포인트 |
+
+### 스키마 문서 재생성
+
+```bash
+node scripts/generate-schema-excel.cjs
+```
 
 ---
 
@@ -318,7 +426,27 @@ npm run build
 
 # 빌드 미리보기
 npm run preview
+
+# 데이터 스키마 엑셀 생성
+node scripts/generate-schema-excel.cjs
 ```
+
+---
+
+## 주요 데이터 제약사항
+
+### 연금계좌 투자 제한
+- 레버리지/인버스 ETF 투자 불가
+- `pensionPortfolioETFs`에 레버리지/인버스 상품 포함 금지
+
+### 분배금 일정
+- 배당/커버드콜 ETF 위주로 구성
+- 월배당 ETF는 매월 말 지급일 추가
+
+### 계좌 타입별 세율
+- 일반계좌: 15.4%
+- ISA계좌: 9.9% (비과세 한도 200만원)
+- 연금계좌: 5.5% (세금이연)
 
 ---
 
@@ -330,9 +458,10 @@ npm run preview
 - [ ] 알림 기능
 - [ ] 관심종목 저장
 - [ ] 포트폴리오 분석 리포트
+- [ ] 분배금 알림 푸시
 
 ---
 
 ## 라이선스
 
-내부 데모용 프로젝트 - 키움증권
+내부 데모용 프로젝트

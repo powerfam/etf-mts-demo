@@ -19,6 +19,7 @@ export interface ETF {
   category: string
   tags: string[]
   healthScore: number
+  holdersCount?: number    // 보유고객 수 (미입력 시 AUM 기반 추정)
   isLeveraged?: boolean
   isInverse?: boolean
   isHedged?: boolean
@@ -73,24 +74,27 @@ export function classifyETF(shortName: string): string {
     return '통화'
   }
 
-  // 5. 원자재
-  if (name.includes('금') || name.includes('골드') || name.includes('은') ||
+  // 5. 원자재 (금융/은행 등과 구분하기 위해 구체적 키워드 사용)
+  if (name.includes('골드') || name.includes('GOLD') || name.includes('금선물') ||
+      name.includes('실물금') || name.includes('금은') ||
+      name.includes('실버') || name.includes('SILVER') || name.includes('은선물') ||
       name.includes('원유') || name.includes('WTI') || name.includes('농산물') ||
-      name.includes('구리') || name.includes('실물') || name.includes('금은')) {
+      name.includes('구리') || name.includes('원자재') || name.includes('COMMODITY')) {
     return '원자재'
   }
 
-  // 6. 전략 (테마/섹터/액티브)
+  // 6. 전략 (테마/섹터/액티브) - 시장지수 ETF와 구분하기 위해 구체적 키워드
   if (name.includes('액티브') || name.includes('모멘텀') || name.includes('퀄리티') ||
       name.includes('가치') || name.includes('ESG') || name.includes('펀더멘털') ||
       name.includes('경기방어') || name.includes('리츠') || name.includes('부동산') ||
-      name.includes('혼합') || name.includes('밸류체인') || name.includes('그룹') ||
+      name.includes('혼합') || name.includes('밸류체인') || name.includes('그룹주') ||
       name.includes('2차전지') || name.includes('반도체') || name.includes('AI') ||
       name.includes('게임') || name.includes('메타버스') || name.includes('신재생') ||
       name.includes('바이오') || name.includes('원자력') || name.includes('로봇') ||
-      name.includes('콘텐츠') || name.includes('IT') || name.includes('테크') ||
-      name.includes('비만') || name.includes('TOP') || name.includes('파운드리') ||
-      name.includes('라틴')) {
+      name.includes('콘텐츠') || name.includes('테크') || name.includes('파운드리') ||
+      name.includes('비만') || name.includes('헬스케어') || name.includes('클린에너지') ||
+      name.includes('금융') || name.includes('은행') || name.includes('보험') ||
+      name.includes('증권') || name.includes('라틴') || name.includes('소버린')) {
     return '전략'
   }
 

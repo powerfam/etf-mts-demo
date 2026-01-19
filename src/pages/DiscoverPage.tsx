@@ -86,12 +86,20 @@ export function DiscoverPage({
     return matchesSearch && matchesTheme && matchesPensionMode && matchesMarket
   })
 
+  // 보유고객 수 계산 (holdersCount가 없으면 AUM 기반 추정)
+  const getHoldersCount = (etf: ETF) => {
+    if (etf.holdersCount) return etf.holdersCount
+    // AUM 1조원당 약 10,000명 보유 추정 (데모용)
+    return Math.round(etf.aum / 100000000)
+  }
+
   const sortedETFs = [...filteredETFs].sort((a, b) => {
     switch (sortBy) {
       case 'health': return b.healthScore - a.healthScore
       case 'ter': return a.ter - b.ter
       case 'liquidity': return b.adtv - a.adtv
       case 'return': return b.changePercent - a.changePercent
+      case 'holders': return getHoldersCount(b) - getHoldersCount(a)
       default: return 0
     }
   })
@@ -207,16 +215,20 @@ export function DiscoverPage({
 
       <div className="px-4 pb-3 flex items-center justify-between" data-tour="sort-options">
         <div className="text-sm text-gray-400">{sortedETFs.length}개 ETF</div>
-        <div className="flex gap-2">
-          {['return', 'liquidity', 'ter', 'health'].map((sort) => (
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+          {['return', 'liquidity', 'ter', 'health', 'holders'].map((sort) => (
             <Button
               key={sort}
               variant="ghost"
               size="sm"
-              className={`text-xs ${sortBy === sort ? 'text-[#d64f79]' : 'text-gray-400'}`}
+              className={`text-xs whitespace-nowrap ${sortBy === sort ? 'text-[#d64f79]' : 'text-gray-400'}`}
               onClick={() => setSortBy(sort)}
             >
-              {sort === 'return' ? '수익률순' : sort === 'liquidity' ? '유동성순' : sort === 'ter' ? '저비용순' : '건전성순'}
+              {sort === 'return' ? '수익률순' :
+               sort === 'liquidity' ? '유동성순' :
+               sort === 'ter' ? '저비용순' :
+               sort === 'health' ? '건전성순' :
+               '보유고객순'}
             </Button>
           ))}
         </div>
