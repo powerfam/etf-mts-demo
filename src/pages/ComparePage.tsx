@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
-import { Plus, X, CheckCircle2, Info, Radar as RadarIcon, Search } from 'lucide-react'
+import { Plus, X, Radar as RadarIcon, Search, HelpCircle } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { mockETFs } from '@/data/mockData'
 import { formatNumber, formatCurrency } from '@/lib/utils'
 import type { ETF } from '@/data/mockData'
@@ -23,11 +24,70 @@ interface ComparePageProps {
   onClearInitialETFs?: () => void
 }
 
-export function ComparePage({ onSelectETF: _onSelectETF, initialETFs, onClearInitialETFs }: ComparePageProps) {
-  void _onSelectETF // 미사용 경고 방지
+// 지표 설명 데이터
+const metricDescriptions: Record<string, { title: string; description: string; tip: string }> = {
+  ter: {
+    title: 'TER (총보수)',
+    description: 'Total Expense Ratio의 약자로, ETF 운용에 드는 연간 비용입니다. 운용보수, 판매보수, 수탁보수 등이 포함됩니다.',
+    tip: '같은 지수를 추종하는 ETF라면 TER이 낮은 것이 유리합니다.',
+  },
+  discrepancy: {
+    title: '괴리율',
+    description: 'ETF 시장가격과 실제 자산가치(NAV)의 차이입니다. 프리미엄(+)이면 NAV 대비 비싸게, 디스카운트(-)면 싸게 거래 중입니다.',
+    tip: '괴리율이 크면 NAV와 다른 가격에 매매하게 됩니다.',
+  },
+  spread: {
+    title: '스프레드',
+    description: '매수호가와 매도호가의 차이입니다. 거래 시 발생하는 숨은 비용으로, LP(유동성공급자)가 관리합니다.',
+    tip: '스프레드는 매매 시 발생하는 거래 비용입니다.',
+  },
+  aum: {
+    title: '순자산 (AUM)',
+    description: 'Assets Under Management의 약자로, ETF에 투자된 총 자산규모입니다.',
+    tip: 'AUM 규모에 따라 상장폐지 요건에 영향을 받을 수 있습니다.',
+  },
+  adtv: {
+    title: '거래대금 (30일)',
+    description: '최근 30일간 일평균 거래대금입니다. 유동성을 나타내며, 원하는 수량의 체결 용이성과 관련됩니다.',
+    tip: '거래량이 많을수록 호가 스프레드가 좁아지는 경향이 있습니다.',
+  },
+  trackingError: {
+    title: '추적오차',
+    description: 'ETF 수익률과 기초지수 수익률의 차이입니다. 지수 추종 정확도를 나타냅니다.',
+    tip: '완전복제 방식 ETF가 샘플링 방식보다 추적오차가 작은 편입니다.',
+  },
+  weeklyReturn: {
+    title: '주간 수익률',
+    description: '최근 1주일간의 가격 변동률입니다.',
+    tip: '수정주가(배당 재투자 반영) 기준으로 계산됩니다.',
+  },
+  dividendYield: {
+    title: '배당수익률',
+    description: '연간 배당금을 현재 가격으로 나눈 비율입니다.',
+    tip: '과거 배당 기준이며, 향후 배당은 달라질 수 있습니다.',
+  },
+  high52w: {
+    title: '52주 최고가',
+    description: '최근 52주(1년)간 기록한 가장 높은 가격입니다.',
+    tip: '현재가와 비교하여 가격 위치를 파악할 수 있습니다.',
+  },
+  low52w: {
+    title: '52주 최저가',
+    description: '최근 52주(1년)간 기록한 가장 낮은 가격입니다.',
+    tip: '현재가와 비교하여 가격 위치를 파악할 수 있습니다.',
+  },
+  position52w: {
+    title: '52주 대비 위치',
+    description: '현재 가격이 52주 최저가(0%)와 최고가(100%) 사이에서 어디에 위치하는지 나타냅니다.',
+    tip: '50% 이하면 52주 중 저점에 가깝고, 50% 이상이면 고점에 가깝습니다.',
+  },
+}
+
+export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: ComparePageProps) {
   const [selectedETFs, setSelectedETFs] = useState<ETF[]>([mockETFs[0], mockETFs[1], mockETFs[2]])
   const [showSelector, setShowSelector] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [selectedMetric, setSelectedMetric] = useState<string | null>(null)
 
   // 외부에서 전달된 비교 목록 적용
   useEffect(() => {
@@ -38,7 +98,7 @@ export function ComparePage({ onSelectETF: _onSelectETF, initialETFs, onClearIni
   }, [initialETFs, onClearInitialETFs])
 
   const addETF = (etf: ETF) => {
-    if (selectedETFs.length < 5 && !selectedETFs.find(e => e.id === etf.id)) {
+    if (selectedETFs.length < 3 && !selectedETFs.find(e => e.id === etf.id)) {
       setSelectedETFs([...selectedETFs, etf])
     }
     setShowSelector(false)
@@ -64,39 +124,78 @@ export function ComparePage({ onSelectETF: _onSelectETF, initialETFs, onClearIni
     setSelectedETFs(selectedETFs.filter(e => e.id !== id))
   }
 
+  // 주간 수익률 계산 (sparkline 데이터 활용)
+  const getWeeklyReturn = (etf: ETF) => {
+    const sparkline = etf.sparkline
+    if (sparkline.length < 2) return 0
+    const first = sparkline[0]
+    const last = sparkline[sparkline.length - 1]
+    return ((last - first) / first) * 100
+  }
+
+  // 52주 대비 현재가 위치 계산 (0% = 최저가, 100% = 최고가)
+  // 신고가면 100% 초과, 신저가면 0% 미만 가능
+  const get52wPosition = (etf: ETF): number => {
+    const range = etf.high52w - etf.low52w
+    if (range <= 0) return 50
+    return Math.round(((etf.price - etf.low52w) / range) * 100)
+  }
+
+  // 바 표시용 (0~100%로 클램핑)
+  const get52wPositionClamped = (etf: ETF): number => {
+    const pos = get52wPosition(etf)
+    return Math.min(100, Math.max(0, pos))
+  }
+
+  // 신고가/신저가 여부
+  const isNewHigh = (etf: ETF): boolean => etf.price > etf.high52w
+  const isNewLow = (etf: ETF): boolean => etf.price < etf.low52w
+
   // Compare metrics
   const compareMetrics = [
     {
-      category: '비용',
+      category: '가격위치',
       items: [
-        { key: 'ter', label: 'TER (총보수)', format: (v: number) => `${v.toFixed(2)}%`, best: 'low' },
+        { key: 'high52w', label: '52주 최고가', format: (v: number) => formatNumber(v), best: 'none' },
+        { key: 'low52w', label: '52주 최저가', format: (v: number) => formatNumber(v), best: 'none' },
+        { key: 'position52w', label: '52주 대비 위치', format: (_v: number, etf?: ETF) => etf ? `${get52wPosition(etf)}%` : '-', best: 'none', computed: true, showBar: true },
       ]
     },
     {
-      category: '거래안전',
+      category: '비용효율',
+      items: [
+        { key: 'ter', label: 'TER', format: (v: number) => `${v.toFixed(2)}%`, best: 'low' },
+      ]
+    },
+    {
+      category: '가격정확도',
       items: [
         { key: 'discrepancy', label: '괴리율', format: (v: number) => `${v >= 0 ? '+' : ''}${v.toFixed(2)}%`, best: 'low', absolute: true },
+      ]
+    },
+    {
+      category: '거래효율',
+      items: [
         { key: 'spread', label: '스프레드', format: (v: number) => `${v.toFixed(2)}%`, best: 'low' },
       ]
     },
     {
       category: '유동성',
       items: [
-        { key: 'adtv', label: '30D 거래대금', format: (v: number) => formatCurrency(v), best: 'high' },
         { key: 'aum', label: '순자산(AUM)', format: (v: number) => formatCurrency(v), best: 'high' },
+        { key: 'adtv', label: '거래대금(30일)', format: (v: number) => formatCurrency(v), best: 'high' },
       ]
     },
     {
-      category: '품질',
+      category: '추적정확도',
       items: [
         { key: 'trackingError', label: '추적오차', format: (v: number) => `${v.toFixed(2)}%`, best: 'low' },
-        { key: 'healthScore', label: '건전성 점수', format: (v: number) => `${v}점`, best: 'high' },
       ]
     },
     {
       category: '수익',
       items: [
-        { key: 'changePercent', label: '일간 수익률', format: (v: number) => `${v >= 0 ? '+' : ''}${v.toFixed(2)}%`, best: 'high' },
+        { key: 'weeklyReturn', label: '주간수익률', format: (v: number) => `${v >= 0 ? '+' : ''}${v.toFixed(2)}%`, best: 'high', computed: true },
         { key: 'dividendYield', label: '배당수익률', format: (v: number) => `${v.toFixed(1)}%`, best: 'high' },
       ]
     }
@@ -105,47 +204,96 @@ export function ComparePage({ onSelectETF: _onSelectETF, initialETFs, onClearIni
   // 레이더 차트용 색상
   const chartColors = ['#d64f79', '#10B981', '#8B5CF6', '#F59E0B', '#3B82F6']
 
-  // 레이더 차트용 지표 정규화 (0-100 스케일)
-  const normalizeForRadar = (etf: ETF) => {
-    // 각 지표를 0-100 점수로 변환 (높을수록 좋음)
-    const terScore = Math.max(0, 100 - etf.ter * 50) // TER 낮을수록 좋음
-    const spreadScore = Math.max(0, 100 - etf.spread * 200) // 스프레드 낮을수록 좋음
-    const healthScore = etf.healthScore // 이미 0-100
-    const liquidityScore = Math.min(100, Math.log10(etf.adtv / 100000000) * 20) // 거래대금 로그 스케일
-    const trackingScore = Math.max(0, 100 - etf.trackingError * 200) // 추적오차 낮을수록 좋음
-    const dividendScore = Math.min(100, etf.dividendYield * 20) // 배당수익률
+  // 레이더 차트용 지표 (상대 비교용) - 8개 항목
+  // 라벨은 "넓을수록 좋음"에 맞게 긍정적 표현 사용
+  const radarMetrics = [
+    { key: 'ter', label: '비용효율', lowerIsBetter: true },
+    { key: 'discrepancy', label: '가격정확도', lowerIsBetter: true, absolute: true },
+    { key: 'aum', label: 'AUM', lowerIsBetter: false },
+    { key: 'trackingError', label: '추적정확도', lowerIsBetter: true },
+    { key: 'spread', label: '거래효율', lowerIsBetter: true },
+    { key: 'adtv', label: '거래대금', lowerIsBetter: false },
+    { key: 'weeklyReturn', label: '주간수익률', lowerIsBetter: false, computed: true },
+    { key: 'dividendYield', label: '배당수익률', lowerIsBetter: false },
+  ]
 
-    return {
-      name: etf.shortName.length > 8 ? etf.shortName.slice(0, 8) + '...' : etf.shortName,
-      '비용효율': Math.round(terScore),
-      '거래안전': Math.round(spreadScore),
-      '건전성': Math.round(healthScore),
-      '유동성': Math.round(liquidityScore),
-      '추적정확': Math.round(trackingScore),
-      '배당매력': Math.round(dividendScore),
-    }
+  // 상대 비교 정규화 (1-10 스케일, 비교군 내 최저=1, 최고=10)
+  const getRelativeScore = (value: number, allValues: number[], lowerIsBetter: boolean): number => {
+    const min = Math.min(...allValues)
+    const max = Math.max(...allValues)
+    if (min === max) return 5.5 // 모두 같으면 중간값
+    const normalized = (value - min) / (max - min) // 0~1
+    // lowerIsBetter면 낮을수록 높은 점수, 최소 1점 보장
+    const score = lowerIsBetter ? (1 - normalized) * 9 + 1 : normalized * 9 + 1
+    return score
   }
 
-  // 레이더 차트 데이터 생성
-  const radarData = [
-    { metric: '비용효율', fullMark: 100 },
-    { metric: '거래안전', fullMark: 100 },
-    { metric: '건전성', fullMark: 100 },
-    { metric: '유동성', fullMark: 100 },
-    { metric: '추적정확', fullMark: 100 },
-    { metric: '배당매력', fullMark: 100 },
-  ].map(item => {
-    const dataPoint: Record<string, string | number> = { metric: item.metric, fullMark: item.fullMark }
+  // 지표값 가져오기 (computed 필드 처리)
+  const getMetricValue = (etf: ETF, metric: typeof radarMetrics[0]): number => {
+    if (metric.key === 'weeklyReturn') {
+      return getWeeklyReturn(etf)
+    }
+    const value = etf[metric.key as keyof ETF] as number
+    return metric.absolute ? Math.abs(value) : value
+  }
+
+  // 레이더 차트 데이터 생성 - 상대 비교
+  const radarData = radarMetrics.map(metric => {
+    const allValues = selectedETFs.map(etf => getMetricValue(etf, metric))
+
+    const dataPoint: Record<string, string | number> = { metric: metric.label, fullMark: 10 }
     selectedETFs.forEach(etf => {
-      const normalized = normalizeForRadar(etf)
-      dataPoint[etf.shortName] = normalized[item.metric as keyof typeof normalized] as number
+      const actualValue = getMetricValue(etf, metric)
+      dataPoint[etf.shortName] = Math.round(getRelativeScore(actualValue, allValues, metric.lowerIsBetter) * 10) / 10
     })
     return dataPoint
   })
 
+  // 각 ETF의 순위 계산 (1위 = 우위 항목)
+  const getRankCounts = (etf: ETF) => {
+    const ranks = { first: 0, second: 0, third: 0 }
+
+    radarMetrics.forEach(metric => {
+      const allValues = selectedETFs.map(e => getMetricValue(e, metric))
+      const etfValue = getMetricValue(etf, metric)
+
+      // 1위 판정: lowerIsBetter면 최소값, 아니면 최대값과 같으면 1위
+      const bestValue = metric.lowerIsBetter ? Math.min(...allValues) : Math.max(...allValues)
+
+      if (etfValue === bestValue) {
+        ranks.first++
+      } else {
+        // 2위, 3위는 단순히 순위로 계산
+        const sorted = [...new Set(allValues)].sort((a, b) => metric.lowerIsBetter ? a - b : b - a)
+        const rank = sorted.indexOf(etfValue) + 1
+        if (rank === 2) ranks.second++
+        else if (rank === 3) ranks.third++
+      }
+    })
+
+    return ranks
+  }
+
+  // 우위 지표 수 기준 내림차순 정렬된 ETF 목록
+  const sortedETFsForSummary = [...selectedETFs].sort((a, b) => {
+    const ranksA = getRankCounts(a)
+    const ranksB = getRankCounts(b)
+    // 1위 개수 먼저, 같으면 2위 개수
+    if (ranksB.first !== ranksA.first) return ranksB.first - ranksA.first
+    return ranksB.second - ranksA.second
+  })
+
+  // ETF에서 값 가져오기 (computed 필드 처리)
+  const getETFValue = (etf: ETF, key: string): number => {
+    if (key === 'weeklyReturn') {
+      return getWeeklyReturn(etf)
+    }
+    return etf[key as keyof ETF] as number
+  }
+
   const getBestValue = (key: string, best: string, absolute?: boolean) => {
     const values = selectedETFs.map(etf => {
-      const value = etf[key as keyof ETF] as number
+      const value = getETFValue(etf, key)
       return absolute ? Math.abs(value) : value
     })
     if (best === 'low') {
@@ -155,7 +303,7 @@ export function ComparePage({ onSelectETF: _onSelectETF, initialETFs, onClearIni
   }
 
   const isBestValue = (etf: ETF, key: string, best: string, absolute?: boolean) => {
-    const value = absolute ? Math.abs(etf[key as keyof ETF] as number) : etf[key as keyof ETF] as number
+    const value = absolute ? Math.abs(getETFValue(etf, key)) : getETFValue(etf, key)
     return value === getBestValue(key, best, absolute)
   }
 
@@ -165,51 +313,48 @@ export function ComparePage({ onSelectETF: _onSelectETF, initialETFs, onClearIni
       <div className="sticky top-[52px] z-40 bg-[#191322] px-4 py-3 border-b border-[#2d2640]">
         <div className="flex items-center justify-between">
           <h1 className="text-lg font-semibold text-white">ETF 비교</h1>
-          <Badge variant="outline" className="text-xs">{selectedETFs.length}/5</Badge>
+          <Badge variant="outline" className="text-xs">{selectedETFs.length}/3</Badge>
         </div>
       </div>
 
-      {/* Selected ETFs Header */}
+      {/* Selected ETFs Header - 3개 균등 배치 */}
       <div className="px-4 py-3 border-b border-[#2d2640]" data-tour="compare-slots">
-        <ScrollArea className="w-full whitespace-nowrap">
-          <div className="flex gap-3">
-            {selectedETFs.map((etf) => (
-              <div key={etf.id} className="relative shrink-0 w-[120px]">
-                <Card className="h-[100px]">
-                  <CardContent className="p-3 h-full flex flex-col justify-between">
-                    <div>
-                      <div className="text-[10px] text-gray-400">{etf.ticker}</div>
-                      <div className="text-xs font-medium text-white truncate">{etf.shortName}</div>
+        <div className="grid grid-cols-3 gap-2">
+          {selectedETFs.map((etf) => (
+            <div key={etf.id} className="relative">
+              <Card className="h-[100px]">
+                <CardContent className="p-2.5 h-full flex flex-col justify-between">
+                  <div>
+                    <div className="text-xs text-gray-400">{etf.ticker}</div>
+                    <div className="text-sm font-medium text-white truncate">{etf.shortName}</div>
+                  </div>
+                  <div>
+                    <div className="text-base font-bold text-white">{formatNumber(etf.price)}</div>
+                    <div className={`text-xs ${etf.change >= 0 ? 'text-up' : 'text-down'}`}>
+                      {etf.change >= 0 ? '+' : ''}{etf.changePercent.toFixed(2)}%
                     </div>
-                    <div>
-                      <div className="text-sm font-bold text-white">{formatNumber(etf.price)}</div>
-                      <div className={`text-[10px] ${etf.change >= 0 ? 'text-up' : 'text-down'}`}>
-                        {etf.change >= 0 ? '+' : ''}{etf.changePercent.toFixed(2)}%
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-                <button
-                  onClick={() => removeETF(etf.id)}
-                  className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[#2d2640] hover:bg-[#3d3450] flex items-center justify-center"
-                >
-                  <X className="h-3 w-3 text-gray-400" />
-                </button>
-              </div>
-            ))}
-
-            {selectedETFs.length < 5 && (
+                  </div>
+                </CardContent>
+              </Card>
               <button
-                onClick={() => setShowSelector(true)}
-                className="shrink-0 w-[120px] h-[100px] border-2 border-dashed border-[#2d2640] rounded-xl flex flex-col items-center justify-center gap-2 hover:border-[#d64f79]/50 transition-colors"
+                onClick={() => removeETF(etf.id)}
+                className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[#2d2640] hover:bg-[#3d3450] flex items-center justify-center"
               >
-                <Plus className="h-5 w-5 text-gray-500" />
-                <span className="text-xs text-gray-500">ETF 추가</span>
+                <X className="h-3 w-3 text-gray-400" />
               </button>
-            )}
-          </div>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
+            </div>
+          ))}
+
+          {selectedETFs.length < 3 && (
+            <button
+              onClick={() => setShowSelector(true)}
+              className="h-[100px] border-2 border-dashed border-[#2d2640] rounded-xl flex flex-col items-center justify-center gap-2 hover:border-[#d64f79]/50 transition-colors"
+            >
+              <Plus className="h-5 w-5 text-gray-500" />
+              <span className="text-sm text-gray-500">ETF 추가</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* ETF Selector Modal */}
@@ -270,31 +415,31 @@ export function ComparePage({ onSelectETF: _onSelectETF, initialETFs, onClearIni
         </div>
       )}
 
-      {/* Radar Chart - 방사형 비교 차트 */}
+      {/* Radar Chart */}
       {selectedETFs.length >= 2 && (
-        <div className="px-4 py-4">
+        <div className="px-4 pt-4">
           <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center gap-2">
-                <RadarIcon className="h-4 w-4 text-[#d64f79]" />
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                <RadarIcon className="h-5 w-5 text-[#d64f79]" />
                 ETF Radar
               </CardTitle>
-              <p className="text-[11px] text-gray-500">주요 6개 항목 시각화 비교</p>
+              <p className="text-sm text-gray-400">선택 종목 간 상대 비교</p>
             </CardHeader>
             <CardContent className="pb-4">
               <div className="h-[280px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
+                  <RadarChart cx="50%" cy="50%" outerRadius="65%" data={radarData}>
                     <PolarGrid stroke="#3d3650" />
                     <PolarAngleAxis
                       dataKey="metric"
-                      tick={{ fill: '#9ca3af', fontSize: 11 }}
+                      tick={{ fill: '#d1d5db', fontSize: 13, fontWeight: 500 }}
                       tickLine={false}
                     />
                     <PolarRadiusAxis
                       angle={30}
-                      domain={[0, 100]}
-                      tick={{ fill: '#6b7280', fontSize: 9 }}
+                      domain={[0, 10]}
+                      tick={false}
                       axisLine={false}
                     />
                     {selectedETFs.map((etf, index) => (
@@ -309,118 +454,270 @@ export function ComparePage({ onSelectETF: _onSelectETF, initialETFs, onClearIni
                       />
                     ))}
                     <Legend
-                      wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }}
-                      iconType="circle"
-                      iconSize={8}
+                      wrapperStyle={{ fontSize: '13px', paddingTop: '8px' }}
+                      content={() => (
+                        <div className="flex justify-center gap-4 flex-wrap pt-2">
+                          {selectedETFs.map((etf, idx) => (
+                            <div key={etf.id} className="flex items-center gap-1.5 max-w-[100px]">
+                              <div
+                                className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                                style={{ backgroundColor: chartColors[idx % chartColors.length] }}
+                              />
+                              <div className="legend-marquee">
+                                <div className="legend-marquee-inner text-[13px] text-white whitespace-nowrap">
+                                  {etf.shortName}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     />
                   </RadarChart>
                 </ResponsiveContainer>
-              </div>
-              {/* 항목 설명 */}
-              <div className="mt-3 grid grid-cols-2 gap-2 text-[10px] text-gray-500">
-                <div className="flex items-center gap-1">
-                  <div className="w-2 h-2 rounded-full bg-[#d64f79]" />
-                  비용효율: TER(총보수) 기준
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-2 h-2 rounded-full bg-[#10B981]" />
-                  거래안전: 스프레드 기준
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-2 h-2 rounded-full bg-[#8B5CF6]" />
-                  건전성: 종합 건전성 점수
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-2 h-2 rounded-full bg-[#F59E0B]" />
-                  유동성: 30일 거래대금
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-2 h-2 rounded-full bg-[#3B82F6]" />
-                  추적정확: 추적오차 기준
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-2 h-2 rounded-full bg-gray-400" />
-                  배당매력: 배당수익률
-                </div>
               </div>
             </CardContent>
           </Card>
         </div>
       )}
 
-      {/* Comparison Table */}
-      <div className="px-4 py-4" data-tour="compare-table">
-        {compareMetrics.map((category) => (
-          <Card key={category.category} className="mb-4">
-            <CardHeader className="py-2 px-3">
-              <CardTitle className="text-xs text-gray-400">{category.category}</CardTitle>
+      {/* Summary */}
+      {selectedETFs.length >= 2 && (
+        <div className="px-4 pt-3">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm">비교 요약</CardTitle>
+              <p className="text-xs text-gray-500">우위 지표 많은 순</p>
             </CardHeader>
-            <CardContent className="p-0">
-              {category.items.map((item) => (
-                <div key={item.key} className="border-t border-[#2d2640]">
-                  <div className="px-3 py-2 flex items-center justify-between">
-                    <div className="flex items-center gap-1">
-                      <span className="text-xs text-gray-400">{item.label}</span>
-                      <Info className="h-3 w-3 text-gray-600" />
-                    </div>
-                  </div>
-                  <div className="px-3 pb-3 grid gap-2" style={{ gridTemplateColumns: `repeat(${selectedETFs.length}, 1fr)` }}>
-                    {selectedETFs.map((etf) => {
-                      const value = etf[item.key as keyof ETF] as number
-                      const isBest = isBestValue(etf, item.key, item.best, item.absolute)
-                      return (
-                        <div
-                          key={etf.id}
-                          className={`p-2 rounded-lg text-center ${isBest ? 'bg-emerald-500/10' : 'bg-[#2a2438]'}`}
-                        >
-                          <div className={`text-sm font-medium ${isBest ? 'text-emerald-400' : 'text-white'}`}>
-                            {item.format(value)}
-                          </div>
-                          {isBest && (
-                            <CheckCircle2 className="h-3 w-3 text-emerald-400 mx-auto mt-1" />
-                          )}
+            <CardContent>
+              <div className="space-y-3">
+                {sortedETFsForSummary.map((etf) => {
+                  const originalIndex = selectedETFs.findIndex(e => e.id === etf.id)
+                  const ranks = getRankCounts(etf)
+                  return (
+                    <button
+                      key={etf.id}
+                      onClick={() => onSelectETF(etf)}
+                      className="w-full text-left hover:bg-[#2a2438] rounded-lg p-2 -m-2 transition-colors"
+                    >
+                      <div className="flex items-center justify-between mb-1.5">
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="w-3 h-3 rounded-full"
+                            style={{ backgroundColor: chartColors[originalIndex % chartColors.length] }}
+                          />
+                          <span className="text-sm text-white">{etf.shortName}</span>
                         </div>
-                      )
-                    })}
-                  </div>
-                </div>
-              ))}
+                        <span className="text-xs text-gray-400">
+                          우위 항목 {ranks.first}개
+                        </span>
+                      </div>
+                      <div className="flex gap-1">
+                        {Array.from({ length: radarMetrics.length }).map((_, i) => (
+                          <div
+                            key={i}
+                            className="flex-1 h-2 rounded-sm transition-all duration-300"
+                            style={{
+                              backgroundColor: i < ranks.first
+                                ? chartColors[originalIndex % chartColors.length]
+                                : '#2d2640',
+                            }}
+                          />
+                        ))}
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
             </CardContent>
           </Card>
-        ))}
+        </div>
+      )}
+
+      {/* Marquee 애니메이션 스타일 */}
+      <style>{`
+        @keyframes marquee {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(calc(-100% - 16px)); }
+        }
+        .marquee-cell {
+          overflow: hidden;
+        }
+        .marquee-inner {
+          display: inline-block;
+          padding-right: 16px;
+          animation: marquee 3s linear infinite;
+        }
+        .legend-marquee {
+          overflow: hidden;
+          max-width: 80px;
+        }
+        .legend-marquee-inner {
+          display: inline-block;
+          padding-right: 12px;
+          animation: marquee 4s linear infinite;
+        }
+      `}</style>
+
+      {/* Comparison Table - 헤더와 본문 분리하여 sticky 적용 */}
+      <div className="px-4 pt-4" data-tour="compare-table">
+        <h3 className="text-sm font-medium text-white mb-2">상세 지표 비교</h3>
+        {/* Sticky Header - 테이블 밖에서 동일한 컬럼 너비 */}
+        <div className="sticky top-[98px] z-30 bg-[#191322]">
+          <table className="w-full bg-[#1f1a2e] border border-[#2d2640] rounded-t-xl" style={{ tableLayout: 'fixed' }}>
+            <colgroup>
+              <col style={{ width: '115px' }} />
+              {selectedETFs.map(etf => (
+                <col key={`h-${etf.id}`} />
+              ))}
+            </colgroup>
+            <thead>
+              <tr>
+                <th className="p-2 text-sm font-medium text-gray-500 text-left rounded-tl-xl">지표</th>
+                {selectedETFs.map((etf, index) => (
+                  <th key={etf.id} className={`p-2 text-center border-l border-[#2d2640] ${index === selectedETFs.length - 1 ? 'rounded-tr-xl' : ''}`}>
+                    <div
+                      className="w-2.5 h-2.5 rounded-full mx-auto mb-1"
+                      style={{ backgroundColor: chartColors[index % chartColors.length] }}
+                    />
+                    <div className="text-xs text-gray-400 font-normal">{etf.ticker}</div>
+                    <div className="marquee-cell">
+                      <div className="marquee-inner text-sm font-medium text-white whitespace-nowrap">
+                        {etf.shortName}
+                      </div>
+                    </div>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+          </table>
+        </div>
+
+        {/* Table Body - 동일한 컬럼 너비 */}
+        <table className="w-full bg-[#1f1a2e] border border-t-0 border-[#2d2640] rounded-b-xl" style={{ tableLayout: 'fixed' }}>
+          <colgroup>
+            <col style={{ width: '115px' }} />
+            {selectedETFs.map(etf => (
+              <col key={`b-${etf.id}`} />
+            ))}
+          </colgroup>
+          <tbody>
+            {compareMetrics.map((category, catIdx) => (
+              <>
+                {/* Category Header */}
+                <tr key={`cat-${category.category}`} className={catIdx > 0 ? 'border-t border-[#2d2640]' : ''}>
+                  <td colSpan={selectedETFs.length + 1} className="bg-[#2a2438] px-3 py-2">
+                    <span className="text-sm font-semibold text-[#d64f79]">{category.category}</span>
+                  </td>
+                </tr>
+
+                {/* Items */}
+                {category.items.map((item) => (
+                  <tr key={item.key} className="border-t border-[#2d2640]">
+                    <td className="p-2">
+                      <button
+                        onClick={() => setSelectedMetric(item.key)}
+                        className="text-sm text-gray-400 hover:text-[#d64f79] transition-colors text-left"
+                      >
+                        {item.label}
+                      </button>
+                    </td>
+                    {selectedETFs.map((etf) => {
+                      const value = getETFValue(etf, item.key)
+                      const isBest = item.best !== 'none' && isBestValue(etf, item.key, item.best, (item as { absolute?: boolean }).absolute)
+                      const itemWithShowBar = item as { showBar?: boolean; computed?: boolean }
+                      const showBar = itemWithShowBar.showBar
+                      const isComputed = itemWithShowBar.computed
+
+                      // computed 필드이면서 position52w인 경우 ETF를 전달하여 format 호출
+                      const displayValue = isComputed && item.key === 'position52w'
+                        ? (item.format as (v: number, etf?: ETF) => string)(value, etf)
+                        : item.format(value)
+
+                      // 52주 대비 위치 퍼센트 값 (바 표시용)
+                      const position = showBar ? get52wPosition(etf) : 0
+                      const positionClamped = showBar ? get52wPositionClamped(etf) : 0
+                      const newHigh = showBar ? isNewHigh(etf) : false
+                      const newLow = showBar ? isNewLow(etf) : false
+
+                      return (
+                        <td
+                          key={etf.id}
+                          className={`p-2 text-center border-l border-[#2d2640] ${isBest ? 'bg-emerald-500/10' : ''}`}
+                        >
+                          {showBar ? (
+                            <div className="flex flex-col items-center gap-1">
+                              <div className="flex items-center gap-1">
+                                <span className={`text-base font-semibold ${newHigh ? 'text-up' : newLow ? 'text-down' : isBest ? 'text-emerald-400' : 'text-white'}`}>
+                                  {displayValue}
+                                </span>
+                                {newHigh && (
+                                  <span className="text-[10px] px-1 py-0.5 bg-red-500/20 text-up rounded font-medium">
+                                    신고가
+                                  </span>
+                                )}
+                                {newLow && (
+                                  <span className="text-[10px] px-1 py-0.5 bg-blue-500/20 text-down rounded font-medium">
+                                    신저가
+                                  </span>
+                                )}
+                              </div>
+                              {/* 52주 위치 바 인디케이터 */}
+                              <div className="w-full h-2 bg-[#2d2640] rounded-full relative overflow-hidden">
+                                <div
+                                  className="absolute left-0 top-0 h-full rounded-full"
+                                  style={{
+                                    width: `${positionClamped}%`,
+                                    background: newHigh ? '#ef4444' : newLow ? '#3b82f6' : position > 70 ? '#ef4444' : position > 40 ? '#d64f79' : '#3b82f6'
+                                  }}
+                                />
+                                {/* 현재 위치 마커 */}
+                                <div
+                                  className="absolute top-1/2 -translate-y-1/2 w-2 h-2 bg-white rounded-full shadow-sm border border-gray-400"
+                                  style={{ left: `calc(${positionClamped}% - 4px)` }}
+                                />
+                              </div>
+                              <div className="flex justify-between w-full text-[10px] text-gray-500">
+                                <span>저가</span>
+                                <span>고가</span>
+                              </div>
+                            </div>
+                          ) : (
+                            <span className={`text-base font-semibold ${isBest ? 'text-emerald-400' : 'text-white'}`}>
+                              {displayValue}
+                            </span>
+                          )}
+                        </td>
+                      )
+                    })}
+                  </tr>
+                ))}
+              </>
+            ))}
+          </tbody>
+        </table>
       </div>
 
-      {/* Summary */}
-      <div className="px-4 pb-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm">비교 요약</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {selectedETFs.map((etf) => {
-                const wins = compareMetrics.flatMap(c => c.items)
-                  .filter(item => isBestValue(etf, item.key, item.best, item.absolute)).length
-                const total = compareMetrics.flatMap(c => c.items).length
-                return (
-                  <div key={etf.id} className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#d64f79' }} />
-                      <span className="text-sm text-white">{etf.shortName}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-gray-400">{wins}/{total} 항목 우위</span>
-                      <Badge variant={wins >= total / 2 ? 'success' : 'outline'}>
-                        {etf.healthScore}점
-                      </Badge>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      {/* 지표 설명 모달 */}
+      <Dialog open={!!selectedMetric} onOpenChange={() => setSelectedMetric(null)}>
+        <DialogContent className="bg-[#1f1a2e] border-[#2d2640] max-w-sm">
+          {selectedMetric && metricDescriptions[selectedMetric] && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-white flex items-center gap-2">
+                  <HelpCircle className="w-5 h-5 text-[#d64f79]" />
+                  {metricDescriptions[selectedMetric].title}
+                </DialogTitle>
+              </DialogHeader>
+              <div className="text-sm">
+                <p className="text-gray-300 leading-relaxed">
+                  {metricDescriptions[selectedMetric].description}
+                </p>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
 
     </div>
   )

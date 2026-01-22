@@ -16,11 +16,14 @@ export function formatPercent(num: number, decimals: number = 2): string {
 
 export function formatCurrency(num: number): string {
   if (num >= 1e12) {
-    return `${(num / 1e12).toFixed(1)}조`
+    const value = num / 1e12
+    return value >= 100 ? `${Math.round(value)}조` : `${value.toFixed(1)}조`
   } else if (num >= 1e8) {
-    return `${(num / 1e8).toFixed(1)}억`
+    const value = num / 1e8
+    return value >= 100 ? `${Math.round(value)}억` : `${value.toFixed(1)}억`
   } else if (num >= 1e4) {
-    return `${(num / 1e4).toFixed(1)}만`
+    const value = num / 1e4
+    return value >= 100 ? `${Math.round(value)}만` : `${value.toFixed(1)}만`
   }
   return formatNumber(num)
 }

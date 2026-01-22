@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Header } from './components/Header'
 import { BottomNav } from './components/BottomNav'
-import { FloatingChatbot } from './components/FloatingChatbot'
+// import { FloatingChatbot } from './components/FloatingChatbot' // 임시 숨김
 import { CompareSlot } from './components/CompareSlot'
 import { OnboardingTour } from './components/OnboardingTour'
 import { HomePage } from './pages/HomePage'
@@ -108,7 +108,7 @@ function App() {
   const handleAddToCompare = (etf: ETF) => {
     setCompareETFs(prev => {
       if (prev.find(e => e.id === etf.id)) return prev // 이미 있으면 무시
-      if (prev.length >= 4) return prev // 최대 4개
+      if (prev.length >= 3) return prev // 최대 3개
       return [...prev, etf]
     })
   }
@@ -146,17 +146,17 @@ function App() {
     setShowContentDetail(false)
   }
 
-  // 챗봇에서 콘텐츠 선택 시 투자정보 상세로 이동
-  const handleChatbotContentSelect = (content: InvestContent) => {
-    setSelectedContent(content)
-    setShowContentDetail(true)
-    setActiveTab('investinfo')
-  }
+  // 챗봇에서 콘텐츠 선택 시 투자정보 상세로 이동 - 임시 숨김
+  // const handleChatbotContentSelect = (content: InvestContent) => {
+  //   setSelectedContent(content)
+  //   setShowContentDetail(true)
+  //   setActiveTab('investinfo')
+  // }
 
-  // 챗봇에서 용어사전으로 이동
-  const handleNavigateToGlossary = () => {
-    setActiveTab('investinfo')
-  }
+  // 챗봇에서 용어사전으로 이동 - 임시 숨김
+  // const handleNavigateToGlossary = () => {
+  //   setActiveTab('investinfo')
+  // }
 
   // Show login page if not authenticated
   if (!isAuthenticated) {
@@ -173,11 +173,7 @@ function App() {
           onBack={handleBackFromTrade}
         />
         <BottomNav activeTab={activeTab} onTabChange={handleNavigate} />
-        <FloatingChatbot
-          onSelectContent={handleChatbotContentSelect}
-          onNavigateToGlossary={handleNavigateToGlossary}
-          hasCompareSlot={compareETFs.length > 0}
-        />
+        {/* FloatingChatbot 임시 숨김 - "챗봇 버튼 다시 보이게 해줘"로 복구 */}
       </div>
     )
   }
@@ -195,11 +191,7 @@ function App() {
           onAddToCompare={handleAddToCompareAndNavigate}
         />
         <BottomNav activeTab={activeTab} onTabChange={handleNavigate} />
-        <FloatingChatbot
-          onSelectContent={handleChatbotContentSelect}
-          onNavigateToGlossary={handleNavigateToGlossary}
-          hasCompareSlot={compareETFs.length > 0}
-        />
+        {/* FloatingChatbot 임시 숨김 */}
       </div>
     )
   }
@@ -218,18 +210,14 @@ function App() {
           }}
         />
         <BottomNav activeTab={activeTab} onTabChange={handleNavigate} />
-        <FloatingChatbot
-          onSelectContent={handleChatbotContentSelect}
-          onNavigateToGlossary={handleNavigateToGlossary}
-          hasCompareSlot={compareETFs.length > 0}
-        />
+        {/* FloatingChatbot 임시 숨김 */}
       </div>
     )
   }
 
   return (
     <div className="min-h-screen bg-[#191322]">
-      <Header onSelectETF={handleSelectETF} accountType={accountType} />
+      <Header onSelectETF={handleSelectETF} accountType={accountType} onStartTour={() => handleStartTour(activeTab)} />
 
       {activeTab === 'home' && (
         <HomePage
@@ -286,7 +274,7 @@ function App() {
 
       <BottomNav activeTab={activeTab} onTabChange={handleNavigate} />
 
-      {/* 전역 플로팅 챗봇 (투자정보 페이지 제외 - 해당 페이지는 자체 챗봇 있음) */}
+      {/* FloatingChatbot 임시 숨김 - "챗봇 버튼 다시 보이게 해줘"로 복구
       {activeTab !== 'investinfo' && (
         <FloatingChatbot
           onSelectContent={handleChatbotContentSelect}
@@ -294,6 +282,7 @@ function App() {
           hasCompareSlot={compareETFs.length > 0}
         />
       )}
+      */}
 
       {/* 온보딩 투어 */}
       <OnboardingTour
@@ -303,14 +292,6 @@ function App() {
         onComplete={handleTourComplete}
       />
 
-      {/* 투어 시작 버튼 (개발/데모용) */}
-      <button
-        onClick={() => handleStartTour(activeTab)}
-        className="fixed bottom-24 left-4 px-3 py-2 bg-[#2d2640] border border-[#3d3650] rounded-full text-xs text-gray-400 hover:text-white hover:border-[#d64f79] transition-colors z-40"
-        title="이 페이지 투어 시작"
-      >
-        🎯 가이드
-      </button>
     </div>
   )
 }
