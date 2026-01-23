@@ -196,10 +196,12 @@
 }
 
 /* PWA standalone 모드에서 iOS input 키보드 이슈 해결 */
+/* iOS Safari 자동 줌인 방지: font-size 16px 이상 필수 */
 input, textarea, select {
   touch-action: manipulation;
   -webkit-user-select: text;
   user-select: text;
+  font-size: 16px !important;
 }
 
 .touch-action-manipulation {

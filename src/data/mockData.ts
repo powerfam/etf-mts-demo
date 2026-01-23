@@ -34,6 +34,11 @@ export interface ETF {
   indexProvider: string
   assetClass: string
   marketClass: string
+  // 검색 기능용 추가 필드
+  holdings?: string[]      // 주요 구성종목 (예: ['삼성전자', 'SK하이닉스'])
+  featureTags?: string[]   // 특징 태그 (예: ['월배당', '고배당', '성장'])
+  // 배당 주기
+  dividendFrequency?: 'monthly' | 'quarterly' | 'annual' | 'none'  // 월배당, 분기배당, 연배당, 무배당
 }
 
 export const themes = [
@@ -130,6 +135,9 @@ export const mockETFs: ETF[] = [
     indexDescription: 'KOSPI200: 유가증권시장 상장 대형주 200종목',
     strategy: '시가총액 가중 방식의 패시브 운용',
     issuer: '삼성자산운용', listedDate: '2002/10/14', indexProvider: 'KRX', assetClass: '주식', marketClass: '국내',
+    holdings: ['삼성전자', 'SK하이닉스', 'LG에너지솔루션', '삼성바이오로직스', '현대차'],
+    featureTags: ['대형주', '시장대표', '분산투자', '안정적'],
+    dividendFrequency: 'annual',
   },
   {
     id: '2', ticker: '360750', name: 'TIGER 미국S&P500', shortName: 'TIGER 미국S&P500',
@@ -143,6 +151,9 @@ export const mockETFs: ETF[] = [
     indexDescription: 'S&P500: 미국 대형주 500개 종목으로 구성',
     strategy: '보수 0.006%, 환헤지 미적용',
     issuer: '미래에셋자산운용', listedDate: '2020/08/07', indexProvider: 'S&P', assetClass: '주식', marketClass: '해외',
+    holdings: ['Apple', 'Microsoft', 'NVIDIA', 'Amazon', 'Meta'],
+    featureTags: ['미국', '대형주', '장기투자', '저비용', '환노출'],
+    dividendFrequency: 'quarterly',
   },
   {
     id: '3', ticker: '133690', name: 'TIGER 미국나스닥100', shortName: 'TIGER 미국나스닥100',
@@ -156,6 +167,8 @@ export const mockETFs: ETF[] = [
     indexDescription: '나스닥100: 나스닥 상장 비금융 대형주 100개 종목',
     strategy: '기술주 중심 구성, 환노출 상품',
     issuer: '미래에셋자산운용', listedDate: '2010/10/18', indexProvider: 'NASDAQ', assetClass: '주식', marketClass: '해외',
+    holdings: ['Apple', 'Microsoft', 'NVIDIA', 'Amazon', 'Tesla', 'Alphabet'],
+    featureTags: ['기술주', '성장주', '미국', '나스닥', '빅테크'],
   },
   {
     id: '4', ticker: '102110', name: 'TIGER 200', shortName: 'TIGER 200',
@@ -195,6 +208,8 @@ export const mockETFs: ETF[] = [
     indexDescription: 'KOSPI200 레버리지: 일일 수익률 2배 추종',
     strategy: '파생상품 활용, 일일 수익률 2배 추종',
     issuer: '삼성자산운용', listedDate: '2010/02/22', indexProvider: 'KRX', assetClass: '주식', marketClass: '국내',
+    holdings: ['삼성전자', 'SK하이닉스', 'KOSPI200선물'],
+    featureTags: ['상승장', '2배수익', '고위험', '단기투자', '레버리지'],
   },
   {
     id: '7', ticker: '114800', name: 'KODEX 인버스', shortName: 'KODEX 인버스',
@@ -208,6 +223,8 @@ export const mockETFs: ETF[] = [
     indexDescription: 'KOSPI200 인버스: 일일 수익률 -1배 추종',
     strategy: '파생상품 활용, 지수 하락 시 수익 구조',
     issuer: '삼성자산운용', listedDate: '2009/09/16', indexProvider: 'KRX', assetClass: '주식', marketClass: '국내',
+    holdings: ['KOSPI200선물'],
+    featureTags: ['하락장', '헷지', '단기투자', '인버스'],
   },
   {
     id: '8', ticker: '161510', name: 'PLUS 고배당주', shortName: 'PLUS 고배당주',
@@ -221,6 +238,25 @@ export const mockETFs: ETF[] = [
     indexDescription: 'FnGuide 배당주 지수 추종',
     strategy: '보수 0.23%, 배당성장률 기반 종목 선별',
     issuer: '한화자산운용', listedDate: '2012/08/29', indexProvider: 'FnGuide', assetClass: '주식', marketClass: '국내',
+    holdings: ['삼성전자우', 'KT&G', '하나금융지주', 'KB금융', 'POSCO홀딩스'],
+    featureTags: ['고배당', '배당성장', '가치주', '안정적', '인컴'],
+    dividendFrequency: 'monthly',
+  },
+  {
+    id: '8-1', ticker: '329200', name: 'ACE 고배당주', shortName: 'ACE 고배당주',
+    price: 11250, prevClose: 11180, change: 70, changePercent: 0.63,
+    iNav: 11245, discrepancy: 0.04, ter: 0.15, spread: 0.06,
+    adtv: 15000000000, aum: 320000000000, trackingError: 1.2, volatility: 11.5, dividendYield: 5.8,
+    high52w: 12180, low52w: 10520,
+    category: '배당', tags: ['국내', '고배당', '가치주'], healthScore: 82,
+    sparkline: [11050, 11080, 11120, 11150, 11140, 11180, 11250],
+    overview: '국내 고배당 종목으로 구성된 ETF',
+    indexDescription: 'KRX 고배당50 지수 추종',
+    strategy: '배당수익률 상위 종목 위주, 분기배당',
+    issuer: '한국투자신탁운용', listedDate: '2019/07/09', indexProvider: 'KRX', assetClass: '주식', marketClass: '국내',
+    holdings: ['한국타이어앤테크놀로지', '기아', '현대차', '삼성증권', 'DB손해보험', 'GS', 'NH투자증권', '키움증권', '코리안리', '신영증권'],
+    featureTags: ['고배당', '가치주', '안정적', '인컴'],
+    dividendFrequency: 'quarterly',
   },
   {
     id: '9', ticker: '153130', name: 'KODEX 단기채권', shortName: 'KODEX 단기채권',
@@ -255,6 +291,8 @@ export const mockETFs: ETF[] = [
     adtv: 75738000000, aum: 1654298450397, trackingError: 0.55, volatility: 28.5, dividendYield: 0.3,
     high52w: 10463, low52w: 7063,
     category: '테마', tags: ['국내', '2차전지', '성장주'], healthScore: 75,
+    holdings: ['LG에너지솔루션', '삼성SDI', 'SK이노베이션', '에코프로비엠', 'POSCO퓨처엠'],
+    featureTags: ['2차전지', '전기차', '성장주', '테마투자', '변동성'],
     sparkline: [8500, 8600, 8550, 8700, 8750, 8820, 8950],
     overview: '2차전지 관련 기업에 투자하는 테마 ETF',
     indexDescription: 'FnGuide 2차전지 산업 지수 추종',
@@ -307,6 +345,7 @@ export const mockETFs: ETF[] = [
     adtv: 8713000000, aum: 455902136115, trackingError: 0.59, volatility: 14.2, dividendYield: 0,
     high52w: 18686, low52w: 15350,
     category: '원자재', tags: ['금', '원자재', '인플레헤지'], healthScore: 72, isHedged: true,
+    featureTags: ['금선물', '골드', '인플레이션헤지', '안전자산', '환헤지'],
     sparkline: [16300, 16400, 16450, 16500, 16580, 16650, 16780],
     overview: '금 선물에 투자하는 원자재 ETF (환헤지)',
     indexDescription: 'S&P GSCI Gold Index(TR) 추종',
@@ -320,6 +359,7 @@ export const mockETFs: ETF[] = [
     adtv: 98117000000, aum: 4423247676800, trackingError: 0.10, volatility: 11.8, dividendYield: 0,
     high52w: 13625, low52w: 11569,
     category: '원자재', tags: ['금', 'KRX', '실물금'], healthScore: 95,
+    featureTags: ['금현물', '실물금', '인플레이션헤지', 'KRX금'],
     sparkline: [12200, 12250, 12280, 12320, 12350, 12380, 12450],
     overview: 'KRX 금현물에 투자하는 ETF',
     indexDescription: 'KRX 금현물지수 추종',
@@ -456,6 +496,8 @@ export const mockETFs: ETF[] = [
     indexDescription: 'Dow Jones U.S. Dividend 100 Price Return Index',
     strategy: '배당 지속성 높은 종목 선별, 초저비용',
     issuer: '미래에셋자산운용', listedDate: '2023/06/20', indexProvider: 'S&P', assetClass: '주식', marketClass: '해외',
+    featureTags: ['배당', '미국배당', '고배당', '저비용', '배당지속성'],
+    dividendFrequency: 'monthly',
   },
   {
     id: '27', ticker: '329200', name: 'TIGER 리츠부동산인프라', shortName: 'TIGER 리츠부동산인프라',
@@ -568,6 +610,7 @@ export const mockETFs: ETF[] = [
     adtv: 49500000000, aum: 495000000000, trackingError: 0.07, volatility: 14.0, dividendYield: 0,
     high52w: 19182, low52w: 15801,
     category: '원자재', tags: ['금', '원자재', '환헤지'], healthScore: 84, isHedged: true,
+    featureTags: ['금선물', '골드', '인플레이션헤지', '안전자산', '환헤지'],
     sparkline: [16800, 16900, 16950, 17000, 17050, 17100, 17250],
     overview: '금 선물에 투자하는 원자재 ETF (환헤지)',
     indexDescription: 'S&P GSCI Gold Index(TR)',

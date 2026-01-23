@@ -1,10 +1,9 @@
-import React, { useState } from 'react'
-import { TrendingUp, Rocket, Coins, Shield, DollarSign, Gem, Zap, Wallet, Layers, ChevronRight, AlertTriangle, Bell, ArrowRight, BookOpen, Search, ChevronDown } from 'lucide-react'
+import React, { useState, useMemo } from 'react'
+import { TrendingUp, Rocket, Coins, Shield, DollarSign, Gem, Zap, Wallet, Layers, ChevronRight, ArrowRight, BookOpen, Search, X } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { mockETFs, themes, getPortfolioByAccountType } from '@/data/mockData'
+import { mockETFs, themes } from '@/data/mockData'
 import { formatNumber, formatPercent } from '@/lib/utils'
 import type { ETF } from '@/data/mockData'
 
@@ -28,13 +27,6 @@ const iconMap: Record<string, React.ElementType> = {
   TrendingUp, Rocket, Coins, Shield, DollarSign, Gem, Zap, Wallet, Layers
 }
 
-// 계좌 목록 데이터 (데모용)
-const accountList = [
-  { id: 'general-1', number: '8012-1234-5678', type: 'general', label: '일반' },
-  { id: 'pension-1', number: '8012-5678-1234', type: 'pension', label: '연금' },
-  { id: 'isa-1', number: '8012-9012-3456', type: 'isa', label: 'ISA' },
-]
-
 interface HomePageProps {
   accountType: string
   onSelectETF: (etf: ETF) => void
@@ -43,15 +35,140 @@ interface HomePageProps {
   onAccountTypeChange?: (type: string) => void
 }
 
-export function HomePage({ accountType, onSelectETF, onNavigate, onLongPressETF, onAccountTypeChange }: HomePageProps) {
-  // 계좌 선택 드롭다운 상태
-  const [showAccountDropdown, setShowAccountDropdown] = useState(false)
+// 검색 결과 인터페이스
+interface SearchResult {
+  type: 'name' | 'feature' | 'holding'
+  etf: ETF
+  matchedText?: string
+  holdingWeights?: { name: string; weight: number }[]  // 구성종목 비중
+}
 
-  // 현재 선택된 계좌 정보
-  const currentAccount = accountList.find(acc => acc.type === accountType) || accountList[0]
+export function HomePage({ onSelectETF, onNavigate, onLongPressETF }: HomePageProps) {
+  // 검색 상태
+  const [searchQuery, setSearchQuery] = useState('')
+  const [pensionOnly, setPensionOnly] = useState(false)
+  const [holdingsSearch, setHoldingsSearch] = useState(false)
+  const [holdingChips, setHoldingChips] = useState<string[]>([])
+  const [showSearchResults, setShowSearchResults] = useState(false)
+  const [expandedSection, setExpandedSection] = useState<'name' | 'feature' | 'holding' | null>(null)
 
   // 히트맵 테마 모달 상태
   const [selectedTheme, setSelectedTheme] = useState<{ theme: string; weeklyReturn: number } | null>(null)
+
+  // 검색 결과 계산
+  const searchResults = useMemo(() => {
+    const results: { nameMatches: SearchResult[]; featureMatches: SearchResult[]; holdingMatches: SearchResult[] } = {
+      nameMatches: [],
+      featureMatches: [],
+      holdingMatches: []
+    }
+
+    // 연금 필터 적용
+    let filteredETFs = mockETFs
+    if (pensionOnly) {
+      filteredETFs = mockETFs.filter(etf => !etf.isLeveraged && !etf.isInverse)
+    }
+
+    // 보유종목 검색 모드
+    if (holdingsSearch && holdingChips.length > 0) {
+      // 비중 생성 함수 (순서 기반 - 첫 번째가 가장 높음)
+      const generateWeights = (holdings: string[]) => {
+        // 상위 5개 기준으로 비중 배분 (합계 약 50-70%)
+        const baseWeights = [15, 12, 10, 8, 6, 5, 4, 3, 2, 2]
+        return holdings.map((_, idx) => {
+          if (idx < baseWeights.length) return baseWeights[idx]
+          return Math.max(1, 5 - Math.floor(idx / 2))
+        })
+      }
+
+      filteredETFs.forEach(etf => {
+        if (!etf.holdings) return
+        const hasAllHoldings = holdingChips.every(chip =>
+          etf.holdings!.some(h => h.toLowerCase().includes(chip.toLowerCase()))
+        )
+        if (hasAllHoldings) {
+          // 매칭된 종목과 비중 계산
+          const weights = generateWeights(etf.holdings!)
+          const matchedWithWeights = etf.holdings!
+            .map((h, idx) => ({ name: h, weight: weights[idx], idx }))
+            .filter(item => holdingChips.some(chip => item.name.toLowerCase().includes(chip.toLowerCase())))
+
+          results.holdingMatches.push({
+            type: 'holding',
+            etf,
+            matchedText: matchedWithWeights.map(m => m.name).join(', '),
+            holdingWeights: matchedWithWeights.map(m => ({ name: m.name, weight: m.weight }))
+          })
+        }
+      })
+      return results
+    }
+
+    const query = searchQuery.toLowerCase().trim()
+    if (!query) return results
+
+    // 띄어쓰기 무시 검색용 (금 현물 → 금현물)
+    const queryNoSpace = query.replace(/\s+/g, '')
+    const isShortQuery = queryNoSpace.length <= 2
+
+    // 띄어쓰기 무시 매칭 함수
+    const matchWithoutSpace = (text: string, q: string) => {
+      const textLower = text.toLowerCase()
+      const textNoSpace = textLower.replace(/\s+/g, '')
+      return textLower.includes(q) || textNoSpace.includes(q.replace(/\s+/g, ''))
+    }
+
+    filteredETFs.forEach(etf => {
+      // 종목명 일치 - 띄어쓰기 무시 매칭
+      if (
+        matchWithoutSpace(etf.name, query) ||
+        matchWithoutSpace(etf.shortName, query) ||
+        etf.ticker.includes(query)
+      ) {
+        results.nameMatches.push({ type: 'name', etf })
+        return
+      }
+
+      // 기본정보(overview) + 주요특징(strategy) 검색
+      // 짧은 검색어(2자 이하)는 오검색 방지를 위해 제외
+      if (!isShortQuery) {
+        // 기본 정보에서 매칭
+        if (matchWithoutSpace(etf.overview, query)) {
+          results.featureMatches.push({ type: 'feature', etf, matchedText: etf.overview.slice(0, 40) + '...' })
+          return
+        }
+        // 주요 특징에서 매칭
+        if (matchWithoutSpace(etf.strategy, query)) {
+          results.featureMatches.push({ type: 'feature', etf, matchedText: etf.strategy.slice(0, 40) + '...' })
+          return
+        }
+      }
+    })
+
+    return results
+  }, [searchQuery, pensionOnly, holdingsSearch, holdingChips])
+
+  // 검색 결과 클릭
+  const handleSelectETF = (etf: ETF) => {
+    onSelectETF(etf)
+    setShowSearchResults(false)
+    setSearchQuery('')
+    setHoldingChips([])
+    setExpandedSection(null)
+  }
+
+  // 보유종목 칩 추가
+  const addHoldingChip = () => {
+    if (searchQuery.trim() && holdingChips.length < 5) {
+      setHoldingChips([...holdingChips, searchQuery.trim()])
+      setSearchQuery('')
+    }
+  }
+
+  // 보유종목 칩 제거
+  const removeHoldingChip = (index: number) => {
+    setHoldingChips(holdingChips.filter((_, i) => i !== index))
+  }
 
   // 테마별 ETF 필터링 함수
   const getETFsByTheme = (themeName: string): ETF[] => {
@@ -85,21 +202,6 @@ export function HomePage({ accountType, onSelectETF, onNavigate, onLongPressETF,
       longPressTimer.current = null
     }
   }
-  // 계좌 타입에 따른 포트폴리오 데이터 가져오기
-  const currentPortfolio = getPortfolioByAccountType(accountType)
-  const totalValue = currentPortfolio.reduce((sum, etf) => sum + etf.totalValue, 0)
-  const totalProfitLoss = currentPortfolio.reduce((sum, etf) => sum + etf.profitLoss, 0)
-  const totalProfitLossPercent = (totalProfitLoss / (totalValue - totalProfitLoss)) * 100
-
-  // Get account-specific tax info
-  const getTaxInfo = () => {
-    switch (accountType) {
-      case 'pension': return { label: '연금계좌', taxRate: 5.5, benefit: '세금이연 혜택' }
-      case 'isa': return { label: 'ISA', taxRate: 9.9, benefit: '비과세 한도 적용' }
-      default: return { label: '일반계좌', taxRate: 15.4, benefit: '' }
-    }
-  }
-  const taxInfo = getTaxInfo()
 
   // 거래대금 기준 인기 ETF (실시간 인기)
   const popularETFs = [...mockETFs]
@@ -121,97 +223,248 @@ export function HomePage({ accountType, onSelectETF, onNavigate, onLongPressETF,
 
   return (
     <div className="pb-20">
-      {/* Hero Section - My Portfolio Summary */}
-      <div className="bg-gradient-to-b from-[#2a1f3d] to-[#191322] px-4 py-6" data-tour="portfolio-summary">
-        {/* 계좌 선택 드롭다운 */}
-        <div className="relative mb-4">
-          <button
-            onClick={() => setShowAccountDropdown(!showAccountDropdown)}
-            className="flex items-center gap-2 bg-[#1f1a2e] border border-[#3d3650] rounded-lg px-3 py-2 w-full"
-          >
-            <Wallet className="h-4 w-4 text-[#d64f79]" />
-            <div className="flex-1 text-left">
-              <div className="text-xs text-gray-400">{currentAccount.label}계좌</div>
-              <div className="text-sm text-white">{currentAccount.number}</div>
-            </div>
-            <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${showAccountDropdown ? 'rotate-180' : ''}`} />
-          </button>
-
-          {/* 드롭다운 메뉴 */}
-          {showAccountDropdown && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-[#1f1a2e] border border-[#3d3650] rounded-lg overflow-hidden z-50 shadow-xl">
-              {accountList.map((account) => {
-                const isSelected = account.type === accountType
-                return (
-                  <button
-                    key={account.id}
-                    onClick={() => {
-                      onAccountTypeChange?.(account.type)
-                      setShowAccountDropdown(false)
-                    }}
-                    className={`flex items-center gap-2 w-full px-3 py-2.5 text-left transition-colors ${
-                      isSelected ? 'bg-[#d64f79]/20' : 'hover:bg-[#2d2640]'
-                    }`}
-                  >
-                    <Wallet className={`h-4 w-4 ${isSelected ? 'text-[#d64f79]' : 'text-gray-400'}`} />
-                    <div className="flex-1">
-                      <div className="text-xs text-gray-400">{account.label}계좌</div>
-                      <div className="text-sm text-white">{account.number}</div>
-                    </div>
-                    {isSelected && (
-                      <div className="w-2 h-2 rounded-full bg-[#d64f79]" />
-                    )}
-                  </button>
-                )
-              })}
-            </div>
-          )}
-        </div>
-
-        <div className="mb-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Badge variant="outline" className="text-[10px]">{taxInfo.label}</Badge>
-            {taxInfo.benefit && (
-              <span className="text-[10px] text-emerald-400">{taxInfo.benefit}</span>
+      {/* Search Bar with Toggles */}
+      <div className="bg-gradient-to-b from-[#2a1f3d] to-[#191322] px-4 pt-4 pb-4">
+        {/* 검색창 + 토글 (우측 2열 배치) */}
+        <div className="flex items-center gap-2">
+          {/* 검색 입력창 */}
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#d64f79]" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value)
+                setShowSearchResults(true)
+              }}
+              onFocus={() => setShowSearchResults(true)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && holdingsSearch && searchQuery.trim()) {
+                  addHoldingChip()
+                }
+              }}
+              placeholder={holdingsSearch ? "종목명 입력 후 Enter" : "ETF 검색..."}
+              className="w-full pl-9 pr-3 py-2.5 bg-[#1f1a2e] border border-[#3d3650] rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#d64f79]"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-2 top-1/2 -translate-y-1/2"
+              >
+                <X className="h-4 w-4 text-gray-500" />
+              </button>
             )}
           </div>
-          <div className="text-sm text-gray-400">내 ETF 평가금액</div>
-          <div className="text-3xl font-bold text-white mt-1">
-            {formatNumber(totalValue)}<span className="text-lg text-gray-400">원</span>
-          </div>
-          <div className={`flex items-center gap-2 mt-2 ${totalProfitLoss >= 0 ? 'text-up' : 'text-down'}`}>
-            <span className="text-sm font-medium">
-              {totalProfitLoss >= 0 ? '+' : ''}{formatNumber(totalProfitLoss)}원
-            </span>
-            <span className="text-sm">
-              ({formatPercent(totalProfitLossPercent)})
-            </span>
+
+          {/* 토글 2열 배치 (우측) */}
+          <div className="flex flex-col gap-1.5 shrink-0">
+            {/* 연금가능 토글 */}
+            <button
+              onClick={() => setPensionOnly(!pensionOnly)}
+              className="flex items-center gap-2"
+            >
+              <span className={`text-xs font-medium transition-colors whitespace-nowrap ${pensionOnly ? 'text-[#d64f79]' : 'text-gray-400'}`}>연금가능</span>
+              <div className={`relative w-9 h-5 rounded-full transition-colors ${pensionOnly ? 'bg-[#d64f79]' : 'bg-gray-600'}`}>
+                <div className={`absolute top-[3px] w-[14px] h-[14px] bg-white rounded-full shadow transition-transform ${pensionOnly ? 'translate-x-[18px]' : 'translate-x-[3px]'}`} />
+              </div>
+            </button>
+
+            {/* 구성종목 토글 */}
+            <button
+              onClick={() => {
+                setHoldingsSearch(!holdingsSearch)
+                setSearchQuery('')
+                if (!holdingsSearch) {
+                  setHoldingChips([])
+                }
+              }}
+              className="flex items-center gap-2"
+            >
+              <span className={`text-xs font-medium transition-colors whitespace-nowrap ${holdingsSearch ? 'text-[#d64f79]' : 'text-gray-400'}`}>구성종목</span>
+              <div className={`relative w-9 h-5 rounded-full transition-colors ${holdingsSearch ? 'bg-[#d64f79]' : 'bg-gray-600'}`}>
+                <div className={`absolute top-[3px] w-[14px] h-[14px] bg-white rounded-full shadow transition-transform ${holdingsSearch ? 'translate-x-[18px]' : 'translate-x-[3px]'}`} />
+              </div>
+            </button>
           </div>
         </div>
 
+        {/* 보유종목 검색 칩 */}
+        {holdingsSearch && holdingChips.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mt-2">
+            {holdingChips.map((chip, index) => (
+              <span
+                key={index}
+                className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 text-[#d64f79] text-xs rounded-full"
+              >
+                {chip}
+                <button onClick={() => removeHoldingChip(index)}>
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            ))}
+            <span className="text-[10px] text-gray-500 self-center ml-1">AND 조건</span>
+          </div>
+        )}
+
+        {/* 검색 결과 드롭다운 */}
+        {showSearchResults && (
+          (holdingsSearch && holdingChips.length > 0) ||
+          (!holdingsSearch && searchQuery)
+        ) && (
+          <div className="mt-2 bg-[#1f1a2e] border border-[#3d3650] rounded-lg overflow-hidden max-h-[400px] overflow-y-auto">
+            {/* 종목명 일치 - 일반 검색 모드에서만 표시 */}
+            {!holdingsSearch && (
+            <div className="p-2">
+              <div className="flex items-center justify-between px-2 mb-1.5">
+                <span className="text-xs font-medium text-gray-400">
+                  종목명 일치 ({searchResults.nameMatches.length}개)
+                </span>
+                {searchResults.nameMatches.length > 5 && expandedSection !== 'name' && (
+                  <button
+                    onClick={() => setExpandedSection('name')}
+                    className="text-xs text-[#d64f79] hover:text-[#e06089]"
+                  >
+                    더보기
+                  </button>
+                )}
+                {expandedSection === 'name' && (
+                  <button
+                    onClick={() => setExpandedSection(null)}
+                    className="text-xs text-gray-500 hover:text-gray-400"
+                  >
+                    접기
+                  </button>
+                )}
+              </div>
+              {searchResults.nameMatches.length === 0 ? (
+                <div className="py-2 px-2 text-xs text-gray-600">일치하는 종목이 없습니다</div>
+              ) : (
+                searchResults.nameMatches.slice(0, expandedSection === 'name' ? undefined : 5).map(({ etf }) => (
+                  <button
+                    key={etf.id}
+                    onClick={() => handleSelectETF(etf)}
+                    className="w-full flex items-center justify-between p-2 hover:bg-[#2d2640] rounded-lg transition-colors"
+                  >
+                    <div className="text-left">
+                      <div className="text-xs text-gray-500">{etf.ticker}</div>
+                      <div className="text-sm text-white">{etf.shortName}</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm text-white">{formatNumber(etf.price)}</div>
+                      <div className={`text-xs ${etf.change >= 0 ? 'text-up' : 'text-down'}`}>
+                        {etf.change >= 0 ? '+' : ''}{etf.changePercent.toFixed(2)}%
+                      </div>
+                    </div>
+                  </button>
+                ))
+              )}
+            </div>
+            )}
+
+            {/* 특징 일치 - 일반 검색 모드에서만 표시 */}
+            {!holdingsSearch && (
+            <div className="p-2 border-t border-[#2d2640]">
+              <div className="flex items-center justify-between px-2 mb-1.5">
+                <span className="text-xs font-medium text-gray-400">
+                  특징 일치 ({searchResults.featureMatches.length}개)
+                </span>
+                {searchResults.featureMatches.length > 5 && expandedSection !== 'feature' && (
+                  <button
+                    onClick={() => setExpandedSection('feature')}
+                    className="text-xs text-[#d64f79] hover:text-[#e06089]"
+                  >
+                    더보기
+                  </button>
+                )}
+                {expandedSection === 'feature' && (
+                  <button
+                    onClick={() => setExpandedSection(null)}
+                    className="text-xs text-gray-500 hover:text-gray-400"
+                  >
+                    접기
+                  </button>
+                )}
+              </div>
+              {searchResults.featureMatches.length === 0 ? (
+                <div className="py-2 px-2 text-xs text-gray-600">일치하는 특징이 없습니다</div>
+              ) : (
+                searchResults.featureMatches.slice(0, expandedSection === 'feature' ? undefined : 5).map(({ etf, matchedText }) => (
+                  <button
+                    key={etf.id}
+                    onClick={() => handleSelectETF(etf)}
+                    className="w-full flex items-center justify-between p-2 hover:bg-[#2d2640] rounded-lg transition-colors"
+                  >
+                    <div className="text-left">
+                      <div className="text-sm text-white">{etf.shortName}</div>
+                      <div className="text-xs text-[#d64f79]">"{matchedText}"</div>
+                    </div>
+                    <div className={`text-xs ${etf.change >= 0 ? 'text-up' : 'text-down'}`}>
+                      {etf.change >= 0 ? '+' : ''}{etf.changePercent.toFixed(2)}%
+                    </div>
+                  </button>
+                ))
+              )}
+            </div>
+            )}
+
+            {/* 구성종목 일치 - 종목검색 토글 ON일 때만 표시 */}
+            {holdingsSearch && searchResults.holdingMatches.length > 0 && (
+              <div className="p-2 border-t border-[#2d2640]">
+                <div className="flex items-center justify-between px-2 mb-1.5">
+                  <span className="text-xs font-medium text-gray-400">
+                    구성종목 일치 ({searchResults.holdingMatches.length}개)
+                  </span>
+                  {searchResults.holdingMatches.length > 5 && expandedSection !== 'holding' && (
+                    <button
+                      onClick={() => setExpandedSection('holding')}
+                      className="text-xs text-[#d64f79] hover:text-[#e06089]"
+                    >
+                      더보기
+                    </button>
+                  )}
+                  {expandedSection === 'holding' && (
+                    <button
+                      onClick={() => setExpandedSection(null)}
+                      className="text-xs text-gray-500 hover:text-gray-400"
+                    >
+                      접기
+                    </button>
+                  )}
+                </div>
+                {searchResults.holdingMatches.slice(0, expandedSection === 'holding' ? undefined : 5).map(({ etf, holdingWeights }) => (
+                  <button
+                    key={etf.id}
+                    onClick={() => handleSelectETF(etf)}
+                    className="w-full flex items-center justify-between p-2 hover:bg-[#2d2640] rounded-lg transition-colors"
+                  >
+                    <div className="text-left flex-1 min-w-0">
+                      <div className="text-sm text-white">{etf.shortName}</div>
+                      <div className="flex flex-wrap gap-1.5 mt-1">
+                        {holdingWeights?.map((hw, idx) => (
+                          <span key={idx} className="inline-flex items-center gap-1 text-[10px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded">
+                            {hw.name} <span className="text-blue-300 font-medium">{hw.weight}%</span>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    <div className={`text-xs shrink-0 ml-2 ${etf.change >= 0 ? 'text-up' : 'text-down'}`}>
+                      {etf.change >= 0 ? '+' : ''}{etf.changePercent.toFixed(2)}%
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* Alerts Section */}
-      <div className="px-4 py-4">
-        <Card className="border-amber-500/30 bg-amber-500/5">
-          <CardContent className="p-3">
-            <div className="flex items-start gap-3">
-              <div className="rounded-full bg-amber-500/20 p-2">
-                <AlertTriangle className="h-4 w-4 text-amber-400" />
-              </div>
-              <div className="flex-1">
-                <div className="text-sm font-medium text-white mb-1">안전 알림</div>
-                <div className="text-xs text-gray-400">
-                  KODEX 인버스2X(252670) 스프레드 확대 - 매매 주의
-                </div>
-              </div>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <Bell className="h-4 w-4" />
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      {/* 검색 결과 영역 외부 클릭시 닫기 */}
+      {showSearchResults && (
+        <div
+          className="fixed inset-0 z-[-1]"
+          onClick={() => setShowSearchResults(false)}
+        />
+      )}
 
       {/* Theme/Category Grid */}
       <div className="px-4 py-2" data-tour="category-buttons">

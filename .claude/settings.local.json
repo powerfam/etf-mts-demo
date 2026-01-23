@@ -4,7 +4,8 @@
       "Bash(npm run build:*)",
       "Bash(file:*)",
       "Bash(node:*)",
-      "Bash(npx vercel --prod)"
+      "Bash(npx vercel --prod)",
+      "Bash(npx vercel:*)"
     ]
   }
 }
