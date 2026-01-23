@@ -116,7 +116,7 @@ export const mockETFs: ETF[] = [
     overview: '국내 AI 관련 기업에 집중 투자하는 패시브 ETF',
     indexDescription: 'iSelect K소버린AI 지수: 자체 AI 기술을 개발하고 사업화를 추진하는 기업 및 AI 관련 기업의 성장을 지원하는 전문 투자기업으로 구성',
     strategy: '글로벌 AI 경쟁 가속화 과정에서 부각되는 국산 AI의 전략적 가치에 투자',
-    issuer: '원큐자산운용', listedDate: '2025/03/15', indexProvider: 'NH투자증권', assetClass: '주식', marketClass: '국내',
+    issuer: '하나자산운용', listedDate: '2025/03/15', indexProvider: 'NH투자증권', assetClass: '주식', marketClass: '국내',
   },
   {
     id: '1', ticker: '069500', name: 'KODEX 200', shortName: 'KODEX 200',

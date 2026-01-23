@@ -154,6 +154,18 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
   // Compare metrics
   const compareMetrics = [
     {
+      category: '기본정보',
+      items: [
+        { key: 'issuer', label: '운용사', format: (v: string) => v.replace('자산운용', '\n자산운용'), best: 'none', isText: true, multiLine: true },
+        { key: 'marketClass', label: '시장구분', format: (v: string) => v, best: 'none', isText: true },
+        { key: 'assetClass', label: '자산군', format: (v: string) => v, best: 'none', isText: true },
+        { key: 'category', label: '카테고리', format: (v: string) => v, best: 'none', isText: true },
+        { key: 'isLeveraged', label: '레버리지', format: (v: boolean) => v ? 'O' : 'X', best: 'none', isText: true },
+        { key: 'isHedged', label: '환헤지', format: (v: boolean) => v ? 'O' : 'X', best: 'none', isText: true },
+        { key: 'pensionEligible', label: '연금투자', format: (_v: unknown, etf?: ETF) => etf && !etf.isLeveraged && !etf.isInverse ? 'O' : 'X', best: 'none', isText: true, computed: true },
+      ]
+    },
+    {
       category: '가격위치',
       items: [
         { key: 'high52w', label: '52주 최고가', format: (v: number) => formatNumber(v), best: 'none' },
@@ -284,16 +296,16 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
   })
 
   // ETF에서 값 가져오기 (computed 필드 처리)
-  const getETFValue = (etf: ETF, key: string): number => {
+  const getETFValue = (etf: ETF, key: string): number | string | boolean | undefined => {
     if (key === 'weeklyReturn') {
       return getWeeklyReturn(etf)
     }
-    return etf[key as keyof ETF] as number
+    return etf[key as keyof ETF] as number | string | boolean | undefined
   }
 
   const getBestValue = (key: string, best: string, absolute?: boolean) => {
     const values = selectedETFs.map(etf => {
-      const value = getETFValue(etf, key)
+      const value = getETFValue(etf, key) as number
       return absolute ? Math.abs(value) : value
     })
     if (best === 'low') {
@@ -303,7 +315,8 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
   }
 
   const isBestValue = (etf: ETF, key: string, best: string, absolute?: boolean) => {
-    const value = absolute ? Math.abs(getETFValue(etf, key)) : getETFValue(etf, key)
+    const rawValue = getETFValue(etf, key) as number
+    const value = absolute ? Math.abs(rawValue) : rawValue
     return value === getBestValue(key, best, absolute)
   }
 
@@ -573,7 +586,7 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
             </colgroup>
             <thead>
               <tr>
-                <th className="p-2 text-sm font-medium text-gray-500 text-left rounded-tl-xl">지표</th>
+                <th className="p-2 text-sm font-medium text-gray-500 text-left rounded-tl-xl"></th>
                 {selectedETFs.map((etf, index) => (
                   <th key={etf.id} className={`p-2 text-center border-l border-[#2d2640] ${index === selectedETFs.length - 1 ? 'rounded-tr-xl' : ''}`}>
                     <div
@@ -624,15 +637,18 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
                     </td>
                     {selectedETFs.map((etf) => {
                       const value = getETFValue(etf, item.key)
-                      const isBest = item.best !== 'none' && isBestValue(etf, item.key, item.best, (item as { absolute?: boolean }).absolute)
-                      const itemWithShowBar = item as { showBar?: boolean; computed?: boolean }
-                      const showBar = itemWithShowBar.showBar
-                      const isComputed = itemWithShowBar.computed
+                      const itemExtended = item as { showBar?: boolean; computed?: boolean; isText?: boolean; absolute?: boolean; multiLine?: boolean }
+                      const isText = itemExtended.isText
+                      const isMultiLine = itemExtended.multiLine
+                      const isBest = !isText && item.best !== 'none' && isBestValue(etf, item.key, item.best, itemExtended.absolute)
+                      const showBar = itemExtended.showBar
+                      const isComputed = itemExtended.computed
 
-                      // computed 필드이면서 position52w인 경우 ETF를 전달하여 format 호출
-                      const displayValue = isComputed && item.key === 'position52w'
-                        ? (item.format as (v: number, etf?: ETF) => string)(value, etf)
-                        : item.format(value)
+                      // computed 필드인 경우 ETF를 전달하여 format 호출
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      const displayValue = isComputed
+                        ? (item.format as (v: any, etf?: ETF) => string)(value, etf)
+                        : (item.format as (v: any) => string)(value)
 
                       // 52주 대비 위치 퍼센트 값 (바 표시용)
                       const position = showBar ? get52wPosition(etf) : 0
@@ -682,6 +698,15 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
                                 <span>고가</span>
                               </div>
                             </div>
+                          ) : isMultiLine && typeof displayValue === 'string' && displayValue.includes('\n') ? (
+                            <span className={`text-sm font-semibold ${isBest ? 'text-emerald-400' : 'text-white'} leading-tight`}>
+                              {displayValue.split('\n').map((line, i) => (
+                                <span key={i}>
+                                  {i > 0 && <br />}
+                                  {line}
+                                </span>
+                              ))}
+                            </span>
                           ) : (
                             <span className={`text-base font-semibold ${isBest ? 'text-emerald-400' : 'text-white'}`}>
                               {displayValue}

@@ -194,3 +194,14 @@
   animation: autoMarquee 4s ease-in-out infinite alternate;
   animation-delay: 1s;
 }
+
+/* PWA standalone 모드에서 iOS input 키보드 이슈 해결 */
+input, textarea, select {
+  touch-action: manipulation;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.touch-action-manipulation {
+  touch-action: manipulation;
+}

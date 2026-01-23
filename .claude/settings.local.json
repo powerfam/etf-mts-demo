@@ -3,7 +3,8 @@
     "allow": [
       "Bash(npm run build:*)",
       "Bash(file:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(npx vercel --prod)"
     ]
   }
 }
