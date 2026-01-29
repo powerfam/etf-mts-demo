@@ -207,3 +207,21 @@ input, textarea, select {
 .touch-action-manipulation {
   touch-action: manipulation;
 }
+
+/* 물흐르듯이 스크롤 애니메이션 */
+@keyframes marquee-slow {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee-slow {
+  animation: marquee-slow 15s linear infinite;
+}
+
+.animate-marquee-slow:hover {
+  animation-play-state: paused;
+}

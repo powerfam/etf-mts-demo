@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { mockETFs } from '@/data/mockData'
 import { formatNumber, formatCurrency } from '@/lib/utils'
 import type { ETF } from '@/data/mockData'
@@ -61,6 +62,16 @@ const metricDescriptions: Record<string, { title: string; description: string; t
     description: '최근 1주일간의 가격 변동률입니다.',
     tip: '수정주가(배당 재투자 반영) 기준으로 계산됩니다.',
   },
+  monthlyReturn: {
+    title: '월간 수익률',
+    description: '최근 1개월간의 가격 변동률입니다.',
+    tip: '20영업일 기준으로 계산됩니다.',
+  },
+  ytdReturn: {
+    title: 'YTD 수익률',
+    description: '연초 대비 현재까지의 수익률(Year-To-Date)입니다.',
+    tip: '해당 연도 1월 첫 영업일 종가 대비 현재가로 계산됩니다.',
+  },
   dividendYield: {
     title: '배당수익률',
     description: '연간 배당금을 현재 가격으로 나눈 비율입니다.',
@@ -83,11 +94,32 @@ const metricDescriptions: Record<string, { title: string; description: string; t
   },
 }
 
+// 구성종목 데이터 (holdings 또는 기본값 사용)
+const getHoldingsData = (etf: ETF) => {
+  const defaultHoldings = [
+    { name: '삼성전자', weight: 20.5 },
+    { name: 'SK하이닉스', weight: 12.3 },
+    { name: 'LG에너지솔루션', weight: 8.7 },
+    { name: '삼성바이오로직스', weight: 6.2 },
+    { name: '현대자동차', weight: 5.1 },
+  ]
+
+  if (etf.holdings && etf.holdings.length > 0) {
+    const weights = [22, 15, 12, 9, 7]
+    return etf.holdings.slice(0, 5).map((name, i) => ({
+      name,
+      weight: weights[i] || 5
+    }))
+  }
+  return defaultHoldings
+}
+
 export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: ComparePageProps) {
   const [selectedETFs, setSelectedETFs] = useState<ETF[]>([mockETFs[0], mockETFs[1], mockETFs[2]])
   const [showSelector, setShowSelector] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null)
+  const [compareTab, setCompareTab] = useState<'key' | 'basic' | 'holdings'>('key')
 
   // 외부에서 전달된 비교 목록 적용
   useEffect(() => {
@@ -133,6 +165,22 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
     return ((last - first) / first) * 100
   }
 
+  // 월간 수익률 계산 (목업: 주간수익률 * 3~4배 + 변동)
+  const getMonthlyReturn = (etf: ETF) => {
+    const weeklyReturn = getWeeklyReturn(etf)
+    // 월간 수익률은 주간의 3~4배 정도로 시뮬레이션
+    const multiplier = 3 + (etf.id.charCodeAt(0) % 10) / 10
+    return weeklyReturn * multiplier + (etf.volatility / 10 - 1.5)
+  }
+
+  // YTD 수익률 계산 (목업: 연초대비)
+  const getYTDReturn = (etf: ETF) => {
+    // YTD는 주간 수익률을 기반으로 연초부터 누적 시뮬레이션
+    const weeklyReturn = getWeeklyReturn(etf)
+    const multiplier = 8 + (etf.id.charCodeAt(1) % 10)
+    return weeklyReturn * multiplier + etf.changePercent * 2
+  }
+
   // 52주 대비 현재가 위치 계산 (0% = 최저가, 100% = 최고가)
   // 신고가면 100% 초과, 신저가면 0% 미만 가능
   const get52wPosition = (etf: ETF): number => {
@@ -151,8 +199,8 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
   const isNewHigh = (etf: ETF): boolean => etf.price > etf.high52w
   const isNewLow = (etf: ETF): boolean => etf.price < etf.low52w
 
-  // Compare metrics
-  const compareMetrics = [
+  // Compare metrics - 기본정보 (배당수익률, 주간수익률 포함)
+  const basicInfoMetrics = [
     {
       category: '기본정보',
       items: [
@@ -166,6 +214,15 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
       ]
     },
     {
+      category: '수익',
+      items: [
+        { key: 'weeklyReturn', label: '주간수익률', format: (v: number) => `${v >= 0 ? '+' : ''}${v.toFixed(2)}%`, best: 'high', computed: true },
+        { key: 'monthlyReturn', label: '월간수익률', format: (v: number) => `${v >= 0 ? '+' : ''}${v.toFixed(2)}%`, best: 'high', computed: true },
+        { key: 'ytdReturn', label: 'YTD', format: (v: number) => `${v >= 0 ? '+' : ''}${v.toFixed(2)}%`, best: 'high', computed: true },
+        { key: 'dividendYield', label: '배당수익률', format: (v: number) => `${v.toFixed(1)}%`, best: 'high' },
+      ]
+    },
+    {
       category: '가격위치',
       items: [
         { key: 'high52w', label: '52주 최고가', format: (v: number) => formatNumber(v), best: 'none' },
@@ -173,6 +230,10 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
         { key: 'position52w', label: '52주 대비 위치', format: (_v: number, etf?: ETF) => etf ? `${get52wPosition(etf)}%` : '-', best: 'none', computed: true, showBar: true },
       ]
     },
+  ]
+
+  // Compare metrics - 주요지표 (6개 평가 지표)
+  const keyMetrics = [
     {
       category: '비용효율',
       items: [
@@ -204,19 +265,12 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
         { key: 'trackingError', label: '추적오차', format: (v: number) => `${v.toFixed(2)}%`, best: 'low' },
       ]
     },
-    {
-      category: '수익',
-      items: [
-        { key: 'weeklyReturn', label: '주간수익률', format: (v: number) => `${v >= 0 ? '+' : ''}${v.toFixed(2)}%`, best: 'high', computed: true },
-        { key: 'dividendYield', label: '배당수익률', format: (v: number) => `${v.toFixed(1)}%`, best: 'high' },
-      ]
-    }
   ]
 
   // 레이더 차트용 색상
   const chartColors = ['#d64f79', '#10B981', '#8B5CF6', '#F59E0B', '#3B82F6']
 
-  // 레이더 차트용 지표 (상대 비교용) - 8개 항목
+  // 레이더 차트용 지표 (상대 비교용) - 6개 항목 (배당수익률, 주간수익률 제외)
   // 라벨은 "넓을수록 좋음"에 맞게 긍정적 표현 사용
   const radarMetrics = [
     { key: 'ter', label: '비용효율', lowerIsBetter: true },
@@ -225,8 +279,6 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
     { key: 'trackingError', label: '추적정확도', lowerIsBetter: true },
     { key: 'spread', label: '거래효율', lowerIsBetter: true },
     { key: 'adtv', label: '거래대금', lowerIsBetter: false },
-    { key: 'weeklyReturn', label: '주간수익률', lowerIsBetter: false, computed: true },
-    { key: 'dividendYield', label: '배당수익률', lowerIsBetter: false },
   ]
 
   // 상대 비교 정규화 (1-10 스케일, 비교군 내 최저=1, 최고=10)
@@ -299,6 +351,12 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
   const getETFValue = (etf: ETF, key: string): number | string | boolean | undefined => {
     if (key === 'weeklyReturn') {
       return getWeeklyReturn(etf)
+    }
+    if (key === 'monthlyReturn') {
+      return getMonthlyReturn(etf)
+    }
+    if (key === 'ytdReturn') {
+      return getYTDReturn(etf)
     }
     return etf[key as keyof ETF] as number | string | boolean | undefined
   }
@@ -572,155 +630,388 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
         }
       `}</style>
 
-      {/* Comparison Table - 헤더와 본문 분리하여 sticky 적용 */}
+      {/* Comparison Table - 탭 형태로 변경 */}
       <div className="px-4 pt-4" data-tour="compare-table">
         <h3 className="text-sm font-medium text-white mb-2">상세 지표 비교</h3>
-        {/* Sticky Header - 테이블 밖에서 동일한 컬럼 너비 */}
-        <div className="sticky top-[98px] z-30 bg-[#191322]">
-          <table className="w-full bg-[#1f1a2e] border border-[#2d2640] rounded-t-xl" style={{ tableLayout: 'fixed' }}>
-            <colgroup>
-              <col style={{ width: '115px' }} />
-              {selectedETFs.map(etf => (
-                <col key={`h-${etf.id}`} />
-              ))}
-            </colgroup>
-            <thead>
-              <tr>
-                <th className="p-2 text-sm font-medium text-gray-500 text-left rounded-tl-xl"></th>
-                {selectedETFs.map((etf, index) => (
-                  <th key={etf.id} className={`p-2 text-center border-l border-[#2d2640] ${index === selectedETFs.length - 1 ? 'rounded-tr-xl' : ''}`}>
-                    <div
-                      className="w-2.5 h-2.5 rounded-full mx-auto mb-1"
-                      style={{ backgroundColor: chartColors[index % chartColors.length] }}
-                    />
-                    <div className="text-xs text-gray-400 font-normal">{etf.ticker}</div>
-                    <div className="marquee-cell">
-                      <div className="marquee-inner text-sm font-medium text-white whitespace-nowrap">
-                        {etf.shortName}
-                      </div>
-                    </div>
-                  </th>
+
+        {/* 탭 버튼 */}
+        <Tabs value={compareTab} onValueChange={(v) => setCompareTab(v as 'key' | 'basic' | 'holdings')} className="mb-3">
+          <TabsList className="w-full grid grid-cols-3 h-auto bg-[#2a2438]">
+            <TabsTrigger value="key" className="text-xs py-2">주요지표</TabsTrigger>
+            <TabsTrigger value="basic" className="text-xs py-2">기본정보</TabsTrigger>
+            <TabsTrigger value="holdings" className="text-xs py-2">보유종목</TabsTrigger>
+          </TabsList>
+
+          {/* 주요지표 탭 */}
+          <TabsContent value="key" className="mt-3">
+            {/* Sticky Header - 테이블 밖에서 동일한 컬럼 너비 */}
+            <div className="sticky top-[98px] z-30 bg-[#191322]">
+              <table className="w-full bg-[#1f1a2e] border border-[#2d2640] rounded-t-xl" style={{ tableLayout: 'fixed' }}>
+                <colgroup>
+                  <col style={{ width: '115px' }} />
+                  {selectedETFs.map(etf => (
+                    <col key={`h-key-${etf.id}`} />
+                  ))}
+                </colgroup>
+                <thead>
+                  <tr>
+                    <th className="p-2 text-sm font-medium text-gray-500 text-left rounded-tl-xl"></th>
+                    {selectedETFs.map((etf, index) => (
+                      <th key={etf.id} className={`p-2 text-center border-l border-[#2d2640] ${index === selectedETFs.length - 1 ? 'rounded-tr-xl' : ''}`}>
+                        <div
+                          className="w-2.5 h-2.5 rounded-full mx-auto mb-1"
+                          style={{ backgroundColor: chartColors[index % chartColors.length] }}
+                        />
+                        <div className="text-xs text-gray-400 font-normal">{etf.ticker}</div>
+                        <div className="marquee-cell">
+                          <div className="marquee-inner text-sm font-medium text-white whitespace-nowrap">
+                            {etf.shortName}
+                          </div>
+                        </div>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+              </table>
+            </div>
+
+            {/* Table Body - 주요지표 */}
+            <table className="w-full bg-[#1f1a2e] border border-t-0 border-[#2d2640] rounded-b-xl" style={{ tableLayout: 'fixed' }}>
+              <colgroup>
+                <col style={{ width: '115px' }} />
+                {selectedETFs.map(etf => (
+                  <col key={`b-key-${etf.id}`} />
                 ))}
-              </tr>
-            </thead>
-          </table>
-        </div>
+              </colgroup>
+              <tbody>
+                {keyMetrics.map((category, catIdx) => (
+                  <>
+                    {/* Category Header */}
+                    <tr key={`cat-key-${category.category}`} className={catIdx > 0 ? 'border-t border-[#2d2640]' : ''}>
+                      <td colSpan={selectedETFs.length + 1} className="bg-[#2a2438] px-3 py-2">
+                        <span className="text-sm font-semibold text-[#d64f79]">{category.category}</span>
+                      </td>
+                    </tr>
 
-        {/* Table Body - 동일한 컬럼 너비 */}
-        <table className="w-full bg-[#1f1a2e] border border-t-0 border-[#2d2640] rounded-b-xl" style={{ tableLayout: 'fixed' }}>
-          <colgroup>
-            <col style={{ width: '115px' }} />
-            {selectedETFs.map(etf => (
-              <col key={`b-${etf.id}`} />
-            ))}
-          </colgroup>
-          <tbody>
-            {compareMetrics.map((category, catIdx) => (
-              <>
-                {/* Category Header */}
-                <tr key={`cat-${category.category}`} className={catIdx > 0 ? 'border-t border-[#2d2640]' : ''}>
-                  <td colSpan={selectedETFs.length + 1} className="bg-[#2a2438] px-3 py-2">
-                    <span className="text-sm font-semibold text-[#d64f79]">{category.category}</span>
-                  </td>
-                </tr>
+                    {/* Items */}
+                    {category.items.map((item) => (
+                      <tr key={item.key} className="border-t border-[#2d2640]">
+                        <td className="p-2">
+                          <button
+                            onClick={() => setSelectedMetric(item.key)}
+                            className="text-sm text-gray-400 hover:text-[#d64f79] transition-colors text-left"
+                          >
+                            {item.label}
+                          </button>
+                        </td>
+                        {selectedETFs.map((etf) => {
+                          const value = getETFValue(etf, item.key)
+                          const itemExtended = item as { computed?: boolean; absolute?: boolean }
+                          const isBest = item.best !== 'none' && isBestValue(etf, item.key, item.best, itemExtended.absolute)
+                          const isComputed = itemExtended.computed
 
-                {/* Items */}
-                {category.items.map((item) => (
-                  <tr key={item.key} className="border-t border-[#2d2640]">
-                    <td className="p-2">
-                      <button
-                        onClick={() => setSelectedMetric(item.key)}
-                        className="text-sm text-gray-400 hover:text-[#d64f79] transition-colors text-left"
-                      >
-                        {item.label}
-                      </button>
-                    </td>
-                    {selectedETFs.map((etf) => {
-                      const value = getETFValue(etf, item.key)
-                      const itemExtended = item as { showBar?: boolean; computed?: boolean; isText?: boolean; absolute?: boolean; multiLine?: boolean }
-                      const isText = itemExtended.isText
-                      const isMultiLine = itemExtended.multiLine
-                      const isBest = !isText && item.best !== 'none' && isBestValue(etf, item.key, item.best, itemExtended.absolute)
-                      const showBar = itemExtended.showBar
-                      const isComputed = itemExtended.computed
+                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                          const displayValue = isComputed
+                            ? (item.format as (v: any, etf?: ETF) => string)(value, etf)
+                            : (item.format as (v: any) => string)(value)
 
-                      // computed 필드인 경우 ETF를 전달하여 format 호출
-                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      const displayValue = isComputed
-                        ? (item.format as (v: any, etf?: ETF) => string)(value, etf)
-                        : (item.format as (v: any) => string)(value)
+                          return (
+                            <td
+                              key={etf.id}
+                              className={`p-2 text-center border-l border-[#2d2640] ${isBest ? 'bg-emerald-500/10' : ''}`}
+                            >
+                              <span className={`text-base font-semibold ${isBest ? 'text-emerald-400' : 'text-white'}`}>
+                                {displayValue}
+                              </span>
+                            </td>
+                          )
+                        })}
+                      </tr>
+                    ))}
+                  </>
+                ))}
+              </tbody>
+            </table>
+          </TabsContent>
 
-                      // 52주 대비 위치 퍼센트 값 (바 표시용)
-                      const position = showBar ? get52wPosition(etf) : 0
-                      const positionClamped = showBar ? get52wPositionClamped(etf) : 0
-                      const newHigh = showBar ? isNewHigh(etf) : false
-                      const newLow = showBar ? isNewLow(etf) : false
+          {/* 기본정보 탭 */}
+          <TabsContent value="basic" className="mt-3">
+            {/* Sticky Header */}
+            <div className="sticky top-[98px] z-30 bg-[#191322]">
+              <table className="w-full bg-[#1f1a2e] border border-[#2d2640] rounded-t-xl" style={{ tableLayout: 'fixed' }}>
+                <colgroup>
+                  <col style={{ width: '115px' }} />
+                  {selectedETFs.map(etf => (
+                    <col key={`h-basic-${etf.id}`} />
+                  ))}
+                </colgroup>
+                <thead>
+                  <tr>
+                    <th className="p-2 text-sm font-medium text-gray-500 text-left rounded-tl-xl"></th>
+                    {selectedETFs.map((etf, index) => (
+                      <th key={etf.id} className={`p-2 text-center border-l border-[#2d2640] ${index === selectedETFs.length - 1 ? 'rounded-tr-xl' : ''}`}>
+                        <div
+                          className="w-2.5 h-2.5 rounded-full mx-auto mb-1"
+                          style={{ backgroundColor: chartColors[index % chartColors.length] }}
+                        />
+                        <div className="text-xs text-gray-400 font-normal">{etf.ticker}</div>
+                        <div className="marquee-cell">
+                          <div className="marquee-inner text-sm font-medium text-white whitespace-nowrap">
+                            {etf.shortName}
+                          </div>
+                        </div>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+              </table>
+            </div>
 
-                      return (
-                        <td
-                          key={etf.id}
-                          className={`p-2 text-center border-l border-[#2d2640] ${isBest ? 'bg-emerald-500/10' : ''}`}
-                        >
-                          {showBar ? (
-                            <div className="flex flex-col items-center gap-1">
-                              <div className="flex items-center gap-1">
-                                <span className={`text-base font-semibold ${newHigh ? 'text-up' : newLow ? 'text-down' : isBest ? 'text-emerald-400' : 'text-white'}`}>
+            {/* Table Body - 기본정보 */}
+            <table className="w-full bg-[#1f1a2e] border border-t-0 border-[#2d2640] rounded-b-xl" style={{ tableLayout: 'fixed' }}>
+              <colgroup>
+                <col style={{ width: '115px' }} />
+                {selectedETFs.map(etf => (
+                  <col key={`b-basic-${etf.id}`} />
+                ))}
+              </colgroup>
+              <tbody>
+                {basicInfoMetrics.map((category, catIdx) => (
+                  <>
+                    {/* Category Header */}
+                    <tr key={`cat-basic-${category.category}`} className={catIdx > 0 ? 'border-t border-[#2d2640]' : ''}>
+                      <td colSpan={selectedETFs.length + 1} className="bg-[#2a2438] px-3 py-2">
+                        <span className="text-sm font-semibold text-[#d64f79]">{category.category}</span>
+                      </td>
+                    </tr>
+
+                    {/* Items */}
+                    {category.items.map((item) => (
+                      <tr key={item.key} className="border-t border-[#2d2640]">
+                        <td className="p-2">
+                          <button
+                            onClick={() => setSelectedMetric(item.key)}
+                            className="text-sm text-gray-400 hover:text-[#d64f79] transition-colors text-left"
+                          >
+                            {item.label}
+                          </button>
+                        </td>
+                        {selectedETFs.map((etf) => {
+                          const value = getETFValue(etf, item.key)
+                          const itemExtended = item as { showBar?: boolean; computed?: boolean; isText?: boolean; absolute?: boolean; multiLine?: boolean }
+                          const isText = itemExtended.isText
+                          const isMultiLine = itemExtended.multiLine
+                          const isBest = !isText && item.best !== 'none' && isBestValue(etf, item.key, item.best, itemExtended.absolute)
+                          const showBar = itemExtended.showBar
+                          const isComputed = itemExtended.computed
+
+                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                          const displayValue = isComputed
+                            ? (item.format as (v: any, etf?: ETF) => string)(value, etf)
+                            : (item.format as (v: any) => string)(value)
+
+                          // 52주 대비 위치 퍼센트 값 (바 표시용)
+                          const position = showBar ? get52wPosition(etf) : 0
+                          const positionClamped = showBar ? get52wPositionClamped(etf) : 0
+                          const newHigh = showBar ? isNewHigh(etf) : false
+                          const newLow = showBar ? isNewLow(etf) : false
+
+                          return (
+                            <td
+                              key={etf.id}
+                              className={`p-2 text-center border-l border-[#2d2640] ${isBest ? 'bg-emerald-500/10' : ''}`}
+                            >
+                              {showBar ? (
+                                <div className="flex flex-col items-center gap-1">
+                                  <div className="flex items-center gap-1">
+                                    <span className={`text-base font-semibold ${newHigh ? 'text-up' : newLow ? 'text-down' : isBest ? 'text-emerald-400' : 'text-white'}`}>
+                                      {displayValue}
+                                    </span>
+                                    {newHigh && (
+                                      <span className="text-[10px] px-1 py-0.5 bg-red-500/20 text-up rounded font-medium">
+                                        신고가
+                                      </span>
+                                    )}
+                                    {newLow && (
+                                      <span className="text-[10px] px-1 py-0.5 bg-blue-500/20 text-down rounded font-medium">
+                                        신저가
+                                      </span>
+                                    )}
+                                  </div>
+                                  {/* 52주 위치 바 인디케이터 */}
+                                  <div className="w-full h-2 bg-[#2d2640] rounded-full relative overflow-hidden">
+                                    <div
+                                      className="absolute left-0 top-0 h-full rounded-full"
+                                      style={{
+                                        width: `${positionClamped}%`,
+                                        background: newHigh ? '#ef4444' : newLow ? '#3b82f6' : position > 70 ? '#ef4444' : position > 40 ? '#d64f79' : '#3b82f6'
+                                      }}
+                                    />
+                                    {/* 현재 위치 마커 */}
+                                    <div
+                                      className="absolute top-1/2 -translate-y-1/2 w-2 h-2 bg-white rounded-full shadow-sm border border-gray-400"
+                                      style={{ left: `calc(${positionClamped}% - 4px)` }}
+                                    />
+                                  </div>
+                                  <div className="flex justify-between w-full text-[10px] text-gray-500">
+                                    <span>저가</span>
+                                    <span>고가</span>
+                                  </div>
+                                </div>
+                              ) : isMultiLine && typeof displayValue === 'string' && displayValue.includes('\n') ? (
+                                <span className={`text-sm font-semibold ${isBest ? 'text-emerald-400' : 'text-white'} leading-tight`}>
+                                  {displayValue.split('\n').map((line, i) => (
+                                    <span key={i}>
+                                      {i > 0 && <br />}
+                                      {line}
+                                    </span>
+                                  ))}
+                                </span>
+                              ) : (
+                                <span className={`text-base font-semibold ${isBest ? 'text-emerald-400' : 'text-white'}`}>
                                   {displayValue}
                                 </span>
-                                {newHigh && (
-                                  <span className="text-[10px] px-1 py-0.5 bg-red-500/20 text-up rounded font-medium">
-                                    신고가
-                                  </span>
-                                )}
-                                {newLow && (
-                                  <span className="text-[10px] px-1 py-0.5 bg-blue-500/20 text-down rounded font-medium">
-                                    신저가
-                                  </span>
-                                )}
-                              </div>
-                              {/* 52주 위치 바 인디케이터 */}
-                              <div className="w-full h-2 bg-[#2d2640] rounded-full relative overflow-hidden">
-                                <div
-                                  className="absolute left-0 top-0 h-full rounded-full"
-                                  style={{
-                                    width: `${positionClamped}%`,
-                                    background: newHigh ? '#ef4444' : newLow ? '#3b82f6' : position > 70 ? '#ef4444' : position > 40 ? '#d64f79' : '#3b82f6'
-                                  }}
-                                />
-                                {/* 현재 위치 마커 */}
-                                <div
-                                  className="absolute top-1/2 -translate-y-1/2 w-2 h-2 bg-white rounded-full shadow-sm border border-gray-400"
-                                  style={{ left: `calc(${positionClamped}% - 4px)` }}
-                                />
-                              </div>
-                              <div className="flex justify-between w-full text-[10px] text-gray-500">
-                                <span>저가</span>
-                                <span>고가</span>
-                              </div>
-                            </div>
-                          ) : isMultiLine && typeof displayValue === 'string' && displayValue.includes('\n') ? (
-                            <span className={`text-sm font-semibold ${isBest ? 'text-emerald-400' : 'text-white'} leading-tight`}>
-                              {displayValue.split('\n').map((line, i) => (
-                                <span key={i}>
-                                  {i > 0 && <br />}
-                                  {line}
-                                </span>
-                              ))}
-                            </span>
-                          ) : (
-                            <span className={`text-base font-semibold ${isBest ? 'text-emerald-400' : 'text-white'}`}>
-                              {displayValue}
-                            </span>
-                          )}
-                        </td>
-                      )
-                    })}
-                  </tr>
+                              )}
+                            </td>
+                          )
+                        })}
+                      </tr>
+                    ))}
+                  </>
                 ))}
-              </>
-            ))}
-          </tbody>
-        </table>
+              </tbody>
+            </table>
+          </TabsContent>
+
+          {/* 보유종목 탭 - 세로 비교 */}
+          <TabsContent value="holdings" className="mt-3">
+            {(() => {
+              // 각 ETF의 보유종목 데이터 수집
+              const allHoldings = selectedETFs.map(etf => getHoldingsData(etf))
+
+              // 모든 종목명 수집하여 공통 종목 찾기
+              const allStockNames = allHoldings.flat().map(h => h.name)
+              const stockCounts = allStockNames.reduce((acc, name) => {
+                acc[name] = (acc[name] || 0) + 1
+                return acc
+              }, {} as Record<string, number>)
+
+              // 2개 이상 ETF에 포함된 종목은 공통 종목 - 색상 인덱스 할당
+              const commonStockColors: Record<string, number> = {}
+              let colorIdx = 0
+              Object.entries(stockCounts)
+                .filter(([, count]) => count >= 2)
+                .forEach(([name]) => {
+                  commonStockColors[name] = colorIdx++
+                })
+
+              // 공통 종목 하이라이트 색상 (서로 다른 색상들)
+              const highlightColors = [
+                { bg: 'bg-[#d64f79]/15', text: 'text-[#d64f79]', border: 'border-[#d64f79]/30' },  // 핑크
+                { bg: 'bg-[#10B981]/15', text: 'text-[#10B981]', border: 'border-[#10B981]/30' },  // 초록
+                { bg: 'bg-[#8B5CF6]/15', text: 'text-[#8B5CF6]', border: 'border-[#8B5CF6]/30' },  // 보라
+                { bg: 'bg-[#F59E0B]/15', text: 'text-[#F59E0B]', border: 'border-[#F59E0B]/30' },  // 주황
+                { bg: 'bg-[#3B82F6]/15', text: 'text-[#3B82F6]', border: 'border-[#3B82F6]/30' },  // 파랑
+                { bg: 'bg-[#EC4899]/15', text: 'text-[#EC4899]', border: 'border-[#EC4899]/30' },  // 분홍
+              ]
+
+              return (
+                <>
+                  {/* Sticky Header */}
+                  <div className="sticky top-[98px] z-30 bg-[#191322]">
+                    <table className="w-full bg-[#1f1a2e] border border-[#2d2640] rounded-t-xl" style={{ tableLayout: 'fixed' }}>
+                      <colgroup>
+                        <col style={{ width: '50px' }} />
+                        {selectedETFs.map(etf => (
+                          <col key={`h-hold-${etf.id}`} />
+                        ))}
+                      </colgroup>
+                      <thead>
+                        <tr>
+                          <th className="p-2 text-sm font-medium text-gray-500 text-center rounded-tl-xl">순위</th>
+                          {selectedETFs.map((etf, index) => (
+                            <th key={etf.id} className={`p-2 text-center border-l border-[#2d2640] ${index === selectedETFs.length - 1 ? 'rounded-tr-xl' : ''}`}>
+                              <div
+                                className="w-2.5 h-2.5 rounded-full mx-auto mb-1"
+                                style={{ backgroundColor: chartColors[index % chartColors.length] }}
+                              />
+                              <div className="text-xs text-gray-400 font-normal">{etf.ticker}</div>
+                              <div className="marquee-cell">
+                                <div className="marquee-inner text-sm font-medium text-white whitespace-nowrap">
+                                  {etf.shortName}
+                                </div>
+                              </div>
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                    </table>
+                  </div>
+
+                  {/* Table Body - 구성종목 */}
+                  <table className="w-full bg-[#1f1a2e] border border-t-0 border-[#2d2640] rounded-b-xl" style={{ tableLayout: 'fixed' }}>
+                    <colgroup>
+                      <col style={{ width: '50px' }} />
+                      {selectedETFs.map(etf => (
+                        <col key={`b-hold-${etf.id}`} />
+                      ))}
+                    </colgroup>
+                    <tbody>
+                      {[0, 1, 2, 3, 4].map((rank) => (
+                        <tr key={rank} className={rank > 0 ? 'border-t border-[#2d2640]' : ''}>
+                          <td className="p-2 text-center">
+                            <span className="text-sm font-medium text-[#d64f79]">{rank + 1}</span>
+                          </td>
+                          {selectedETFs.map((etf, etfIdx) => {
+                            const holdings = allHoldings[etfIdx]
+                            const holding = holdings[rank]
+                            const colorIndex = holding ? commonStockColors[holding.name] : undefined
+                            const isCommon = colorIndex !== undefined
+                            const colors = isCommon ? highlightColors[colorIndex % highlightColors.length] : null
+
+                            return (
+                              <td
+                                key={etf.id}
+                                className={`p-2 border-l border-[#2d2640] ${colors ? colors.bg : ''}`}
+                              >
+                                {holding ? (
+                                  <div className="flex flex-col">
+                                    <span className={`text-sm font-medium ${colors ? colors.text : 'text-white'}`}>
+                                      {holding.name}
+                                    </span>
+                                    <span className="text-xs text-gray-400">{holding.weight.toFixed(1)}%</span>
+                                  </div>
+                                ) : (
+                                  <span className="text-xs text-gray-500">-</span>
+                                )}
+                              </td>
+                            )
+                          })}
+                        </tr>
+                      ))}
+                      {/* 기타 비중 */}
+                      <tr className="border-t border-[#2d2640] bg-[#2a2438]/50">
+                        <td className="p-2 text-center">
+                          <span className="text-xs text-gray-500">기타</span>
+                        </td>
+                        {selectedETFs.map((etf, etfIdx) => {
+                          const holdings = allHoldings[etfIdx]
+                          const total = holdings.reduce((sum, h) => sum + h.weight, 0)
+                          return (
+                            <td key={etf.id} className="p-2 border-l border-[#2d2640]">
+                              <span className="text-sm text-gray-400">{(100 - total).toFixed(1)}%</span>
+                            </td>
+                          )
+                        })}
+                      </tr>
+                    </tbody>
+                  </table>
+
+                </>
+              )
+            })()}
+          </TabsContent>
+        </Tabs>
       </div>
 
       {/* 지표 설명 모달 */}
