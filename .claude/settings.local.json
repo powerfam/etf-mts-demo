@@ -5,7 +5,8 @@
       "Bash(file:*)",
       "Bash(node:*)",
       "Bash(npx vercel --prod)",
-      "Bash(npx vercel:*)"
+      "Bash(npx vercel:*)",
+      "Bash(npx tsc:*)"
     ]
   }
 }

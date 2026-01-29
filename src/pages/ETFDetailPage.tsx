@@ -4,7 +4,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
 import { mockETFs } from '@/data/mockData'
 import type { ETF } from '@/data/mockData'
 import { formatNumber, formatCurrency } from '@/lib/utils'
@@ -375,6 +374,58 @@ const generateNextDividend = (etf: ETF) => {
 
 const PIE_COLORS = ['#d64f79', '#796ec2', '#10B981', '#F59E0B', '#3B82F6', '#6B7280']
 
+// 괴리율 1개월 레인지 데이터 생성 (목업)
+const getDiscrepancyRange = (etf: ETF) => {
+  const d = etf.discrepancy
+  const spread = Math.max(Math.abs(d), 0.2)
+  const min = +(d - spread * 0.8).toFixed(2)
+  const max = +(d + spread * 0.6).toFixed(2)
+  const avg = +((min * 0.55 + max * 0.45)).toFixed(2)
+  // 전일값: healthScore를 시드로 사용하여 결정적 생성
+  const seed = etf.healthScore % 10
+  let yesterday: number
+  if (seed === 0 || seed === 5) {
+    // ~20%: 범위 초과 (Max 초과)
+    yesterday = +(max + spread * 0.3).toFixed(2)
+  } else {
+    const t = seed / 9
+    yesterday = +(min + (max - min) * t).toFixed(2)
+  }
+  return { min, max, avg, yesterday }
+}
+
+// 동일 유형 ETF 피어그룹 통계 (marketClass + assetClass 기준)
+const computePeerStats = (peers: ETF[]) => {
+  const stat = (values: number[]) => ({
+    min: Math.min(...values),
+    max: Math.max(...values),
+    avg: +(values.reduce((a, b) => a + b, 0) / values.length)
+  })
+  return {
+    ter: stat(peers.map(e => e.ter)),
+    spread: stat(peers.map(e => e.spread)),
+    trackingError: stat(peers.map(e => e.trackingError)),
+    adtv: stat(peers.map(e => e.adtv))
+  }
+}
+
+const getPeerGroup = (etf: ETF) => {
+  const isSpecial = etf.isLeveraged || etf.isInverse
+  let peers = mockETFs.filter(e => {
+    if (e.id === etf.id) return false
+    if (isSpecial) return (e.isLeveraged || e.isInverse) && e.assetClass === etf.assetClass
+    return e.marketClass === etf.marketClass && e.assetClass === etf.assetClass && !e.isLeveraged && !e.isInverse
+  })
+  if (peers.length < 3) {
+    peers = mockETFs.filter(e => e.id !== etf.id && e.assetClass === etf.assetClass && !e.isLeveraged && !e.isInverse)
+  }
+  if (peers.length === 0) {
+    peers = mockETFs.filter(e => e.id !== etf.id)
+  }
+  const label = isSpecial ? `레버리지/인버스 ${etf.assetClass}` : `${etf.marketClass} ${etf.assetClass}`
+  return { ...computePeerStats(peers), label, count: peers.length }
+}
+
 export function ETFDetailPage({ etf, onBack, onTrade, onAddToCompare, onSelectETF }: ETFDetailPageProps) {
   const [tab, setTab] = useState('overview')
   const [showHealthInfo, setShowHealthInfo] = useState(false)
@@ -407,6 +458,8 @@ export function ETFDetailPage({ etf, onBack, onTrade, onAddToCompare, onSelectET
   const holdingsData = useMemo(() => getHoldingsData(etf), [etf.id])
   const countryData = useMemo(() => getCountryData(etf), [etf.id])
   const sectorData = useMemo(() => getSectorData(etf), [etf.id])
+  const discrepancyRange = useMemo(() => getDiscrepancyRange(etf), [etf.id])
+  const peerGroup = useMemo(() => getPeerGroup(etf), [etf.id])
 
   const getCurrentCompositionData = () => {
     switch (compositionTab) {
@@ -439,6 +492,67 @@ export function ETFDetailPage({ etf, onBack, onTrade, onAddToCompare, onSelectET
       case 'annual': return '연 1회 (12월)'
       default: return '-'
     }
+  }
+
+  // 피어그룹 대비 지표 레인지 바
+  const renderMetricRangeBar = (
+    label: string,
+    value: number,
+    stats: { min: number; max: number; avg: number },
+    format: (v: number) => string,
+    useLog = false
+  ) => {
+    const { min, max, avg } = stats
+    const toScale = (v: number) => useLog ? Math.log10(Math.max(v, 1)) : v
+    const sMin = toScale(min)
+    const sMax = toScale(max)
+    const sSpan = sMax - sMin || 0.001
+    const clampPos = (v: number) => Math.max(6, Math.min(94, v))
+    const getPos = (v: number) => clampPos(((toScale(v) - sMin) / sSpan) * 100)
+    const avgPos = getPos(avg)
+    const isAbove = value > max
+    const isBelow = value < min
+    const isOutOfRange = isAbove || isBelow
+    const valuePos = isAbove ? 94 : isBelow ? 6 : getPos(value)
+    return (
+      <div>
+        <div className="flex justify-between items-center mb-2">
+          <span className="text-sm text-white">{label}</span>
+          <span className="text-sm font-medium text-white">{format(value)}</span>
+        </div>
+        <div className="flex justify-between text-xs mb-1">
+          <span className="text-gray-500">최저 <span className="text-gray-400 font-medium">{format(min)}</span></span>
+          <span className="text-gray-500">최고 <span className="text-gray-400 font-medium">{format(max)}</span></span>
+        </div>
+        <div className="relative h-7 bg-[#2d2640] rounded-full">
+          <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-10" style={{ left: `${avgPos}%` }}>
+            <div className="w-3 h-3 bg-blue-400 rotate-45 rounded-[1px]" />
+          </div>
+          <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-10" style={{ left: `${valuePos}%` }}>
+            <div className={`w-3.5 h-3.5 rounded-full border-2 border-[#1f1a2e] ${isOutOfRange ? 'bg-orange-400' : 'bg-blue-400'}`} />
+          </div>
+        </div>
+        <div className="flex items-center mt-2">
+          <div className="flex items-center gap-1 mr-3">
+            <div className="w-2.5 h-2.5 bg-blue-400 rotate-45 rounded-[1px] shrink-0" />
+            <span className="text-xs text-gray-500">유형평균 {format(avg)}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${isOutOfRange ? 'bg-orange-400' : 'bg-blue-400'}`} />
+            <span className="text-xs text-gray-500">현재 {format(value)}</span>
+          </div>
+          <div className="flex items-center gap-1 ml-auto">
+            <span className={`text-[10px] leading-none px-1.5 py-0.5 rounded ${etf.marketClass === '해외' ? 'bg-blue-500/20 text-blue-400' : 'bg-emerald-500/20 text-emerald-400'}`}>
+              {etf.marketClass}
+            </span>
+            <span className="text-[10px] leading-none px-1.5 py-0.5 rounded bg-gray-500/20 text-gray-400">
+              {etf.assetClass}
+            </span>
+            <span className="text-[10px] text-gray-500">{peerGroup.count}개</span>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -1053,63 +1167,80 @@ export function ETFDetailPage({ etf, onBack, onTrade, onAddToCompare, onSelectET
             </CardHeader>
             <CardContent className="space-y-4">
               {/* TER */}
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm text-white">TER (총보수)</span>
-                  <span className={`text-sm font-medium ${etf.ter <= 0.1 ? 'text-emerald-400' : etf.ter <= 0.3 ? 'text-amber-400' : 'text-red-400'}`}>
-                    {etf.ter.toFixed(2)}%
-                  </span>
-                </div>
-                <Progress value={Math.min(etf.ter / 0.5 * 100, 100)} className="h-2" />
-                <div className="text-xs text-gray-500 mt-1">낮을수록 좋음 (기준: 0.1% 이하 우수)</div>
-              </div>
+              {renderMetricRangeBar('TER (총보수)', etf.ter, peerGroup.ter, v => `${v.toFixed(2)}%`)}
 
-              {/* 괴리율 */}
+              {/* 스프레드 */}
+              {renderMetricRangeBar('스프레드', etf.spread, peerGroup.spread, v => `${v.toFixed(2)}%`)}
+
+              {/* 유동성 */}
+              {renderMetricRangeBar('유동성 (30D 거래대금)', etf.adtv, peerGroup.adtv, v => formatCurrency(v), true)}
+
+              {/* 추적오차 */}
+              {renderMetricRangeBar('추적오차', etf.trackingError, peerGroup.trackingError, v => `${v.toFixed(2)}%`)}
+
+              {/* 괴리율 - 레인지 바 */}
               <div>
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-sm text-white">괴리율</span>
-                  <span className={`text-sm font-medium ${Math.abs(etf.discrepancy) <= 0.1 ? 'text-emerald-400' : Math.abs(etf.discrepancy) <= 0.3 ? 'text-amber-400' : 'text-red-400'}`}>
+                  <span className="text-sm font-medium text-white">
                     {etf.discrepancy >= 0 ? '+' : ''}{etf.discrepancy.toFixed(2)}%
                   </span>
                 </div>
-                <Progress value={Math.min(Math.abs(etf.discrepancy) / 0.5 * 100, 100)} className="h-2" />
-                <div className="text-xs text-gray-500 mt-1">0에 가까울수록 좋음 (기준: ±0.1% 이내 우수)</div>
-              </div>
-
-              {/* 스프레드 */}
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm text-white">스프레드</span>
-                  <span className={`text-sm font-medium ${etf.spread <= 0.05 ? 'text-emerald-400' : etf.spread <= 0.1 ? 'text-amber-400' : 'text-red-400'}`}>
-                    {etf.spread.toFixed(2)}%
-                  </span>
-                </div>
-                <Progress value={Math.min(etf.spread / 0.2 * 100, 100)} className="h-2" />
-                <div className="text-xs text-gray-500 mt-1">낮을수록 좋음 (기준: 0.05% 이하 우수)</div>
-              </div>
-
-              {/* 유동성 */}
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm text-white">유동성 (30D 거래대금)</span>
-                  <span className={`text-sm font-medium ${etf.adtv >= 100000000000 ? 'text-emerald-400' : etf.adtv >= 10000000000 ? 'text-amber-400' : 'text-red-400'}`}>
-                    {formatCurrency(etf.adtv)}
-                  </span>
-                </div>
-                <Progress value={Math.min(etf.adtv / 500000000000 * 100, 100)} className="h-2" />
-                <div className="text-xs text-gray-500 mt-1">높을수록 좋음 (기준: 100억 이상 우수)</div>
-              </div>
-
-              {/* 추적오차 */}
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm text-white">추적오차</span>
-                  <span className={`text-sm font-medium ${etf.trackingError <= 1 ? 'text-emerald-400' : etf.trackingError <= 2 ? 'text-amber-400' : 'text-red-400'}`}>
-                    {etf.trackingError.toFixed(2)}%
-                  </span>
-                </div>
-                <Progress value={Math.min(etf.trackingError / 5 * 100, 100)} className="h-2" />
-                <div className="text-xs text-gray-500 mt-1">낮을수록 좋음 (기준: 1% 이하 우수)</div>
+                {(() => {
+                  const { min, max, avg, yesterday } = discrepancyRange
+                  const span = max - min || 0.01
+                  const clampPos = (v: number) => Math.max(6, Math.min(94, v))
+                  const avgPos = clampPos(((avg - min) / span) * 100)
+                  const isExceeded = yesterday > max
+                  const isBelow = yesterday < min
+                  const isOutOfRange = isExceeded || isBelow
+                  const yesterdayPos = isExceeded ? 94 : isBelow ? 6 : clampPos(((yesterday - min) / span) * 100)
+                  return (
+                    <>
+                      {/* 최저/최고 레이블 */}
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="text-gray-500">최저 <span className="text-gray-400 font-medium">{min >= 0 ? '+' : ''}{min.toFixed(2)}%</span></span>
+                        <span className="text-gray-500">최고 <span className="text-gray-400 font-medium">{max >= 0 ? '+' : ''}{max.toFixed(2)}%</span></span>
+                      </div>
+                      {/* 레인지 바 */}
+                      <div className="relative h-7 bg-[#2d2640] rounded-full">
+                        {/* 평균 마커 ◆ */}
+                        <div
+                          className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-10"
+                          style={{ left: `${avgPos}%` }}
+                        >
+                          <div className="w-3 h-3 bg-blue-400 rotate-45 rounded-[1px]" />
+                        </div>
+                        {/* 전일 마커 ● */}
+                        <div
+                          className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-10"
+                          style={{ left: `${yesterdayPos}%` }}
+                        >
+                          <div className={`w-3.5 h-3.5 rounded-full border-2 border-[#1f1a2e] ${isOutOfRange ? 'bg-orange-400' : 'bg-blue-400'}`} />
+                        </div>
+                      </div>
+                      {/* 범례 + 기준 문구 (한 줄) */}
+                      <div className="flex items-center mt-2">
+                        <div className="flex items-center gap-1 mr-3">
+                          <div className="w-2.5 h-2.5 bg-blue-400 rotate-45 rounded-[1px] shrink-0" />
+                          <span className="text-xs text-gray-500">평균 {avg >= 0 ? '+' : ''}{avg.toFixed(2)}%</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${isOutOfRange ? 'bg-orange-400' : 'bg-blue-400'}`} />
+                          <span className="text-xs text-gray-500">전일 {yesterday >= 0 ? '+' : ''}{yesterday.toFixed(2)}%</span>
+                        </div>
+                        <span className={`text-xs ml-auto ${isOutOfRange ? 'text-orange-400' : 'text-gray-500'}`}>
+                          {isExceeded ? '1개월 최댓값 초과' : isBelow ? '1개월 최솟값 초과' : '(1개월 기준)'}
+                        </span>
+                      </div>
+                    </>
+                  )
+                })()}
+                {etf.marketClass === '해외' && (
+                  <p className="text-xs text-gray-500 mt-2">
+                    국내상장 해외 ETF는 환율, 시차, 기초자산 선물가 등으로 인해 괴리율이 변동할 수 있습니다.
+                  </p>
+                )}
               </div>
             </CardContent>
           </Card>
