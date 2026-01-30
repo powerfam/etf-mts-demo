@@ -404,7 +404,6 @@ const computePeerStats = (peers: ETF[]) => {
   return {
     ter: stat(peers.map(e => e.ter)),
     spread: stat(peers.map(e => e.spread)),
-    trackingError: stat(peers.map(e => e.trackingError)),
     adtv: stat(peers.map(e => e.adtv))
   }
 }
@@ -500,7 +499,8 @@ export function ETFDetailPage({ etf, onBack, onTrade, onAddToCompare, onSelectET
     value: number,
     stats: { min: number; max: number; avg: number },
     format: (v: number) => string,
-    useLog = false
+    useLog = false,
+    description?: string
   ) => {
     const { min, max, avg } = stats
     const toScale = (v: number) => useLog ? Math.log10(Math.max(v, 1)) : v
@@ -516,9 +516,12 @@ export function ETFDetailPage({ etf, onBack, onTrade, onAddToCompare, onSelectET
     const valuePos = isAbove ? 94 : isBelow ? 6 : getPos(value)
     return (
       <div>
-        <div className="flex justify-between items-center mb-2">
-          <span className="text-sm text-white">{label}</span>
-          <span className="text-sm font-medium text-white">{format(value)}</span>
+        <div className="flex justify-between items-start mb-2">
+          <div>
+            <span className="text-sm text-white">{label}</span>
+            {description && <p className="text-[11px] text-gray-500 mt-0.5">{description}</p>}
+          </div>
+          <span className="text-sm font-medium text-white shrink-0 ml-3">{format(value)}</span>
         </div>
         <div className="flex justify-between text-xs mb-1">
           <span className="text-gray-500">최저 <span className="text-gray-400 font-medium">{format(min)}</span></span>
@@ -562,16 +565,15 @@ export function ETFDetailPage({ etf, onBack, onTrade, onAddToCompare, onSelectET
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
           <div className="bg-[#1f1a2e] border border-[#3d3450] rounded-2xl max-w-sm w-full p-5 shadow-xl">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-white">ETF 건전성 지표</h3>
+              <h3 className="text-lg font-bold text-white">거래 지표 안내</h3>
               <button onClick={() => setShowHealthInfo(false)} className="text-gray-400 hover:text-white"><X className="h-5 w-5" /></button>
             </div>
             <div className="space-y-3 mb-4">
               {[
-                ['TER (총보수)', '연간 운용비용. 낮을수록 유리'],
-                ['괴리율', '시장가와 순자산가치 차이. 0에 가까울수록 좋음'],
-                ['스프레드', '매수/매도 호가 차이. 낮을수록 거래비용 감소'],
-                ['유동성', '거래대금 기준. 높을수록 거래 용이'],
-                ['추적오차', '지수 추종 정확도. 낮을수록 정확']
+                ['TER (총보수)', '순자산에서 자동 차감되는 연간 운용비용. 보수, 수탁보수, 사무관리보수 등 포함'],
+                ['스프레드', '최우선 매수호가와 매도호가 간 차이. LP 호가 제시에 의해 결정'],
+                ['유동성', '일정 기간 평균 거래대금. 체결 속도와 대량 주문 소화 능력에 영향'],
+                ['괴리율', '시장가격과 순자산가치(iNAV) 간 차이. 시장 수급, 환율 등에 의해 발생']
               ].map(([title, desc]) => (
                 <div key={title} className="bg-[#2d2640]/50 rounded-lg p-3">
                   <div className="text-sm font-medium text-white mb-1">{title}</div>
@@ -692,7 +694,7 @@ export function ETFDetailPage({ etf, onBack, onTrade, onAddToCompare, onSelectET
           <TabsTrigger value="overview" className="text-xs py-2">개요</TabsTrigger>
           <TabsTrigger value="composition" className="text-xs py-2">구성</TabsTrigger>
           <TabsTrigger value="dividend" className="text-xs py-2">배당</TabsTrigger>
-          <TabsTrigger value="health" className="text-xs py-2">건전성</TabsTrigger>
+          <TabsTrigger value="health" className="text-xs py-2">지표모니터</TabsTrigger>
           <TabsTrigger value="insight" className="text-xs py-2">키움인사이트</TabsTrigger>
         </TabsList>
 
@@ -1167,22 +1169,22 @@ export function ETFDetailPage({ etf, onBack, onTrade, onAddToCompare, onSelectET
             </CardHeader>
             <CardContent className="space-y-4">
               {/* TER */}
-              {renderMetricRangeBar('TER (총보수)', etf.ter, peerGroup.ter, v => `${v.toFixed(2)}%`)}
+              {renderMetricRangeBar('TER (총보수)', etf.ter, peerGroup.ter, v => `${v.toFixed(2)}%`, false, '보유 중 순자산에서 자동 차감되는 연간 비용')}
 
               {/* 스프레드 */}
-              {renderMetricRangeBar('스프레드', etf.spread, peerGroup.spread, v => `${v.toFixed(2)}%`)}
+              {renderMetricRangeBar('스프레드', etf.spread, peerGroup.spread, v => `${v.toFixed(2)}%`, false, '매수·매도 호가 간격, 체결 시 발생하는 거래비용')}
 
               {/* 유동성 */}
-              {renderMetricRangeBar('유동성 (30D 거래대금)', etf.adtv, peerGroup.adtv, v => formatCurrency(v), true)}
-
-              {/* 추적오차 */}
-              {renderMetricRangeBar('추적오차', etf.trackingError, peerGroup.trackingError, v => `${v.toFixed(2)}%`)}
+              {renderMetricRangeBar('유동성 (30D 거래대금)', etf.adtv, peerGroup.adtv, v => formatCurrency(v), true, '일평균 거래대금 기준, 체결 속도·물량에 영향')}
 
               {/* 괴리율 - 레인지 바 */}
               <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm text-white">괴리율</span>
-                  <span className="text-sm font-medium text-white">
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <span className="text-sm text-white">괴리율</span>
+                    <p className="text-[11px] text-gray-500 mt-0.5">시장가와 NAV 차이, 매매 시점의 가격 괴리 정도</p>
+                  </div>
+                  <span className="text-sm font-medium text-white shrink-0 ml-3">
                     {etf.discrepancy >= 0 ? '+' : ''}{etf.discrepancy.toFixed(2)}%
                   </span>
                 </div>
