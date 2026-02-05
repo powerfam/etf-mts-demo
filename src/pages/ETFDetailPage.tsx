@@ -539,13 +539,14 @@ export function ETFDetailPage({ etf, onBack, onTrade, onAddToCompare, onSelectET
     const sMin = toScale(min)
     const sMax = toScale(max)
     const sSpan = sMax - sMin || 0.001
-    const clampPos = (v: number) => Math.max(6, Math.min(94, v))
+    const clampPos = (v: number) => Math.max(10, Math.min(90, v))
     const getPos = (v: number) => clampPos(((toScale(v) - sMin) / sSpan) * 100)
     const avgPos = getPos(avg)
     const isAbove = value > max
     const isBelow = value < min
     const isOutOfRange = isAbove || isBelow
-    const valuePos = isAbove ? 94 : isBelow ? 6 : getPos(value)
+    // 최저/최고에 해당하거나 벗어나면 바 끝단에 배치
+    const valuePos = value >= max ? 97 : value <= min ? 3 : getPos(value)
     const mk = metricKey || label
 
     return (
@@ -1328,12 +1329,13 @@ export function ETFDetailPage({ etf, onBack, onTrade, onAddToCompare, onSelectET
               {(() => {
                 const { min, max, avg, yesterday } = discrepancyRange
                 const span = max - min || 0.01
-                const clampPos = (v: number) => Math.max(6, Math.min(94, v))
+                const clampPos = (v: number) => Math.max(10, Math.min(90, v))
                 const avgPos = clampPos(((avg - min) / span) * 100)
                 const isExceeded = yesterday > max
                 const isBelowMin = yesterday < min
                 const isOutOfRange = isExceeded || isBelowMin
-                const yesterdayPos = isExceeded ? 94 : isBelowMin ? 6 : clampPos(((yesterday - min) / span) * 100)
+                // 최저/최고에 해당하거나 벗어나면 바 끝단에 배치
+                const yesterdayPos = yesterday >= max ? 97 : yesterday <= min ? 3 : clampPos(((yesterday - min) / span) * 100)
                 return (
                   <>
                     {/* 1개월 최저/최고 */}
