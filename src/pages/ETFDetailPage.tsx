@@ -396,44 +396,74 @@ const getDiscrepancyRange = (etf: ETF) => {
 
 // 동일 유형 ETF 피어그룹 통계 (marketClass + assetClass 기준)
 const computePeerStats = (peers: ETF[]) => {
-  const stat = (values: number[]) => ({
-    min: Math.min(...values),
-    max: Math.max(...values),
-    avg: +(values.reduce((a, b) => a + b, 0) / values.length)
-  })
-  return {
-    ter: stat(peers.map(e => e.ter)),
-    spread: stat(peers.map(e => e.spread)),
-    adtv: stat(peers.map(e => e.adtv))
+  const stat = (getter: (e: ETF) => number) => {
+    const values = peers.map(getter)
+    const minVal = Math.min(...values)
+    const maxVal = Math.max(...values)
+    const minETFs = peers.filter(e => getter(e) === minVal)
+    const maxETFs = peers.filter(e => getter(e) === maxVal)
+    return {
+      min: minVal,
+      max: maxVal,
+      avg: +(values.reduce((a, b) => a + b, 0) / values.length),
+      minName: minETFs[0]?.shortName || '',
+      maxName: maxETFs[0]?.shortName || '',
+      minExtra: minETFs.length - 1,
+      maxExtra: maxETFs.length - 1,
+      minETFNames: minETFs.map(e => e.shortName),
+      maxETFNames: maxETFs.map(e => e.shortName),
+    }
   }
+  return {
+    ter: stat(e => e.ter),
+    spread: stat(e => e.spread),
+    adtv: stat(e => e.adtv)
+  }
+}
+
+// ETF 액티브 운용 여부 판별
+const isActiveETF = (etf: ETF): boolean => {
+  return etf.name.includes('액티브') || (etf.tags?.includes('액티브') ?? false)
 }
 
 const getPeerGroup = (etf: ETF) => {
   const isSpecial = etf.isLeveraged || etf.isInverse
+  const isActive = isActiveETF(etf)
   let peers = mockETFs.filter(e => {
     if (e.id === etf.id) return false
     if (isSpecial) return (e.isLeveraged || e.isInverse) && e.assetClass === etf.assetClass
-    return e.marketClass === etf.marketClass && e.assetClass === etf.assetClass && !e.isLeveraged && !e.isInverse
+    return e.marketClass === etf.marketClass && e.assetClass === etf.assetClass
+      && !e.isLeveraged && !e.isInverse && isActiveETF(e) === isActive
   })
+  // 피어가 너무 적으면 액티브/패시브 제한 해제
+  if (peers.length < 3) {
+    peers = mockETFs.filter(e => {
+      if (e.id === etf.id) return false
+      if (isSpecial) return (e.isLeveraged || e.isInverse) && e.assetClass === etf.assetClass
+      return e.marketClass === etf.marketClass && e.assetClass === etf.assetClass && !e.isLeveraged && !e.isInverse
+    })
+  }
   if (peers.length < 3) {
     peers = mockETFs.filter(e => e.id !== etf.id && e.assetClass === etf.assetClass && !e.isLeveraged && !e.isInverse)
   }
   if (peers.length === 0) {
     peers = mockETFs.filter(e => e.id !== etf.id)
   }
+  const styleLabel = isActive ? '액티브' : '패시브'
   const label = isSpecial ? `레버리지/인버스 ${etf.assetClass}` : `${etf.marketClass} ${etf.assetClass}`
-  return { ...computePeerStats(peers), label, count: peers.length }
+  return { ...computePeerStats(peers), label, count: peers.length, isActive, styleLabel }
 }
 
 export function ETFDetailPage({ etf, onBack, onTrade, onAddToCompare, onSelectETF }: ETFDetailPageProps) {
   const [tab, setTab] = useState('overview')
-  const [showHealthInfo, setShowHealthInfo] = useState(false)
+  const [expandedMetricInfo, setExpandedMetricInfo] = useState<string | null>(null)
   const [dividendPeriod, setDividendPeriod] = useState<'1y' | '3y' | '5y'>('1y')
   const [dividendView, setDividendView] = useState<'monthly' | 'yearly'>('monthly')
   const [compositionTab, setCompositionTab] = useState<'stock' | 'country' | 'sector'>('stock')
   const [chartType, setChartType] = useState<'line' | 'candle'>('line')
   const [showMoreInfo, setShowMoreInfo] = useState(false)
   const [showAllDividends, setShowAllDividends] = useState(false)
+  const [peerListModal, setPeerListModal] = useState<{ label: string; names: string[] } | null>(null)
   const isUp = etf.change >= 0
 
   // 차트 데이터 - ETF 변경시에만 재생성 (탭 이동시 유지)
@@ -497,12 +527,14 @@ export function ETFDetailPage({ etf, onBack, onTrade, onAddToCompare, onSelectET
   const renderMetricRangeBar = (
     label: string,
     value: number,
-    stats: { min: number; max: number; avg: number },
+    stats: { min: number; max: number; avg: number; minName: string; maxName: string; minExtra: number; maxExtra: number; minETFNames: string[]; maxETFNames: string[] },
     format: (v: number) => string,
     useLog = false,
-    description?: string
+    description?: string,
+    metricKey?: string,
+    detailedInfo?: string
   ) => {
-    const { min, max, avg } = stats
+    const { min, max, avg, minName, maxName, minExtra, maxExtra, minETFNames, maxETFNames } = stats
     const toScale = (v: number) => useLog ? Math.log10(Math.max(v, 1)) : v
     const sMin = toScale(min)
     const sMax = toScale(max)
@@ -514,44 +546,94 @@ export function ETFDetailPage({ etf, onBack, onTrade, onAddToCompare, onSelectET
     const isBelow = value < min
     const isOutOfRange = isAbove || isBelow
     const valuePos = isAbove ? 94 : isBelow ? 6 : getPos(value)
+    const mk = metricKey || label
+
     return (
-      <div>
-        <div className="flex justify-between items-start mb-2">
-          <div>
-            <span className="text-sm text-white">{label}</span>
-            {description && <p className="text-[11px] text-gray-500 mt-0.5">{description}</p>}
+      <div className="space-y-2.5">
+        {/* 라벨 + (i) + 현재값 */}
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-1.5">
+            <span className="text-sm font-medium text-white">{label}</span>
+            {detailedInfo && (
+              <button
+                onClick={() => setExpandedMetricInfo(expandedMetricInfo === mk ? null : mk)}
+                className="p-0.5"
+              >
+                <Info className={`h-3.5 w-3.5 transition-colors ${expandedMetricInfo === mk ? 'text-[#d64f79]' : 'text-gray-500 hover:text-white'}`} />
+              </button>
+            )}
           </div>
-          <span className="text-sm font-medium text-white shrink-0 ml-3">{format(value)}</span>
+          <span className="text-sm font-bold text-white shrink-0 ml-3">{format(value)}</span>
         </div>
-        <div className="flex justify-between text-xs mb-1">
-          <span className="text-gray-500">최저 <span className="text-gray-400 font-medium">{format(min)}</span></span>
-          <span className="text-gray-500">최고 <span className="text-gray-400 font-medium">{format(max)}</span></span>
+        {description && <p className="text-xs text-gray-400 leading-relaxed">{description}</p>}
+        {/* 상세 안내 (i 클릭 시 펼침) */}
+        {expandedMetricInfo === mk && detailedInfo && (
+          <div className="bg-[#2d2640]/60 rounded-lg px-3 py-2.5 text-xs text-gray-300 leading-relaxed border border-[#3d3650]/50">
+            {detailedInfo}
+          </div>
+        )}
+
+        {/* 최저/최고 - 종목명 항시 표시 */}
+        <div className="flex justify-between text-xs">
+          <div className="text-left text-gray-400">
+            <span>최저 <span className="font-medium">{format(min)}</span></span>
+            {minName && (
+              <span className="block text-[11px] text-[#d64f79] mt-0.5">
+                {minName}
+                {minExtra > 0 && (
+                  <button
+                    onClick={() => setPeerListModal({ label: `${label} 최저`, names: minETFNames })}
+                    className="text-gray-400 hover:text-[#d64f79] active:text-[#d64f79] ml-1 underline underline-offset-2"
+                  >
+                    외 {minExtra}개
+                  </button>
+                )}
+              </span>
+            )}
+          </div>
+          <div className="text-right text-gray-400">
+            <span>최고 <span className="font-medium">{format(max)}</span></span>
+            {maxName && (
+              <span className="block text-[11px] text-[#d64f79] mt-0.5">
+                {maxName}
+                {maxExtra > 0 && (
+                  <button
+                    onClick={() => setPeerListModal({ label: `${label} 최고`, names: maxETFNames })}
+                    className="text-gray-400 hover:text-[#d64f79] active:text-[#d64f79] ml-1 underline underline-offset-2"
+                  >
+                    외 {maxExtra}개
+                  </button>
+                )}
+              </span>
+            )}
+          </div>
         </div>
-        <div className="relative h-7 bg-[#2d2640] rounded-full">
+
+        {/* 레인지 바 */}
+        <div className="relative h-7 bg-[#352d4a] rounded-full">
+          {/* 유형 평균 마커 (◆) */}
           <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-10" style={{ left: `${avgPos}%` }}>
-            <div className="w-3 h-3 bg-blue-400 rotate-45 rounded-[1px]" />
+            <div className="w-2.5 h-2.5 bg-gray-400 rotate-45 rounded-[1px]" />
           </div>
-          <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-10" style={{ left: `${valuePos}%` }}>
-            <div className={`w-3.5 h-3.5 rounded-full border-2 border-[#1f1a2e] ${isOutOfRange ? 'bg-orange-400' : 'bg-blue-400'}`} />
+          {/* 현재값 마커 (●) */}
+          <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-20" style={{ left: `${valuePos}%` }}>
+            <div className={`w-4 h-4 rounded-full border-2 border-[#252038] shadow-lg ${isOutOfRange ? 'bg-orange-400' : 'bg-[#d64f79]'}`} />
           </div>
         </div>
-        <div className="flex items-center mt-2">
-          <div className="flex items-center gap-1 mr-3">
-            <div className="w-2.5 h-2.5 bg-blue-400 rotate-45 rounded-[1px] shrink-0" />
-            <span className="text-xs text-gray-500">유형평균 {format(avg)}</span>
+
+        {/* 범례 */}
+        <div className="flex items-center gap-3 text-[11px] text-gray-500">
+          <div className="flex items-center gap-1">
+            <div className="w-2 h-2 bg-gray-400 rotate-45 rounded-[1px] shrink-0" />
+            <span>유형평균 {format(avg)}</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${isOutOfRange ? 'bg-orange-400' : 'bg-blue-400'}`} />
-            <span className="text-xs text-gray-500">현재 {format(value)}</span>
-          </div>
-          <div className="flex items-center gap-1 ml-auto">
-            <span className={`text-[10px] leading-none px-1.5 py-0.5 rounded ${etf.marketClass === '해외' ? 'bg-blue-500/20 text-blue-400' : 'bg-emerald-500/20 text-emerald-400'}`}>
-              {etf.marketClass}
+            <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${isOutOfRange ? 'bg-orange-400' : 'bg-[#d64f79]'}`} />
+            <span className={isOutOfRange ? 'text-orange-400' : ''}>
+              {etf.shortName}
+              {isBelow && ' (유형 최저 이하)'}
+              {isAbove && ' (유형 최고 이상)'}
             </span>
-            <span className="text-[10px] leading-none px-1.5 py-0.5 rounded bg-gray-500/20 text-gray-400">
-              {etf.assetClass}
-            </span>
-            <span className="text-[10px] text-gray-500">{peerGroup.count}개</span>
           </div>
         </div>
       </div>
@@ -560,24 +642,18 @@ export function ETFDetailPage({ etf, onBack, onTrade, onAddToCompare, onSelectET
 
   return (
     <div className="pb-36">
-      {/* 건전성 점수 정보 모달 */}
-      {showHealthInfo && (
+      {/* 피어그룹 종목 리스트 모달 */}
+      {peerListModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
           <div className="bg-[#1f1a2e] border border-[#3d3450] rounded-2xl max-w-sm w-full p-5 shadow-xl">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-white">거래 지표 안내</h3>
-              <button onClick={() => setShowHealthInfo(false)} className="text-gray-400 hover:text-white"><X className="h-5 w-5" /></button>
+              <h3 className="text-base font-bold text-white">{peerListModal.label}</h3>
+              <button onClick={() => setPeerListModal(null)} className="text-gray-400 hover:text-white"><X className="h-5 w-5" /></button>
             </div>
-            <div className="space-y-3 mb-4">
-              {[
-                ['TER (총보수)', '순자산에서 자동 차감되는 연간 운용비용. 보수, 수탁보수, 사무관리보수 등 포함'],
-                ['스프레드', '최우선 매수호가와 매도호가 간 차이. LP 호가 제시에 의해 결정'],
-                ['유동성', '일정 기간 평균 거래대금. 체결 속도와 대량 주문 소화 능력에 영향'],
-                ['괴리율', '시장가격과 순자산가치(iNAV) 간 차이. 시장 수급, 환율 등에 의해 발생']
-              ].map(([title, desc]) => (
-                <div key={title} className="bg-[#2d2640]/50 rounded-lg p-3">
-                  <div className="text-sm font-medium text-white mb-1">{title}</div>
-                  <p className="text-xs text-gray-400">{desc}</p>
+            <div className="space-y-2 max-h-[300px] overflow-y-auto">
+              {peerListModal.names.map((name, i) => (
+                <div key={i} className="bg-[#2d2640]/50 rounded-lg px-3 py-2.5 text-sm text-white">
+                  {name}
                 </div>
               ))}
             </div>
@@ -1156,94 +1232,151 @@ export function ETFDetailPage({ etf, onBack, onTrade, onAddToCompare, onSelectET
           </Card>
         </TabsContent>
 
-        {/* 건전성 탭 */}
-        <TabsContent value="health" className="space-y-4 mt-4">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center gap-2">
-                건전성 지표
-                <button onClick={() => setShowHealthInfo(true)}>
-                  <Info className="h-4 w-4 text-gray-400 hover:text-white" />
-                </button>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* TER */}
-              {renderMetricRangeBar('TER (총보수)', etf.ter, peerGroup.ter, v => `${v.toFixed(2)}%`, false, '보유 중 순자산에서 자동 차감되는 연간 비용')}
+        {/* 건전성 탭 (지표모니터) */}
+        <TabsContent value="health" className="space-y-3 mt-4">
+          {/* 비교 기준 컨텍스트 바 */}
+          <div className="flex items-center justify-between px-1 py-1">
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs text-gray-400">비교 기준:</span>
+              <span className={`text-[10px] px-1.5 py-0.5 rounded ${etf.marketClass === '해외' ? 'bg-blue-500/20 text-blue-400' : 'bg-emerald-500/20 text-emerald-400'}`}>
+                {etf.marketClass}
+              </span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-500/20 text-gray-400">
+                {etf.assetClass}
+              </span>
+              <span className={`text-[10px] px-1.5 py-0.5 rounded ${peerGroup.isActive ? 'bg-amber-500/20 text-amber-400' : 'bg-cyan-500/20 text-cyan-400'}`}>
+                {peerGroup.styleLabel}
+              </span>
+              <span className="text-xs text-gray-400">{peerGroup.count}개 ETF</span>
+            </div>
+          </div>
+          <p className="text-[11px] text-gray-500 px-1">* 직전 거래일 기준</p>
 
-              {/* 스프레드 */}
-              {renderMetricRangeBar('스프레드', etf.spread, peerGroup.spread, v => `${v.toFixed(2)}%`, false, '매수·매도 호가 간격, 체결 시 발생하는 거래비용')}
+          {/* 섹션: 동일 유형 ETF 대비 */}
+          <div className="flex items-center gap-2 px-1 pt-1">
+            <div className="h-px flex-1 bg-[#3d3650]" />
+            <span className="text-[11px] text-gray-500 shrink-0">동일 유형 ETF 대비</span>
+            <div className="h-px flex-1 bg-[#3d3650]" />
+          </div>
 
-              {/* 유동성 */}
-              {renderMetricRangeBar('유동성 (30D 거래대금)', etf.adtv, peerGroup.adtv, v => formatCurrency(v), true, '일평균 거래대금 기준, 체결 속도·물량에 영향')}
+          {/* TER (총보수) */}
+          <Card className="bg-[#2d2640]/30 border-[#3d3650]">
+            <CardContent className="p-4">
+              {renderMetricRangeBar(
+                'TER (총보수)', etf.ter, peerGroup.ter, v => `${v.toFixed(2)}%`, false,
+                '보유 중 순자산에서 자동 차감되는 연간 비용', 'ter',
+                '운용보수, 수탁보수, 사무관리보수 등을 포함한 총비용입니다. 같은 지수를 추종하는 ETF라도 보수 차이가 있어, 보유 기간이 길수록 누적 비용 차이가 발생합니다.'
+              )}
+            </CardContent>
+          </Card>
 
-              {/* 괴리율 - 레인지 바 */}
-              <div>
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <span className="text-sm text-white">괴리율</span>
-                    <p className="text-[11px] text-gray-500 mt-0.5">시장가와 NAV 차이, 매매 시점의 가격 괴리 정도</p>
-                  </div>
-                  <span className="text-sm font-medium text-white shrink-0 ml-3">
-                    {etf.discrepancy >= 0 ? '+' : ''}{etf.discrepancy.toFixed(2)}%
-                  </span>
+          {/* 스프레드 */}
+          <Card className="bg-[#2d2640]/30 border-[#3d3650]">
+            <CardContent className="p-4">
+              {renderMetricRangeBar(
+                '스프레드', etf.spread, peerGroup.spread, v => `${v.toFixed(2)}%`, false,
+                '매수·매도 호가 간 차이, 매매 시마다 발생하는 거래비용', 'spread',
+                'LP(유동성공급자)가 제시하는 매수·매도 호가 간 차이입니다. 매매할 때마다 발생하므로 거래 빈도가 높을수록 누적 영향이 커집니다.'
+              )}
+            </CardContent>
+          </Card>
+
+          {/* 유동성 */}
+          <Card className="bg-[#2d2640]/30 border-[#3d3650]">
+            <CardContent className="p-4">
+              {renderMetricRangeBar(
+                '유동성 (30D 거래대금)', etf.adtv, peerGroup.adtv, v => formatCurrency(v), true,
+                '일평균 거래대금 기준, 체결 속도·물량에 영향', 'adtv',
+                '최근 30일 일평균 거래대금입니다. 거래대금이 많을수록 원하는 가격·수량에 체결될 가능성이 높아지며, 대량 매매 시 특히 참고되는 지표입니다.'
+              )}
+            </CardContent>
+          </Card>
+
+          {/* 섹션: 이 종목의 최근 추이 */}
+          <div className="flex items-center gap-2 px-1 pt-2">
+            <div className="h-px flex-1 bg-[#3d3650]" />
+            <span className="text-[11px] text-gray-500 shrink-0">이 종목의 최근 추이</span>
+            <div className="h-px flex-1 bg-[#3d3650]" />
+          </div>
+
+          {/* 괴리율 */}
+          <Card className="bg-[#2d2640]/30 border-[#3d3650]">
+            <CardContent className="p-4 space-y-2.5">
+              {/* 라벨 + (i) + 현재값 */}
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-sm font-medium text-white">괴리율</span>
+                  <button
+                    onClick={() => setExpandedMetricInfo(expandedMetricInfo === 'discrepancy' ? null : 'discrepancy')}
+                    className="p-0.5"
+                  >
+                    <Info className={`h-3.5 w-3.5 transition-colors ${expandedMetricInfo === 'discrepancy' ? 'text-[#d64f79]' : 'text-gray-500 hover:text-white'}`} />
+                  </button>
                 </div>
-                {(() => {
-                  const { min, max, avg, yesterday } = discrepancyRange
-                  const span = max - min || 0.01
-                  const clampPos = (v: number) => Math.max(6, Math.min(94, v))
-                  const avgPos = clampPos(((avg - min) / span) * 100)
-                  const isExceeded = yesterday > max
-                  const isBelow = yesterday < min
-                  const isOutOfRange = isExceeded || isBelow
-                  const yesterdayPos = isExceeded ? 94 : isBelow ? 6 : clampPos(((yesterday - min) / span) * 100)
-                  return (
-                    <>
-                      {/* 최저/최고 레이블 */}
-                      <div className="flex justify-between text-xs mb-1">
-                        <span className="text-gray-500">최저 <span className="text-gray-400 font-medium">{min >= 0 ? '+' : ''}{min.toFixed(2)}%</span></span>
-                        <span className="text-gray-500">최고 <span className="text-gray-400 font-medium">{max >= 0 ? '+' : ''}{max.toFixed(2)}%</span></span>
+                <span className="text-sm font-bold text-white shrink-0 ml-3">
+                  {etf.discrepancy >= 0 ? '+' : ''}{etf.discrepancy.toFixed(2)}%
+                </span>
+              </div>
+              <p className="text-xs text-gray-400 leading-relaxed">시장가와 NAV 차이, 매매 시점의 가격 괴리 정도</p>
+              {/* 상세 안내 (i 클릭 시 펼침) */}
+              {expandedMetricInfo === 'discrepancy' && (
+                <div className="bg-[#2d2640]/60 rounded-lg px-3 py-2.5 text-xs text-gray-300 leading-relaxed border border-[#3d3650]/50">
+                  시장가격과 순자산가치(iNAV) 간 차이입니다. 매수 시점에 프리미엄, 매도 시점에 디스카운트가 발생할 수 있으며, 이 수치를 통해 현재 가격이 적정 가치에 가까운지 참고할 수 있습니다.
+                </div>
+              )}
+
+              {(() => {
+                const { min, max, avg, yesterday } = discrepancyRange
+                const span = max - min || 0.01
+                const clampPos = (v: number) => Math.max(6, Math.min(94, v))
+                const avgPos = clampPos(((avg - min) / span) * 100)
+                const isExceeded = yesterday > max
+                const isBelowMin = yesterday < min
+                const isOutOfRange = isExceeded || isBelowMin
+                const yesterdayPos = isExceeded ? 94 : isBelowMin ? 6 : clampPos(((yesterday - min) / span) * 100)
+                return (
+                  <>
+                    {/* 1개월 최저/최고 */}
+                    <div className="flex justify-between text-xs">
+                      <span className="text-gray-400">1개월 최저 <span className="font-medium">{min >= 0 ? '+' : ''}{min.toFixed(2)}%</span></span>
+                      <span className="text-gray-400">1개월 최고 <span className="font-medium">{max >= 0 ? '+' : ''}{max.toFixed(2)}%</span></span>
+                    </div>
+
+                    {/* 레인지 바 */}
+                    <div className="relative h-7 bg-[#352d4a] rounded-full">
+                      {/* 평균 마커 (◆) */}
+                      <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-10" style={{ left: `${avgPos}%` }}>
+                        <div className="w-2.5 h-2.5 bg-gray-400 rotate-45 rounded-[1px]" />
                       </div>
-                      {/* 레인지 바 */}
-                      <div className="relative h-7 bg-[#2d2640] rounded-full">
-                        {/* 평균 마커 ◆ */}
-                        <div
-                          className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-10"
-                          style={{ left: `${avgPos}%` }}
-                        >
-                          <div className="w-3 h-3 bg-blue-400 rotate-45 rounded-[1px]" />
-                        </div>
-                        {/* 전일 마커 ● */}
-                        <div
-                          className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-10"
-                          style={{ left: `${yesterdayPos}%` }}
-                        >
-                          <div className={`w-3.5 h-3.5 rounded-full border-2 border-[#1f1a2e] ${isOutOfRange ? 'bg-orange-400' : 'bg-blue-400'}`} />
-                        </div>
+                      {/* 전일 마커 (●) */}
+                      <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-20" style={{ left: `${yesterdayPos}%` }}>
+                        <div className={`w-4 h-4 rounded-full border-2 border-[#252038] shadow-lg ${isOutOfRange ? 'bg-orange-400' : 'bg-[#d64f79]'}`} />
                       </div>
-                      {/* 범례 + 기준 문구 (한 줄) */}
-                      <div className="flex items-center mt-2">
-                        <div className="flex items-center gap-1 mr-3">
-                          <div className="w-2.5 h-2.5 bg-blue-400 rotate-45 rounded-[1px] shrink-0" />
-                          <span className="text-xs text-gray-500">평균 {avg >= 0 ? '+' : ''}{avg.toFixed(2)}%</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${isOutOfRange ? 'bg-orange-400' : 'bg-blue-400'}`} />
-                          <span className="text-xs text-gray-500">전일 {yesterday >= 0 ? '+' : ''}{yesterday.toFixed(2)}%</span>
-                        </div>
-                        <span className={`text-xs ml-auto ${isOutOfRange ? 'text-orange-400' : 'text-gray-500'}`}>
-                          {isExceeded ? '1개월 최댓값 초과' : isBelow ? '1개월 최솟값 초과' : '(1개월 기준)'}
+                    </div>
+
+                    {/* 범례 */}
+                    <div className="flex items-center gap-3 text-[11px] text-gray-500">
+                      <div className="flex items-center gap-1">
+                        <div className="w-2 h-2 bg-gray-400 rotate-45 rounded-[1px] shrink-0" />
+                        <span>평균 {avg >= 0 ? '+' : ''}{avg.toFixed(2)}%</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${isOutOfRange ? 'bg-orange-400' : 'bg-[#d64f79]'}`} />
+                        <span className={isOutOfRange ? 'text-orange-400' : ''}>
+                          전일 {yesterday >= 0 ? '+' : ''}{yesterday.toFixed(2)}%
+                          {isExceeded && ' (1개월 최고 이상)'}
+                          {isBelowMin && ' (1개월 최저 이하)'}
                         </span>
                       </div>
-                    </>
-                  )
-                })()}
-                {etf.marketClass === '해외' && (
-                  <p className="text-xs text-gray-500 mt-2">
-                    국내상장 해외 ETF는 환율, 시차, 기초자산 선물가 등으로 인해 괴리율이 변동할 수 있습니다.
-                  </p>
-                )}
-              </div>
+                    </div>
+                  </>
+                )
+              })()}
+              {etf.marketClass === '해외' && (
+                <p className="text-xs text-gray-400 mt-1">
+                  국내상장 해외 ETF는 환율, 시차, 기초자산 선물가 등으로 인해 괴리율이 변동할 수 있습니다.
+                </p>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
