@@ -695,3 +695,378 @@ input, textarea, select {
 .light-mode .search-bar-main {
   background-color: #ffffff !important;
 }
+
+/* ========================================
+   LIGHT MODE - TAB TEXT FIX
+   배당 월별/연별 탭 등 활성 탭 텍스트 가시성
+   ======================================== */
+
+/* 커스텀 탭 버튼 (bg-[#d64f79] 활성 탭) */
+.light-mode button.bg-\[\#d64f79\] {
+  background-color: #d64f79 !important;
+  color: #ffffff !important;
+}
+
+/* 비활성 탭 버튼 (bg-[#2d2640] 탭) */
+.light-mode button.bg-\[\#2d2640\] {
+  background-color: #e5e7eb !important;
+  color: #374151 !important;
+}
+
+/* rounded-lg/full p-0.5 컨테이너 내부 탭들 */
+.light-mode .rounded-lg.p-0\.5 button,
+.light-mode .rounded-full.p-0\.5 button {
+  color: #374151 !important;
+}
+
+.light-mode .rounded-lg.p-0\.5 button.bg-\[\#d64f79\],
+.light-mode .rounded-full.p-0\.5 button.bg-\[\#d64f79\] {
+  color: #ffffff !important;
+}
+
+/* 일반 텍스트 탭들 (테두리 없는 탭) */
+.light-mode button.text-\[\#d64f79\] {
+  color: #d64f79 !important;
+}
+
+.light-mode button.text-gray-500 {
+  color: #6b7280 !important;
+}
+
+/* ========================================
+   LIGHT MODE - SCREENING SHEET PANEL FIX
+   스크리닝 시트의 좌측 메뉴 텍스트 가시성
+   ======================================== */
+
+/* 스크리닝 시트 좌측 패널 배경 */
+.light-mode .border-r.border-\[\#2d2640\] {
+  background-color: #f5f5f5 !important;
+  border-color: #e5e7eb !important;
+}
+
+/* 스크리닝 시트 좌측 패널 텍스트 */
+.light-mode .border-r button {
+  color: #374151 !important;
+}
+
+.light-mode .border-r button:hover {
+  background-color: #e5e7eb !important;
+}
+
+/* 스크리닝 시트 활성 탭 */
+.light-mode .border-r button.bg-\[\#d64f79\]\/20 {
+  background-color: rgba(214, 79, 121, 0.15) !important;
+  color: #d64f79 !important;
+}
+
+/* 스크리닝 시트 우측 패널 */
+.light-mode [class*="flex-1"][class*="overflow-y-auto"] {
+  background-color: #ffffff !important;
+}
+
+/* 스크리닝 시트 내부 텍스트 */
+.light-mode [class*="Sheet"] .text-sm.text-gray-400,
+.light-mode [class*="Sheet"] .text-xs.text-gray-400 {
+  color: #374151 !important;
+}
+
+.light-mode [class*="Sheet"] .text-sm.text-white,
+.light-mode [class*="Sheet"] .text-xs.text-white {
+  color: #111827 !important;
+}
+
+/* ========================================
+   LOGIN PAGE - ALWAYS DARK MODE
+   로그인 페이지는 라이트/다크 모드 상관없이 항상 다크
+   ======================================== */
+
+/* 로그인 페이지 컨테이너 - 항상 다크 */
+.light-mode .min-h-screen.lg\:h-screen.bg-\[\#191322\] {
+  background-color: #191322 !important;
+}
+
+/* 로그인 카드 */
+.light-mode .bg-\[\#1f1a2e\]\/95 {
+  background-color: rgba(31, 26, 46, 0.95) !important;
+}
+
+/* 로그인 카드 내부 텍스트 - 다크 모드 유지 */
+.light-mode .bg-\[\#1f1a2e\]\/95 .text-white {
+  color: #ffffff !important;
+}
+
+.light-mode .bg-\[\#1f1a2e\]\/95 .text-gray-400 {
+  color: #9ca3af !important;
+}
+
+.light-mode .bg-\[\#1f1a2e\]\/95 .text-gray-500 {
+  color: #6b7280 !important;
+}
+
+/* 로그인 입력창 */
+.light-mode .bg-\[\#1f1a2e\]\/95 input {
+  background-color: #2d2640 !important;
+  color: #ffffff !important;
+  border-color: #3d3650 !important;
+}
+
+.light-mode .bg-\[\#1f1a2e\]\/95 input::placeholder {
+  color: #6b7280 !important;
+}
+
+/* 로그인 페이지 그라데이션 오버레이 */
+.light-mode .bg-gradient-to-t.from-\[\#191322\] {
+  background: linear-gradient(to top, #191322, rgba(25, 19, 34, 0.6), transparent) !important;
+}
+
+/* ========================================
+   3D ICON BUTTON STYLES
+   입체감 있는 아이콘 버튼 스타일
+   ======================================== */
+
+/* 다크모드 아이콘 버튼 (기본) */
+.icon-btn-3d {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  background: linear-gradient(to bottom, #3d3650, #2d2640);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    0 1px 2px rgba(0, 0, 0, 0.2),
+    inset 0 1px 1px rgba(255, 255, 255, 0.1),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.2);
+  transition: all 0.15s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.icon-btn-3d:hover {
+  background: linear-gradient(to bottom, #4d4660, #3d3650);
+  box-shadow:
+    0 3px 6px rgba(0, 0, 0, 0.35),
+    0 2px 3px rgba(0, 0, 0, 0.25),
+    inset 0 1px 1px rgba(255, 255, 255, 0.15),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.2);
+}
+
+.icon-btn-3d:active {
+  transform: translateY(1px);
+  background: linear-gradient(to bottom, #2d2640, #252038);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.3),
+    inset 0 1px 2px rgba(0, 0, 0, 0.2),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.05);
+}
+
+.icon-btn-3d svg {
+  color: #e5e5e5;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
+}
+
+/* 활성화 상태 (핑크) */
+.icon-btn-3d-active {
+  background: linear-gradient(to bottom, #e05a88, #d64f79);
+  box-shadow:
+    0 2px 4px rgba(214, 79, 121, 0.4),
+    0 1px 2px rgba(0, 0, 0, 0.2),
+    inset 0 1px 1px rgba(255, 255, 255, 0.2),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.15);
+}
+
+.icon-btn-3d-active:hover {
+  background: linear-gradient(to bottom, #e86a98, #e05a88);
+}
+
+.icon-btn-3d-active svg {
+  color: #ffffff;
+}
+
+/* 라이트모드 아이콘 버튼 */
+.light-mode .icon-btn-3d {
+  background: linear-gradient(to bottom, #ffffff, #e5e7eb);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    0 1px 2px rgba(0, 0, 0, 0.08),
+    inset 0 1px 1px rgba(255, 255, 255, 0.9),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.light-mode .icon-btn-3d:hover {
+  background: linear-gradient(to bottom, #f9fafb, #e5e7eb);
+  box-shadow:
+    0 3px 6px rgba(0, 0, 0, 0.12),
+    0 2px 3px rgba(0, 0, 0, 0.1),
+    inset 0 1px 1px rgba(255, 255, 255, 1),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.light-mode .icon-btn-3d:active {
+  background: linear-gradient(to bottom, #e5e7eb, #d1d5db);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.1),
+    inset 0 1px 2px rgba(0, 0, 0, 0.05),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.5);
+}
+
+.light-mode .icon-btn-3d svg {
+  color: #374151;
+  filter: drop-shadow(0 1px 1px rgba(255, 255, 255, 0.5));
+}
+
+.light-mode .icon-btn-3d-active {
+  background: linear-gradient(to bottom, #e05a88, #d64f79);
+  box-shadow:
+    0 2px 4px rgba(214, 79, 121, 0.3),
+    0 1px 2px rgba(0, 0, 0, 0.1),
+    inset 0 1px 1px rgba(255, 255, 255, 0.2),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.1);
+}
+
+.light-mode .icon-btn-3d-active svg {
+  color: #ffffff;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.2));
+}
+
+/* ========================================
+   3D NAVIGATION BUTTON STYLES
+   하단 네비게이션 버튼 입체감 스타일
+   ======================================== */
+
+/* 다크모드 네비게이션 버튼 (기본) */
+.nav-btn-3d {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.75rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nav-btn-3d .nav-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.625rem;
+  background: linear-gradient(to bottom, #3d3650, #2d2640);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.25),
+    0 1px 2px rgba(0, 0, 0, 0.15),
+    inset 0 1px 1px rgba(255, 255, 255, 0.08),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+}
+
+.nav-btn-3d .nav-icon-wrapper svg {
+  color: #9ca3af;
+  width: 1.125rem;
+  height: 1.125rem;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.2));
+  transition: color 0.2s ease;
+}
+
+.nav-btn-3d .nav-label {
+  font-size: 0.625rem;
+  font-weight: 500;
+  color: #6b7280;
+  transition: color 0.2s ease;
+}
+
+.nav-btn-3d:hover .nav-icon-wrapper {
+  background: linear-gradient(to bottom, #4d4660, #3d3650);
+  box-shadow:
+    0 3px 6px rgba(0, 0, 0, 0.3),
+    0 2px 3px rgba(0, 0, 0, 0.2),
+    inset 0 1px 1px rgba(255, 255, 255, 0.1),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.15);
+}
+
+.nav-btn-3d:hover .nav-icon-wrapper svg {
+  color: #d1d5db;
+}
+
+.nav-btn-3d:hover .nav-label {
+  color: #9ca3af;
+}
+
+/* 활성화 상태 */
+.nav-btn-3d-active .nav-icon-wrapper {
+  background: linear-gradient(to bottom, #e05a88, #d64f79);
+  box-shadow:
+    0 2px 6px rgba(214, 79, 121, 0.4),
+    0 1px 3px rgba(214, 79, 121, 0.3),
+    inset 0 1px 1px rgba(255, 255, 255, 0.2),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.1);
+}
+
+.nav-btn-3d-active .nav-icon-wrapper svg {
+  color: #ffffff;
+}
+
+.nav-btn-3d-active .nav-label {
+  color: #d64f79;
+}
+
+/* 라이트모드 네비게이션 버튼 */
+.light-mode .nav-btn-3d .nav-icon-wrapper {
+  background: linear-gradient(to bottom, #ffffff, #e5e7eb);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.08),
+    0 1px 2px rgba(0, 0, 0, 0.06),
+    inset 0 1px 1px rgba(255, 255, 255, 0.9),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.04);
+}
+
+.light-mode .nav-btn-3d .nav-icon-wrapper svg {
+  color: #6b7280;
+  filter: drop-shadow(0 1px 1px rgba(255, 255, 255, 0.5));
+}
+
+.light-mode .nav-btn-3d .nav-label {
+  color: #9ca3af;
+}
+
+.light-mode .nav-btn-3d:hover .nav-icon-wrapper {
+  background: linear-gradient(to bottom, #f9fafb, #e5e7eb);
+  box-shadow:
+    0 3px 6px rgba(0, 0, 0, 0.1),
+    0 2px 3px rgba(0, 0, 0, 0.08),
+    inset 0 1px 1px rgba(255, 255, 255, 1),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.04);
+}
+
+.light-mode .nav-btn-3d:hover .nav-icon-wrapper svg {
+  color: #374151;
+}
+
+.light-mode .nav-btn-3d:hover .nav-label {
+  color: #6b7280;
+}
+
+.light-mode .nav-btn-3d-active .nav-icon-wrapper {
+  background: linear-gradient(to bottom, #e05a88, #d64f79);
+  box-shadow:
+    0 2px 6px rgba(214, 79, 121, 0.3),
+    0 1px 3px rgba(214, 79, 121, 0.2),
+    inset 0 1px 1px rgba(255, 255, 255, 0.2),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.08);
+}
+
+.light-mode .nav-btn-3d-active .nav-icon-wrapper svg {
+  color: #ffffff;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.2));
+}
+
+.light-mode .nav-btn-3d-active .nav-label {
+  color: #d64f79;
+}

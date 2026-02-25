@@ -342,40 +342,6 @@ const generateYearlyDividendHistory = (etf: ETF, years: number) => {
   return data
 }
 
-// 예상 다음 배당 정보 생성
-const generateNextDividend = (etf: ETF) => {
-  const frequency = getEffectiveFrequency(etf)
-  const dividendsPerYear = getDividendCount(frequency)
-  if (dividendsPerYear === 0) return null
-
-  const baseAmount = Math.abs(Math.round(etf.price * etf.dividendYield / 100 / dividendsPerYear))
-  const now = new Date()
-
-  // 다음 배당락일 계산 (주기에 따라)
-  let nextExDate: Date
-  if (frequency === 'monthly') {
-    nextExDate = new Date(now.getFullYear(), now.getMonth() + 1, 20)
-  } else if (frequency === 'quarterly') {
-    const currentQuarter = Math.floor(now.getMonth() / 3)
-    nextExDate = new Date(now.getFullYear(), (currentQuarter + 1) * 3, 20)
-  } else {
-    nextExDate = new Date(now.getFullYear(), 11, 20)
-    if (nextExDate < now) {
-      nextExDate = new Date(now.getFullYear() + 1, 11, 20)
-    }
-  }
-
-  const nextPayDate = new Date(nextExDate)
-  nextPayDate.setDate(nextPayDate.getDate() + 5)
-
-  return {
-    exDate: `${nextExDate.getFullYear()}.${String(nextExDate.getMonth() + 1).padStart(2, '0')}.${String(nextExDate.getDate()).padStart(2, '0')}`,
-    payDate: `${nextPayDate.getFullYear()}.${String(nextPayDate.getMonth() + 1).padStart(2, '0')}.${String(nextPayDate.getDate()).padStart(2, '0')}`,
-    amount: Math.round(baseAmount * (0.95 + Math.random() * 0.1)),
-    isEstimate: true
-  }
-}
-
 const PIE_COLORS = ['#d64f79', '#796ec2', '#10B981', '#F59E0B', '#3B82F6', '#6B7280']
 
 // 괴리율 1개월 레인지 데이터 생성 (목업)
@@ -532,7 +498,6 @@ export function ETFDetailPage({ etf, onBack, onTrade, onAddToCompare, onSelectET
     [etf.id, dividendYears, dividendView]
   )
   const recentDividends = useMemo(() => generateRecentDividends(etf), [etf.id])
-  const nextDividend = useMemo(() => generateNextDividend(etf), [etf.id])
 
   // 구성 데이터 (종목/국가/섹터)
   const holdingsData = useMemo(() => getHoldingsData(etf), [etf.id])
@@ -833,159 +798,246 @@ export function ETFDetailPage({ etf, onBack, onTrade, onAddToCompare, onSelectET
 
         {/* 개요 탭 */}
         <TabsContent value="overview" className="space-y-4 mt-4">
-          {/* 기본 정보 */}
+          {/* 종목개요 */}
           <Card className="bg-[#2d2640]/50 border-[#3d3650]">
             <CardContent className="p-4">
-              <div className="text-xs text-gray-500 mb-2">기본 정보</div>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-xs text-gray-500">종목개요</span>
+                <span className={`text-[10px] px-1.5 py-0.5 rounded ${etf.marketClass === '해외' ? 'bg-blue-500/20 text-blue-400' : 'bg-emerald-500/20 text-emerald-400'}`}>
+                  {etf.marketClass}
+                </span>
+                {etf.category && etf.category !== '레버리지' && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#d64f79]/20 text-[#d64f79]">
+                    {etf.category}
+                  </span>
+                )}
+              </div>
               <p className="text-sm text-white leading-relaxed">{etf.overview}</p>
             </CardContent>
           </Card>
 
-          {/* 기초 지수 */}
+          {/* 기초지수 */}
           <Card className="bg-[#2d2640]/50 border-[#3d3650]">
             <CardContent className="p-4">
-              <div className="text-xs text-gray-500 mb-2">기초 지수</div>
-              <p className="text-sm text-gray-300">{etf.indexDescription}</p>
+              <div className="text-xs text-gray-500 mb-2">기초지수</div>
+              <p className="text-sm text-white">{etf.indexProvider || '없음'}</p>
             </CardContent>
           </Card>
 
-          {/* 주요 특징 */}
+          {/* 주요특징 */}
           <Card className="bg-[#2d2640]/50 border-[#3d3650]">
             <CardContent className="p-4">
-              <div className="text-xs text-gray-500 mb-2">주요 특징</div>
-              <p className="text-sm text-gray-300">{etf.strategy}</p>
+              <div className="text-xs text-gray-500 mb-2">주요특징</div>
+              <p className="text-sm text-gray-300 leading-relaxed">
+                {etf.strategy.split(/(\s+)/).map((word, i) => {
+                  const keywords = ['밸류업', '성장목표', '배당지급', '기업가치', '저평가', '핵심기업', '리밸런싱', '액티브']
+                  const isKeyword = keywords.some(k => word.includes(k))
+                  return isKeyword ? <span key={i} className="text-[#d64f79]">{word}</span> : word
+                })}
+              </p>
             </CardContent>
           </Card>
 
-          {/* 핵심 지표 - 2x2 컴팩트 레이아웃 (순서: 순자산, 거래대금, 배당수익률, 총보수) */}
-          <div className="grid grid-cols-2 gap-2">
-            <Card>
-              <CardContent className="p-3 flex items-center justify-between">
-                <span className="text-xs text-gray-400">순자산 (AUM)</span>
-                <span className="text-sm font-bold text-white">{formatCurrency(etf.aum)}</span>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-3 flex items-center justify-between">
-                <span className="text-xs text-gray-400">거래대금</span>
-                <span className="text-sm font-bold text-white">{formatCurrency(etf.adtv)}</span>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-3 flex items-center justify-between">
-                <span className="text-xs text-gray-400">배당수익률</span>
-                <span className="text-sm font-bold text-white">{etf.dividendYield.toFixed(1)}%</span>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-3 flex items-center justify-between">
-                <span className="text-xs text-gray-400">총보수 (TER)</span>
-                <span className="text-sm font-bold text-white">{etf.ter.toFixed(2)}%</span>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* 더 보기 버튼 */}
-          <button
-            onClick={() => setShowMoreInfo(!showMoreInfo)}
-            className="w-full flex items-center justify-center gap-1 py-2 text-sm text-gray-400 hover:text-white transition-colors"
-          >
-            {showMoreInfo ? '접기' : '더 보기'}
-            {showMoreInfo ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-          </button>
-
-          {/* 더 보기 내용 */}
-          {showMoreInfo && (
-            <div className="space-y-3">
-              {/* 비용 정보 */}
-              <div className="grid grid-cols-2 gap-2">
-                <Card>
-                  <CardContent className="p-3 flex items-center justify-between">
-                    <span className="text-xs text-gray-400">총보수율</span>
-                    <span className="text-sm font-bold text-white">{etf.ter.toFixed(2)}%</span>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-3 flex items-center justify-between">
-                    <span className="text-xs text-gray-400">실부담비용</span>
-                    <span className="text-sm font-bold text-white">{(etf.ter * 1.15).toFixed(2)}%</span>
-                  </CardContent>
-                </Card>
+          {/* 투자정보 - 작은 카드 형태 */}
+          <div>
+            <div className="text-xs text-gray-500 mb-3 px-1">투자정보</div>
+            {/* Row 1: 순자산, 거래대금, 배당수익률 */}
+            <div className="grid grid-cols-3 gap-2 mb-2">
+              <div className="bg-[#2d2640]/50 border border-[#3d3650] rounded-lg p-3 text-center">
+                <div className="text-[10px] text-gray-500 mb-1">순자산(AUM)</div>
+                <div className="text-sm font-bold text-white">{formatCurrency(etf.aum)}</div>
               </div>
-
-              {/* 운용사, 설정일 */}
-              <div className="grid grid-cols-2 gap-2">
-                <Card>
-                  <CardContent className="p-3 flex items-center justify-between">
-                    <span className="text-xs text-gray-400">운용사</span>
-                    <span className="text-sm font-bold text-white truncate ml-2">{etf.issuer}</span>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-3 flex items-center justify-between">
-                    <span className="text-xs text-gray-400">설정일</span>
-                    <span className="text-sm font-bold text-white">{etf.listedDate}</span>
-                  </CardContent>
-                </Card>
+              <div className="bg-[#2d2640]/50 border border-[#3d3650] rounded-lg p-3 text-center">
+                <div className="text-[10px] text-gray-500 mb-1">거래대금</div>
+                <div className="text-sm font-bold text-white">{formatCurrency(etf.adtv)}</div>
               </div>
-
-              {/* 환헤지, 레버리지 */}
-              <div className="grid grid-cols-2 gap-2">
-                <Card>
-                  <CardContent className="p-3 flex items-center justify-between">
-                    <span className="text-xs text-gray-400">환헤지</span>
-                    <span className={`text-sm font-bold ${etf.isHedged ? 'text-emerald-400' : 'text-gray-500'}`}>
-                      {etf.isHedged ? 'O' : 'X'}
-                    </span>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-3 flex items-center justify-between">
-                    <span className="text-xs text-gray-400">레버리지</span>
-                    <span className={`text-sm font-bold ${etf.isLeveraged ? 'text-amber-400' : 'text-gray-500'}`}>
-                      {etf.isLeveraged ? 'O' : 'X'}
-                    </span>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* 연금저축, 과세유형 */}
-              <div className="grid grid-cols-2 gap-2">
-                <Card>
-                  <CardContent className="p-3 flex items-center justify-between">
-                    <span className="text-xs text-gray-400">연금저축</span>
-                    <span className={`text-sm font-bold ${!etf.isLeveraged && !etf.isInverse ? 'text-emerald-400' : 'text-gray-500'}`}>
-                      {!etf.isLeveraged && !etf.isInverse ? '가능' : '불가'}
-                    </span>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-3 flex items-center justify-between">
-                    <span className="text-xs text-gray-400">과세유형</span>
-                    <span className="text-sm font-bold text-white">
-                      {etf.marketClass === '해외' ? '보유기간과세' : '배당소득세'}
-                    </span>
-                  </CardContent>
-                </Card>
+              <div className="bg-[#2d2640]/50 border border-[#3d3650] rounded-lg p-3 text-center">
+                <div className="text-[10px] text-gray-500 mb-1">배당수익률</div>
+                <div className="text-sm font-bold text-white">{etf.dividendYield.toFixed(2)}%</div>
               </div>
             </div>
-          )}
+            {/* Row 2: 총보수, 운용사, 상장일 */}
+            <div className="grid grid-cols-3 gap-2 mb-2">
+              <div className="bg-[#2d2640]/50 border border-[#3d3650] rounded-lg p-3 text-center">
+                <div className="text-[10px] text-gray-500 mb-1">총보수(TER)</div>
+                <div className="text-sm font-bold text-white">{etf.ter.toFixed(2)}%</div>
+              </div>
+              <div className="bg-[#2d2640]/50 border border-[#3d3650] rounded-lg p-3 text-center">
+                <div className="text-[10px] text-gray-500 mb-1">운용사</div>
+                <div className="text-xs font-bold text-white truncate">{etf.issuer}</div>
+              </div>
+              <div className="bg-[#2d2640]/50 border border-[#3d3650] rounded-lg p-3 text-center">
+                <div className="text-[10px] text-gray-500 mb-1">상장일</div>
+                <div className="text-sm font-bold text-white">{etf.listedDate}</div>
+              </div>
+            </div>
+            {/* 자세히 보기 버튼 */}
+            <button
+              onClick={() => setShowMoreInfo(true)}
+              className="w-full flex items-center justify-end gap-1 py-2 text-sm text-gray-400 hover:text-[#d64f79] transition-colors"
+            >
+              자세히 보기
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
 
-          {/* 레버리지/인버스 경고 - 한 줄 표시 */}
-          {(etf.isLeveraged || etf.isInverse) && (
-            <Card className="border-amber-500/30 bg-amber-500/5">
-              <CardContent className="p-3">
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0" />
-                  <p className="text-xs text-amber-400">
-                    {etf.isLeveraged && '레버리지 ETF는 일별 수익률 추종, 장기 보유 시 지수와 괴리 발생 가능'}
-                    {etf.isInverse && '인버스 ETF는 역방향 수익률 추종, 장기 보유 부적합'}
-                  </p>
+                  </TabsContent>
+
+        {/* 자세히 보기 모달 */}
+        {showMoreInfo && (
+          <div className="fixed inset-0 z-[100] flex items-end justify-center bg-black/60 backdrop-blur-sm" onClick={() => setShowMoreInfo(false)}>
+            <div
+              className="bg-[#1f1a2e] border-t border-[#3d3450] rounded-t-2xl w-full max-h-[85vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* 모달 헤더 */}
+              <div className="sticky top-0 bg-[#1f1a2e] px-4 py-4 border-b border-[#3d3450] flex items-center justify-between">
+                <h3 className="text-lg font-bold text-white">{etf.shortName}</h3>
+                <button onClick={() => setShowMoreInfo(false)} className="text-gray-400 hover:text-white">
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              <div className="p-4 space-y-6">
+                {/* ETF 개요 */}
+                <div>
+                  <h4 className="text-sm font-medium text-white mb-3">ETF 개요</h4>
+                  <div className="space-y-2">
+                    <div className="flex justify-between py-1.5 border-b border-[#2d2640]">
+                      <span className="text-sm text-gray-400">운용사</span>
+                      <span className="text-sm text-white">{etf.issuer}</span>
+                    </div>
+                    <div className="flex justify-between py-1.5 border-b border-[#2d2640]">
+                      <span className="text-sm text-gray-400">상장일</span>
+                      <span className="text-sm text-white">{etf.listedDate}</span>
+                    </div>
+                    <div className="flex justify-between py-1.5 border-b border-[#2d2640]">
+                      <span className="text-sm text-gray-400">기초자산</span>
+                      <span className="text-sm text-white">{etf.assetClass}</span>
+                    </div>
+                    <div className="flex justify-between py-1.5 border-b border-[#2d2640]">
+                      <span className="text-sm text-gray-400">기초지수</span>
+                      <span className="text-sm text-white">{etf.indexProvider || '-'}</span>
+                    </div>
+                    <div className="flex justify-between py-1.5 border-b border-[#2d2640]">
+                      <span className="text-sm text-gray-400">시가총액</span>
+                      <span className="text-sm text-white">{formatCurrency(etf.aum)}</span>
+                    </div>
+                    <div className="flex justify-between py-1.5 border-b border-[#2d2640]">
+                      <span className="text-sm text-gray-400">순자산(AUM)</span>
+                      <span className="text-sm text-white">{formatCurrency(etf.aum)}</span>
+                    </div>
+                    <div className="flex justify-between py-1.5 border-b border-[#2d2640]">
+                      <span className="text-sm text-gray-400">구성종목수</span>
+                      <span className="text-sm text-white">{etf.holdings?.length || 30}종목</span>
+                    </div>
+                    <div className="flex justify-between py-1.5 border-b border-[#2d2640]">
+                      <span className="text-sm text-gray-400">레버리지</span>
+                      <span className="text-sm text-white">{etf.isLeveraged ? '2배' : '1배'}</span>
+                    </div>
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
+
+                {/* 수수료(연) */}
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <h4 className="text-sm font-medium text-white">수수료(연)</h4>
+                    <button
+                      onClick={() => setExpandedMetricInfo(expandedMetricInfo === 'fee' ? null : 'fee')}
+                      className="p-0.5"
+                    >
+                      <Info className={`h-4 w-4 transition-colors ${expandedMetricInfo === 'fee' ? 'text-[#d64f79]' : 'text-gray-500 hover:text-white'}`} />
+                    </button>
+                  </div>
+                  {/* 비용 설명 팝업 */}
+                  {expandedMetricInfo === 'fee' && (
+                    <div className="bg-[#2d2640] rounded-lg p-4 mb-3 space-y-3 text-sm">
+                      <h5 className="font-medium text-white">ETF 수수료</h5>
+                      <div>
+                        <p className="text-[#d64f79] font-medium">총보수</p>
+                        <p className="text-gray-400">= 운용보수+신탁보수+사무관리보수+지정참가회사보수</p>
+                      </div>
+                      <div>
+                        <p className="text-[#d64f79] font-medium">TER <span className="text-gray-400 font-normal">(Total Expense Ratio)</span></p>
+                        <p className="text-gray-400">= 총보수 + 기타비용*</p>
+                        <p className="text-gray-500 text-xs">*기타비용 : 지수사용료, 회계감사비, 해외보관비 등</p>
+                      </div>
+                      <div>
+                        <p className="text-[#d64f79] font-medium">실부담비용</p>
+                        <p className="text-gray-400">= TER + 매매·중개수수료*</p>
+                        <p className="text-gray-500 text-xs">*매매·중개수수료 : 자산 매매시 발생하는 증권거래비용</p>
+                      </div>
+                      <div className="pt-2 border-t border-[#3d3650] space-y-1">
+                        <p className="text-xs text-gray-500">ⓘ 총보수는 일별자료이나 TER과 실부담비용은 월별자료 (기준일 : 2026/01/30) 입니다.</p>
+                        <p className="text-xs text-gray-500">ⓘ 상장 1년 미만인 경우 매매·중개수수료가 과다하게 발생할 수 있습니다.</p>
+                      </div>
+                    </div>
+                  )}
+                  <div className="space-y-2">
+                    <div className="flex justify-between py-1.5 border-b border-[#2d2640]">
+                      <span className="text-sm text-gray-400">총보수율</span>
+                      <span className="text-sm text-white">{etf.ter.toFixed(4)}%</span>
+                    </div>
+                    <div className="flex justify-between py-1.5 border-b border-[#2d2640]">
+                      <span className="text-sm text-gray-400">TER</span>
+                      <span className="text-sm text-white">{(etf.ter * 1.1).toFixed(4)}%</span>
+                    </div>
+                    <div className="flex justify-between py-1.5 border-b border-[#2d2640]">
+                      <span className="text-sm text-gray-400">실부담비용률</span>
+                      <span className="text-sm text-white">{(etf.ter * 1.15).toFixed(4)}%</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 세금 */}
+                <div>
+                  <h4 className="text-sm font-medium text-white mb-3">세금</h4>
+                  <div className="space-y-2">
+                    <div className="flex justify-between py-1.5 border-b border-[#2d2640]">
+                      <span className="text-sm text-gray-400">증권거래</span>
+                      <span className="text-sm text-white">비과세</span>
+                    </div>
+                    <div className="flex justify-between py-1.5 border-b border-[#2d2640]">
+                      <span className="text-sm text-gray-400">매매차익</span>
+                      <span className="text-sm text-white">비과세</span>
+                    </div>
+                    <div className="flex justify-between py-1.5 border-b border-[#2d2640]">
+                      <span className="text-sm text-gray-400">현금배당</span>
+                      <span className="text-sm text-white">배당소득세 (15.4%)</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 거래정보 */}
+                <div>
+                  <h4 className="text-sm font-medium text-white mb-3">거래정보</h4>
+                  <div className="space-y-2">
+                    <div className="flex justify-between py-1.5 border-b border-[#2d2640]">
+                      <span className="text-sm text-gray-400">당일고저</span>
+                      <span className="text-sm text-white">
+                        {formatNumber(Math.round(etf.price * 0.98))} - {formatNumber(Math.round(etf.price * 1.02))}
+                      </span>
+                    </div>
+                    <div className="flex justify-between py-1.5 border-b border-[#2d2640]">
+                      <span className="text-sm text-gray-400">52주고저</span>
+                      <span className="text-sm text-white">
+                        {formatNumber(Math.round(etf.price * 0.85))} - {formatNumber(Math.round(etf.price * 1.15))}
+                      </span>
+                    </div>
+                    <div className="flex justify-between py-1.5 border-b border-[#2d2640]">
+                      <span className="text-sm text-gray-400">거래량(60일평균)</span>
+                      <span className="text-sm text-white">{formatNumber(Math.round(etf.adtv / etf.price))}주</span>
+                    </div>
+                    <div className="flex justify-between py-1.5 border-b border-[#2d2640]">
+                      <span className="text-sm text-gray-400">거래대금(60일평균)</span>
+                      <span className="text-sm text-white">{formatCurrency(etf.adtv)}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* 구성 탭 */}
         <TabsContent value="composition" className="space-y-4 mt-4">
@@ -1124,9 +1176,9 @@ export function ETFDetailPage({ etf, onBack, onTrade, onAddToCompare, onSelectET
               <div className="flex gap-2 mt-3">
                 <button
                   onClick={() => setDividendView('monthly')}
-                  className={`flex-1 py-1.5 text-xs rounded ${
+                  className={`flex-1 py-1.5 text-xs rounded font-medium ${
                     dividendView === 'monthly'
-                      ? 'bg-[#d64f79]/20 text-[#d64f79] border border-[#d64f79]'
+                      ? 'bg-[#d64f79] text-white'
                       : 'bg-[#2d2640] text-gray-400'
                   }`}
                 >
@@ -1134,9 +1186,9 @@ export function ETFDetailPage({ etf, onBack, onTrade, onAddToCompare, onSelectET
                 </button>
                 <button
                   onClick={() => setDividendView('yearly')}
-                  className={`flex-1 py-1.5 text-xs rounded ${
+                  className={`flex-1 py-1.5 text-xs rounded font-medium ${
                     dividendView === 'yearly'
-                      ? 'bg-[#d64f79]/20 text-[#d64f79] border border-[#d64f79]'
+                      ? 'bg-[#d64f79] text-white'
                       : 'bg-[#2d2640] text-gray-400'
                   }`}
                 >
@@ -1191,22 +1243,6 @@ export function ETFDetailPage({ etf, onBack, onTrade, onAddToCompare, onSelectET
                     <span>지급일</span>
                     <span className="text-right">주당 배당금</span>
                   </div>
-                  {/* 예상 다음 배당 */}
-                  {nextDividend && (
-                    <div className="grid grid-cols-3 text-sm bg-[#d64f79]/10 rounded-lg p-2 -mx-2">
-                      <div>
-                        <span className="text-[#d64f79]">{nextDividend.exDate}</span>
-                        <span className="text-[10px] ml-1 text-[#d64f79]">(예상)</span>
-                      </div>
-                      <div>
-                        <span className="text-[#d64f79]">{nextDividend.payDate}</span>
-                        <span className="text-[10px] ml-1 text-[#d64f79]">(예상)</span>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-[#d64f79] font-medium">~{formatNumber(nextDividend.amount)}원</span>
-                      </div>
-                    </div>
-                  )}
                   {/* 과거 배당 내역 - 연도별 그룹화 */}
                   {(() => {
                     const displayDividends = showAllDividends ? recentDividends : recentDividends.slice(0, 5)

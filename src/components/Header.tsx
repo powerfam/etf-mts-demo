@@ -111,39 +111,36 @@ export function Header({ onSelectETF, accountType = 'general', onStartTour, isDa
 
         <div className="flex items-center gap-1">
           {/* 돋보기 아이콘 제거 - 홈 검색 기능 활용 */}
-          <Button
-            variant="ghost"
-            size="icon"
+          <button
             onClick={() => setShowDividendCalendar(true)}
             title="분배금 캘린더"
             data-tour="dividend-calendar"
+            className="icon-btn-3d"
           >
             <CalendarDays className="h-5 w-5" />
-          </Button>
+          </button>
           {/* 알림 아이콘 임시 숨김 - "알림 아이콘 다시 보이게 해줘"로 복구
           <Button variant="ghost" size="icon" className="relative" onClick={() => setShowNotifications(true)}>
             <Bell className="h-5 w-5" />
             <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-[#d64f79]" />
           </Button>
           */}
-          <Button
-            variant="ghost"
-            size="icon"
+          <button
             onClick={() => setShowProductInfo(true)}
             title="제품 소개서"
             data-tour="product-info"
+            className="icon-btn-3d"
           >
             <FileText className="h-5 w-5" />
-          </Button>
+          </button>
           {onStartTour && (
-            <Button
-              variant="ghost"
-              size="icon"
+            <button
               onClick={onStartTour}
               title="페이지 가이드"
+              className="icon-btn-3d"
             >
               <Compass className="h-5 w-5" />
-            </Button>
+            </button>
           )}
           {onToggleTheme && (
             <ThemeSwitch isDarkMode={isDarkMode} onToggle={onToggleTheme} />

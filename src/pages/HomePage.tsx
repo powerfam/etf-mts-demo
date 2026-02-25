@@ -282,17 +282,17 @@ export function HomePage({ onSelectETF, onNavigate, onLongPressETF, onOpenSearch
               )
             }
 
-            // 나머지 버튼들 (다크모드 대응)
+            // 나머지 버튼들 - 흰색 배경
             return (
               <button
                 key={filter.id}
                 onClick={() => onOpenQuickSearch?.(filter.id)}
-                className="flex items-center gap-2 p-3 rounded-xl bg-[#2d2640] border border-[#3d3650] hover:border-[#d64f79]/50 transition-colors"
+                className="flex items-center gap-2 p-3 rounded-xl bg-white border border-gray-200 hover:border-[#d64f79]/50 transition-colors shadow-sm"
               >
-                <div className="rounded-lg bg-[#3d3650] p-2">
+                <div className="rounded-lg bg-gray-100 p-2">
                   <Icon className="h-4 w-4 text-[#d64f79]" />
                 </div>
-                <span className="text-xs text-gray-300 text-left whitespace-pre-line leading-tight">{filter.label}</span>
+                <span className="text-xs text-gray-700 text-left whitespace-pre-line leading-tight font-medium">{filter.label}</span>
               </button>
             )
           })}
@@ -374,7 +374,7 @@ export function HomePage({ onSelectETF, onNavigate, onLongPressETF, onOpenSearch
               onMouseLeave={handleLongPressEnd}
               onTouchStart={() => handleLongPressStart(etf)}
               onTouchEnd={handleLongPressEnd}
-              className="flex items-center gap-3 p-3 border-b border-[#2d2640] last:border-b-0 cursor-pointer hover:bg-[#2a2438] transition-colors select-none"
+              className="flex items-center gap-3 p-3 border-b border-[#2d2640] last:border-b-0 cursor-pointer hover:bg-[#3d3650]/50 transition-colors select-none"
             >
               {/* ETF 뱃지 */}
               <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#2d2640] text-[10px] text-gray-400 font-medium">
@@ -495,7 +495,7 @@ export function HomePage({ onSelectETF, onNavigate, onLongPressETF, onOpenSearch
           <h2 className="text-base font-semibold text-white">구성종목 검색 TOP10</h2>
           <button
             onClick={() => setShowConstituentModal(true)}
-            className="flex items-center justify-center w-6 h-6 rounded-full bg-[#d64f79]/20 text-[#d64f79]"
+            className="flex items-center justify-center w-6 h-6 rounded-full bg-[#d64f79] text-white"
           >
             <Search className="h-3.5 w-3.5" />
           </button>

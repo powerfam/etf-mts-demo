@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react'
-import { ChevronLeft, ChevronDown, Filter, ShoppingCart, Star } from 'lucide-react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
+import { ChevronLeft, ChevronDown, Filter, ShoppingCart, Star, Smartphone } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { mockETFs } from '@/data/mockData'
 import { formatNumber, formatPercent } from '@/lib/utils'
@@ -13,6 +13,7 @@ interface QuickSearchPageProps {
   compareETFs: ETF[]
   onAddToCompare: (etf: ETF) => void
   onGoToCompare: () => void
+  embedded?: boolean  // 모달이 아닌 임베디드 페이지로 렌더링
 }
 
 // 탭 메뉴 정의
@@ -26,17 +27,16 @@ const tabMenus = [
 
 // 지수 카테고리 (투자국가 / 지수 탭용)
 const indexCategories = {
-  '한국': ['KOSPI200', 'KOSDAQ150'],
-  '미국': ['S&P500', '나스닥100'],
-  '중국': ['항셍', '항셍테크'],
-  '일본': ['Nikkei225', 'Eurostoxx50'],
-  '인도': ['Nifty50'],
+  '한국': ['KOSPI200', 'KOSDAQ150', 'KRX300'],
+  '미국': ['S&P500', '나스닥100', '다우존스30'],
+  '중국': ['CSI300', '항셍테크'],
+  '유럽': ['유로스탁스50', 'MSCI선진국'],
 }
 
-// 섹터 카테고리
+// 섹터 카테고리 (실제 ETF 데이터 기반)
 const sectorCategories = [
-  '반도체', '2차전지', '바이오', '금융', '에너지', '소비재',
-  '산업재', '유틸리티', 'IT', '통신', '헬스케어', '소재'
+  '반도체/AI', '2차전지', '바이오/헬스케어', '금융',
+  '게임/엔터', '원자재', '배당', 'ESG'
 ]
 
 // 정렬 옵션
@@ -97,13 +97,20 @@ export function QuickSearchPage({
   initialTab = 'index',
   compareETFs,
   onAddToCompare,
-  onGoToCompare
+  onGoToCompare,
+  embedded = false
 }: QuickSearchPageProps) {
   // 탭 상태
   const [activeTab, setActiveTab] = useState(initialTab)
+
+  // initialTab 변경 시 activeTab 동기화
+  useEffect(() => {
+    setActiveTab(initialTab)
+  }, [initialTab])
+
   // 선택된 지수/섹터
-  const [selectedIndex, setSelectedIndex] = useState('KOSDAQ150')
-  const [selectedSector, setSelectedSector] = useState('반도체')
+  const [selectedIndex, setSelectedIndex] = useState('KOSPI200')
+  const [selectedSector, setSelectedSector] = useState('반도체/AI')
   // 뷰 모드 (요약/상세) - 디폴트: 요약
   const [viewMode, setViewMode] = useState<'summary' | 'detail'>('summary')
   // 상세 탭
@@ -124,30 +131,57 @@ export function QuickSearchPage({
 
     switch (activeTab) {
       case 'parking':
-        // 단기자금/파킹형 ETF (머니마켓, CD금리, 단기채)
-        results = results.filter(etf =>
-          etf.shortName.includes('머니마켓') ||
-          etf.shortName.includes('CD금리') ||
-          etf.shortName.includes('KOFR') ||
-          etf.shortName.includes('단기') ||
-          etf.shortName.includes('파킹') ||
-          etf.category === '채권'
-        )
+        // 단기자금/파킹형 ETF (머니마켓, CD금리, 단기채, 국채, 통안채)
+        results = results.filter(etf => {
+          const name = etf.shortName
+          return (
+            name.includes('머니마켓') ||
+            name.includes('CD금리') ||
+            name.includes('KOFR') ||
+            name.includes('단기채') ||
+            name.includes('단기통안') ||
+            name.includes('국채') ||
+            name.includes('국고채') ||
+            (etf.category === '채권' && !name.includes('혼합'))
+          )
+        })
         break
       case 'country':
-        // 투자국가별
+        // 투자국가별 (레버리지/인버스 제외)
         results = results.filter(etf => {
+          if (etf.isLeveraged || etf.isInverse) return false
           const name = etf.shortName.toUpperCase()
-          if (selectedIndex.includes('KOSPI') || selectedIndex.includes('KOSDAQ')) {
-            return etf.marketClass === '국내'
-          } else if (selectedIndex.includes('S&P') || selectedIndex.includes('나스닥')) {
-            return name.includes('미국') || name.includes('S&P') || name.includes('나스닥') || name.includes('NASDAQ')
-          } else if (selectedIndex.includes('항셍')) {
-            return name.includes('중국') || name.includes('차이나') || name.includes('홍콩') || name.includes('항셍')
-          } else if (selectedIndex.includes('Nikkei')) {
-            return name.includes('일본') || name.includes('NIKKEI') || name.includes('니케이')
-          } else if (selectedIndex.includes('Nifty')) {
-            return name.includes('인도') || name.includes('INDIA')
+
+          if (selectedIndex === 'KOSPI200') {
+            return (name.includes('200') || name.includes('KOSPI') || name.includes('코스피')) &&
+                   !name.includes('미국') && !name.includes('중국') && !name.includes('차이나')
+          }
+          if (selectedIndex === 'KOSDAQ150') {
+            return name.includes('코스닥') || name.includes('KOSDAQ')
+          }
+          if (selectedIndex === 'KRX300') {
+            return name.includes('KRX') || name.includes('MSCI KOREA')
+          }
+          if (selectedIndex === 'S&P500') {
+            return name.includes('미국') && (name.includes('S&P') || name.includes('500'))
+          }
+          if (selectedIndex === '나스닥100') {
+            return name.includes('미국') && (name.includes('나스닥') || name.includes('NASDAQ'))
+          }
+          if (selectedIndex === '다우존스30') {
+            return name.includes('다우')
+          }
+          if (selectedIndex === 'CSI300') {
+            return name.includes('차이나') || name.includes('CSI') || name.includes('중국')
+          }
+          if (selectedIndex === '항셍테크') {
+            return name.includes('항셍') || name.includes('홍콩')
+          }
+          if (selectedIndex === '유로스탁스50') {
+            return name.includes('유로') || name.includes('EURO')
+          }
+          if (selectedIndex === 'MSCI선진국') {
+            return name.includes('MSCI') && name.includes('선진')
           }
           return true
         })
@@ -157,39 +191,89 @@ export function QuickSearchPage({
         results = results.filter(etf => etf.isLeveraged || etf.isInverse)
         break
       case 'sector':
-        // 섹터별
+        // 섹터별 (레버리지/인버스 제외)
         results = results.filter(etf => {
-          const name = etf.shortName.toUpperCase()
+          if (etf.isLeveraged || etf.isInverse) return false
+          const name = etf.shortName
           const sector = selectedSector
-          if (sector === '반도체') return name.includes('반도체') || name.includes('AI') || name.includes('칩')
-          if (sector === '2차전지') return name.includes('2차전지') || name.includes('배터리') || name.includes('EV')
-          if (sector === '바이오') return name.includes('바이오') || name.includes('헬스') || name.includes('제약')
-          if (sector === '금융') return name.includes('금융') || name.includes('은행') || name.includes('보험')
-          if (sector === '에너지') return name.includes('에너지') || name.includes('원유') || name.includes('가스')
-          if (sector === '소비재') return name.includes('소비') || name.includes('리테일')
-          if (sector === '산업재') return name.includes('산업') || name.includes('기계') || name.includes('조선')
-          if (sector === '유틸리티') return name.includes('유틸') || name.includes('전력')
-          if (sector === 'IT') return name.includes('IT') || name.includes('테크') || name.includes('소프트')
-          if (sector === '통신') return name.includes('통신') || name.includes('미디어')
-          if (sector === '헬스케어') return name.includes('헬스') || name.includes('바이오') || name.includes('의료')
-          if (sector === '소재') return name.includes('소재') || name.includes('철강') || name.includes('화학')
+
+          if (sector === '반도체/AI') {
+            return name.includes('반도체') || name.includes('AI') ||
+                   name.includes('파운드리') || name.includes('메모리') ||
+                   name.includes('빅테크') || name.includes('로봇')
+          }
+          if (sector === '2차전지') {
+            return name.includes('2차전지') || name.includes('배터리')
+          }
+          if (sector === '바이오/헬스케어') {
+            return name.includes('바이오') || name.includes('헬스케어') ||
+                   name.includes('제약') || name.includes('비만')
+          }
+          if (sector === '금융') {
+            return name.includes('금융') || name.includes('은행') ||
+                   name.includes('보험') || name.includes('증권')
+          }
+          if (sector === '게임/엔터') {
+            return name.includes('게임') || name.includes('메타버스') ||
+                   name.includes('K콘텐츠') || name.includes('엔터')
+          }
+          if (sector === '원자재') {
+            return name.includes('골드') || name.includes('금') ||
+                   name.includes('WTI') || name.includes('원유') ||
+                   name.includes('구리') || name.includes('농산물') ||
+                   etf.category === '원자재'
+          }
+          if (sector === '배당') {
+            return name.includes('배당') || name.includes('커버드콜') ||
+                   name.includes('인컴') || name.includes('리츠') ||
+                   etf.category === '배당'
+          }
+          if (sector === 'ESG') {
+            return name.includes('ESG') || name.includes('신재생') ||
+                   name.includes('원자력')
+          }
           return false
         })
         break
       case 'index':
-        // 지수 추종
+        // 지수 추종 ETF (레버리지/인버스 제외)
         results = results.filter(etf => {
+          if (etf.isLeveraged || etf.isInverse) return false
           const name = etf.shortName.toUpperCase()
-          if (selectedIndex === 'KOSPI200') return name.includes('KOSPI') || name.includes('코스피') || name.includes('200')
-          if (selectedIndex === 'KOSDAQ150') return name.includes('KOSDAQ') || name.includes('코스닥') || name.includes('150')
-          if (selectedIndex === 'S&P500') return name.includes('S&P') || name.includes('500')
-          if (selectedIndex === '나스닥100') return name.includes('나스닥') || name.includes('NASDAQ') || name.includes('100')
-          if (selectedIndex === '항셍') return name.includes('항셍') || name.includes('홍콩')
-          if (selectedIndex === '항셍테크') return name.includes('항셍') && name.includes('테크')
-          if (selectedIndex === 'Nikkei225') return name.includes('니케이') || name.includes('NIKKEI') || name.includes('일본')
-          if (selectedIndex === 'Eurostoxx50') return name.includes('유로') || name.includes('EURO')
-          if (selectedIndex === 'Nifty50') return name.includes('인도') || name.includes('NIFTY')
-          return true
+
+          if (selectedIndex === 'KOSPI200') {
+            return (name.includes('200') || name.includes('KOSPI') || name.includes('코스피')) &&
+                   !name.includes('미국') && !name.includes('코스닥') && !name.includes('KOSDAQ')
+          }
+          if (selectedIndex === 'KOSDAQ150') {
+            return name.includes('코스닥') || name.includes('KOSDAQ')
+          }
+          if (selectedIndex === 'KRX300') {
+            return name.includes('KRX') && !name.includes('KOSPI') && !name.includes('KOSDAQ')
+          }
+          if (selectedIndex === 'S&P500') {
+            return (name.includes('S&P') || name.includes('S&P500') || name.includes('500')) &&
+                   (name.includes('미국') || name.includes('US') || etf.tags?.some(t => t.includes('미국')))
+          }
+          if (selectedIndex === '나스닥100') {
+            return name.includes('나스닥') || name.includes('NASDAQ')
+          }
+          if (selectedIndex === '다우존스30') {
+            return name.includes('다우') || name.includes('DOW')
+          }
+          if (selectedIndex === 'CSI300') {
+            return name.includes('CSI') || name.includes('차이나') || name.includes('중국')
+          }
+          if (selectedIndex === '항셍테크') {
+            return name.includes('항셍') || name.includes('홍콩') || name.includes('HANG')
+          }
+          if (selectedIndex === '유로스탁스50') {
+            return name.includes('유로') || name.includes('EURO') || name.includes('유럽')
+          }
+          if (selectedIndex === 'MSCI선진국') {
+            return name.includes('MSCI') && (name.includes('선진') || name.includes('WORLD'))
+          }
+          return false
         })
         break
     }
@@ -231,25 +315,165 @@ export function QuickSearchPage({
     )
   }
 
+  // 가로보기 모드 (테이블만 90도 회전)
+  const [isLandscape, setIsLandscape] = useState(false)
+  // 실제 화면 방향 감지
+  const [isDeviceLandscape, setIsDeviceLandscape] = useState(
+    typeof window !== 'undefined' && window.innerWidth > window.innerHeight
+  )
+
+  // 화면 방향 변경 감지
+  useEffect(() => {
+    const handleOrientationChange = () => {
+      setIsDeviceLandscape(window.innerWidth > window.innerHeight)
+    }
+
+    window.addEventListener('resize', handleOrientationChange)
+    window.addEventListener('orientationchange', handleOrientationChange)
+
+    return () => {
+      window.removeEventListener('resize', handleOrientationChange)
+      window.removeEventListener('orientationchange', handleOrientationChange)
+    }
+  }, [])
+
+  // 닫을 때 가로보기 모드 리셋
+  const handleClose = () => {
+    setIsLandscape(false)
+    onClose()
+  }
+
   if (!isOpen) return null
 
+  // embedded 모드: 페이지 내 임베디드 / 모달 모드: 전체화면 오버레이
+  const containerClass = embedded
+    ? 'pb-20 bg-[#191322]'
+    : 'fixed inset-0 z-50 bg-[#191322]'
+
+  // 가로보기 모드일 때 전체화면 오버레이로 테이블만 표시
+  if (isLandscape) {
+    // 디바이스가 이미 가로인 경우 transform 적용하지 않음
+    const needsRotation = !isDeviceLandscape
+
+    return (
+      <div className="fixed inset-0 z-[100] bg-[#191322] flex flex-col">
+        {/* 가로보기 컨테이너 - 디바이스가 세로일 때만 90도 회전 */}
+        <div
+          className="flex-1 origin-center"
+          style={needsRotation ? {
+            transform: 'rotate(90deg)',
+            width: '100vh',
+            height: '100vw',
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            marginTop: '-50vw',
+            marginLeft: '-50vh',
+          } : {
+            width: '100%',
+            height: '100%',
+          }}
+        >
+          {/* 가로보기 헤더 */}
+          <div className="flex items-center justify-between px-4 py-2 bg-[#191322] border-b border-[#2d2640]">
+            <h1 className="text-sm font-semibold text-white">ETF 스크리닝 (가로보기)</h1>
+            <button
+              onClick={() => setIsLandscape(false)}
+              className="px-3 py-1 rounded-lg bg-[#d64f79] text-white text-xs"
+            >
+              세로로 돌아가기
+            </button>
+          </div>
+          {/* 가로보기 테이블 */}
+          <div className="flex-1 overflow-auto p-2">
+            <table className="w-full min-w-[800px] text-xs">
+              <thead className="bg-[#2d2640] sticky top-0">
+                <tr>
+                  <th className="text-left text-gray-400 font-medium px-2 py-2">종목</th>
+                  <th className="text-right text-gray-400 font-medium px-2 py-2">현재가</th>
+                  <th className="text-right text-gray-400 font-medium px-2 py-2">등락률</th>
+                  <th className="text-right text-gray-400 font-medium px-2 py-2">TER</th>
+                  <th className="text-right text-gray-400 font-medium px-2 py-2">괴리율</th>
+                  <th className="text-right text-gray-400 font-medium px-2 py-2">거래대금</th>
+                  <th className="text-right text-gray-400 font-medium px-2 py-2">AUM</th>
+                  <th className="text-right text-gray-400 font-medium px-2 py-2">배당률</th>
+                  <th className="text-right text-gray-400 font-medium px-2 py-2">건전성</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredETFs.slice(0, 30).map((etf) => (
+                  <tr
+                    key={etf.id}
+                    onClick={() => {
+                      setIsLandscape(false)
+                      onSelectETF(etf)
+                    }}
+                    className="border-b border-[#2d2640] hover:bg-[#2d2640]/30 cursor-pointer"
+                  >
+                    <td className="px-2 py-2">
+                      <div className="marquee-wrapper max-w-[120px]">
+                        <span className="marquee-text text-white">{etf.shortName}</span>
+                      </div>
+                    </td>
+                    <td className="text-right px-2 py-2 text-white">{formatNumber(etf.price)}</td>
+                    <td className={`text-right px-2 py-2 ${etf.changePercent >= 0 ? 'text-up' : 'text-down'}`}>
+                      {formatPercent(etf.changePercent)}
+                    </td>
+                    <td className="text-right px-2 py-2 text-white">{etf.ter.toFixed(2)}%</td>
+                    <td className={`text-right px-2 py-2 ${Math.abs(etf.discrepancy) > 0.1 ? 'text-yellow-400' : 'text-white'}`}>
+                      {etf.discrepancy.toFixed(2)}%
+                    </td>
+                    <td className="text-right px-2 py-2 text-white">{(etf.adtv / 100000000).toFixed(0)}억</td>
+                    <td className="text-right px-2 py-2 text-white">{(etf.aum / 100000000).toFixed(0)}억</td>
+                    <td className="text-right px-2 py-2 text-white">{etf.dividendYield.toFixed(1)}%</td>
+                    <td className="text-right px-2 py-2">
+                      <span className={`px-1.5 py-0.5 rounded text-[10px] ${
+                        etf.healthScore >= 85 ? 'bg-green-500/20 text-green-400' :
+                        etf.healthScore >= 70 ? 'bg-yellow-500/20 text-yellow-400' :
+                        'bg-red-500/20 text-red-400'
+                      }`}>
+                        {etf.healthScore}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="fixed inset-0 z-50 bg-[#191322]">
+    <div className={containerClass}>
       {/* 헤더 */}
-      <div className="sticky top-0 bg-[#191322] border-b border-[#2d2640] z-10">
+      <div className={`${embedded ? '' : 'sticky top-0'} bg-[#191322] border-b border-[#2d2640] z-10`}>
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
-            <button onClick={onClose}>
-              <ChevronLeft className="h-6 w-6 text-white" />
-            </button>
+            {!embedded && (
+              <button onClick={handleClose}>
+                <ChevronLeft className="h-6 w-6 text-white" />
+              </button>
+            )}
             <h1 className="text-lg font-semibold text-white">ETF 빠른검색</h1>
           </div>
-          <button
-            onClick={() => setShowFilterModal(true)}
-            className="p-2 rounded-lg bg-[#2d2640] text-white"
-          >
-            <Filter className="h-5 w-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            {/* 가로보기 버튼 */}
+            <button
+              onClick={() => setIsLandscape(true)}
+              className="icon-btn-3d"
+              title="가로보기 (테이블 회전)"
+            >
+              <Smartphone className={`h-5 w-5 ${isLandscape ? 'rotate-90' : ''} transition-transform`} />
+            </button>
+            <button
+              onClick={() => setShowFilterModal(true)}
+              className="icon-btn-3d"
+            >
+              <Filter className="h-5 w-5" />
+            </button>
+          </div>
         </div>
 
         {/* 탭 메뉴 */}
@@ -363,10 +587,10 @@ export function QuickSearchPage({
                   className="flex-1 text-left"
                 >
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#2d2640] text-gray-400">
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#2d2640] text-gray-400 shrink-0">
                       ETF
                     </span>
-                    <span className="text-sm text-white truncate">{etf.shortName}</span>
+                    <span className="text-sm text-white truncate max-w-[180px]">{etf.shortName}</span>
                   </div>
                   <div className="flex items-center gap-3 mt-1">
                     <span className="text-xs text-gray-500">{formatNumber(etf.price)}원</span>
@@ -378,18 +602,14 @@ export function QuickSearchPage({
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => onAddToCompare(etf)}
-                    className={`p-2 rounded-lg transition-colors ${
-                      isInCompare(etf.id) ? 'bg-[#d64f79] text-white' : 'bg-[#2d2640] text-gray-400'
-                    }`}
+                    className={`icon-btn-3d ${isInCompare(etf.id) ? 'icon-btn-3d-active' : ''}`}
                     disabled={compareETFs.length >= 3 && !isInCompare(etf.id)}
                   >
                     <ShoppingCart className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => toggleFavorite(etf.id)}
-                    className={`p-2 rounded-lg transition-colors ${
-                      favorites.includes(etf.id) ? 'text-yellow-400' : 'text-gray-500'
-                    }`}
+                    className={`icon-btn-3d ${favorites.includes(etf.id) ? 'icon-btn-3d-active' : ''}`}
                   >
                     <Star className={`h-4 w-4 ${favorites.includes(etf.id) ? 'fill-current' : ''}`} />
                   </button>
@@ -450,7 +670,9 @@ export function QuickSearchPage({
                           onClick={() => onSelectETF(etf)}
                           className="text-left"
                         >
-                          <div className="text-sm text-white truncate max-w-[140px]">{etf.shortName}</div>
+                          <div className="marquee-wrapper max-w-[140px]">
+                            <span className="marquee-text text-sm text-white">{etf.shortName}</span>
+                          </div>
                         </button>
                       </td>
                       {detailTab === 'basic' && (
@@ -514,9 +736,7 @@ export function QuickSearchPage({
                       <td className="text-center px-2 py-3">
                         <button
                           onClick={() => onAddToCompare(etf)}
-                          className={`p-1.5 rounded transition-colors ${
-                            isInCompare(etf.id) ? 'bg-[#d64f79] text-white' : 'text-gray-500 hover:text-white'
-                          }`}
+                          className={`icon-btn-3d ${isInCompare(etf.id) ? 'icon-btn-3d-active' : ''}`}
                           disabled={compareETFs.length >= 3 && !isInCompare(etf.id)}
                         >
                           <ShoppingCart className="h-4 w-4" />
@@ -525,9 +745,7 @@ export function QuickSearchPage({
                       <td className="text-center px-2 py-3">
                         <button
                           onClick={() => toggleFavorite(etf.id)}
-                          className={`p-1.5 rounded transition-colors ${
-                            favorites.includes(etf.id) ? 'text-yellow-400' : 'text-gray-500 hover:text-white'
-                          }`}
+                          className={`icon-btn-3d ${favorites.includes(etf.id) ? 'icon-btn-3d-active' : ''}`}
                         >
                           <Star className={`h-4 w-4 ${favorites.includes(etf.id) ? 'fill-current' : ''}`} />
                         </button>

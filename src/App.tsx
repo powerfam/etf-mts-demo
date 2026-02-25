@@ -5,7 +5,7 @@ import { BottomNav } from './components/BottomNav'
 import { CompareSlot } from './components/CompareSlot'
 import { OnboardingTour } from './components/OnboardingTour'
 import { HomePage } from './pages/HomePage'
-// import { DiscoverPage } from './pages/DiscoverPage' // 탐색 메뉴 숨김
+import { DiscoverPage } from './pages/DiscoverPage'
 import { ETFDetailPage } from './pages/ETFDetailPage'
 import { TradePage } from './pages/TradePage'
 // import { PortfolioPage } from './pages/PortfolioPage' // 보유 기능 숨김
@@ -263,17 +263,14 @@ function App() {
         />
       )}
 
-      {/* 탐색 페이지 임시 숨김 - 검색 기능으로 대체
-      {activeTab === 'discover' && (
+      {/* 스크리닝 페이지 (기존 DiscoverPage 활용) */}
+      {activeTab === 'screening' && (
         <DiscoverPage
           onSelectETF={handleSelectETF}
           accountType={accountType}
-          selectedTheme={selectedTheme}
-          onThemeChange={setSelectedTheme}
           onLongPressETF={handleAddToCompare}
         />
       )}
-      */}
 
       {activeTab === 'compare' && (
         <ComparePage

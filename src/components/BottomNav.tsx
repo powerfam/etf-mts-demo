@@ -1,5 +1,5 @@
-import { Home, GitCompare, BookOpen } from 'lucide-react'
-// import { Search, Briefcase } from 'lucide-react' // 탐색, 보유 탭 숨김으로 미사용
+import { Home, Search, GitCompare, BookOpen } from 'lucide-react'
+// import { Briefcase } from 'lucide-react' // 보유 탭 숨김으로 미사용
 import { cn } from '@/lib/utils'
 
 interface BottomNavProps {
@@ -9,7 +9,7 @@ interface BottomNavProps {
 
 const navItems = [
   { id: 'home', label: '홈', icon: Home },
-  // { id: 'discover', label: '탐색', icon: Search }, // 임시 숨김 - 검색 기능으로 대체
+  { id: 'screening', label: '스크리닝', icon: Search },
   { id: 'compare', label: '비교', icon: GitCompare },
   { id: 'investinfo', label: '투자정보', icon: BookOpen },
   // { id: 'portfolio', label: '보유', icon: Briefcase }, // 임시 숨김 - "보유 기능 다시 보이게 해줘"로 복구
@@ -27,12 +27,14 @@ export function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
               key={item.id}
               onClick={() => onTabChange(item.id)}
               className={cn(
-                'flex flex-col items-center gap-1 px-4 py-2 rounded-lg transition-colors',
-                isActive ? 'text-[#d64f79]' : 'text-gray-500 hover:text-gray-300'
+                'nav-btn-3d',
+                isActive && 'nav-btn-3d-active'
               )}
             >
-              <Icon className={cn('h-5 w-5', isActive && 'drop-shadow-[0_0_8px_rgba(214,79,121,0.5)]')} />
-              <span className="text-[10px] font-medium">{item.label}</span>
+              <div className="nav-icon-wrapper">
+                <Icon />
+              </div>
+              <span className="nav-label">{item.label}</span>
             </button>
           )
         })}

@@ -95,7 +95,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
               Smart Investment Platform
             </p>
             <ShinyText
-              text="Everything ETF Trading"
+              text="All that ETF"
               className="text-4xl font-bold tracking-tight"
               color="#9ca3af"
               shineColor="#d64f79"
@@ -136,7 +136,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
               Smart Investment Platform
             </p>
             <ShinyText
-              text="Everything ETF Trading"
+              text="All that ETF"
               className="text-xl font-bold tracking-tight"
               color="#9ca3af"
               shineColor="#d64f79"
@@ -149,7 +149,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
 
       {/* Mobile: Bottom Login Form / Desktop: Left Side */}
       <div className="order-2 lg:order-1 w-full lg:w-1/2 flex items-center justify-center p-4 py-8 lg:p-8 relative z-10 flex-shrink-0">
-        <Card className="w-full max-w-sm bg-[#1f1a2e]/95 border-[#2d2640] backdrop-blur-sm">
+        <Card className="w-full max-w-sm bg-[#1f1a2e]/95 border-none backdrop-blur-sm">
           <CardHeader className="text-center space-y-2 pb-4">
             <div className="mx-auto w-12 h-12 lg:w-16 lg:h-16 bg-[#d64f79]/20 rounded-full flex items-center justify-center mb-2">
               <Lock className="w-6 h-6 lg:w-8 lg:h-8 text-[#d64f79]" />
