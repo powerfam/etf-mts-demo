@@ -50,7 +50,7 @@ src/
 │   │   ├── dialog.tsx
 │   │   └── ...
 │   ├── Header.tsx           # 상단 헤더 (계좌 타입 선택, 검색, 알림, 분배금 캘린더)
-│   ├── BottomNav.tsx        # 하단 네비게이션 (홈/탐색/투자정보/비교/보유)
+│   ├── BottomNav.tsx        # 하단 네비게이션 (홈/탐색/투자정보/비교) - 보유 탭 숨김
 │   ├── FloatingChatbot.tsx  # 전역 플로팅 챗봇 (검색 기능 포함)
 │   ├── DividendCalendar.tsx # 분배금 캘린더 모달 컴포넌트
 │   └── ETFCard.tsx          # ETF 정보 카드 컴포넌트
@@ -123,13 +123,16 @@ docs/                        # 프로젝트 문서
 
 ### 3. ETF 상세 화면 (ETFDetailPage)
 
-- 가격 차트 (스파크라인)
-- 건전성 점수 (Health Score)
+- **헤더**: 티커 코드 중앙 정렬, 종목명 중앙 정렬
+- **랭킹 배지**: "어제 ETF 조회수 N위" (거래대금 기준 TOP 10)
+- **가격 정보**: 현재가, 등락률, iNAV, 괴리율
+- **차트**: 라인/캔들 차트 토글 (단일 버튼)
+- **스와이프 네비게이션**: 좌우 스와이프로 다른 종목 전환
+- **탭 메뉴**: 개요, 구성, 배당, 지표모니터, 키움인사이트
+- **하단 버튼**: "비교하러가기", "주문하러가기"
 - ETF 분류 배지: 국내/해외 + 자산분류
 - 상품 개요, 지수 설명, 운용 전략
 - TER, 괴리율, 스프레드, 거래대금 지표
-- 배당수익률, 변동성, 추적오차
-- 매수/매도 버튼
 
 ### 4. 투자정보 화면 (InvestInfoPage)
 
@@ -147,7 +150,9 @@ docs/                        # 프로젝트 문서
 - **롱프레스 추가**: ETF 카드 길게 눌러 비교 슬롯에 담기
 - 주문 버튼 제거됨 (비교 전용)
 
-### 6. 보유현황 화면 (PortfolioPage)
+### 6. 보유현황 화면 (PortfolioPage) - **현재 숨김 처리됨**
+
+> **복구 방법**: "보유 기능 다시 보이게 해줘"
 
 - **계좌 선택 드롭다운**: 일반/연금/ISA 계좌 간 전환
 - **계좌별 보유 ETF**: 계좌 타입에 따라 다른 종목/평가금액 표시
@@ -166,7 +171,9 @@ docs/                        # 프로젝트 문서
   - 탭하면 분배금 캘린더 모달 오픈
 - **보유 종목 리스트**: 전체/수익/손실 필터링
 
-### 7. 전역 플로팅 챗봇 (FloatingChatbot)
+### 7. 전역 플로팅 챗봇 (FloatingChatbot) - **현재 숨김 처리됨**
+
+> **복구 방법**: "챗봇 버튼 다시 보이게 해줘"
 
 - 모든 페이지에서 접근 가능 (투자정보 페이지 제외 - 자체 챗봇 있음)
 - ETF 관련 질문 검색 기능
@@ -195,9 +202,19 @@ docs/                        # 프로젝트 문서
 
 ## UI/UX 특징
 
+### 테마 시스템 (다크/라이트 모드)
+
+- **테마 토글**: 헤더 우측 3D 입체감 스위치 버튼
+- **다크 테마** (기본값): 배경 `#191322`, 카드 `#1f1a2e`, 보더 `#2d2640`
+- **라이트 테마**: 배경 `#f8f9fa`, 카드 `#ffffff`, 보더 `#e5e7eb`
+- **테마 저장**: localStorage에 저장하여 새로고침 후에도 유지
+- **구현 파일**:
+  - `src/contexts/ThemeContext.tsx` - 전역 테마 상태 관리
+  - `src/components/ui/switch.tsx` - 3D 입체감 토글 스위치
+  - `src/index.css` - `.light-mode` 클래스 기반 스타일
+
 ### 디자인 시스템
 
-- **다크 테마**: 배경 `#191322`, 카드 `#1f1a2e`, 보더 `#2d2640`
 - **메인 컬러**: 핑크 `#d64f79`
 - **상승/하락**: 빨강 `text-up` / 파랑 `text-down`
 - **폰트**: Pretendard (웹폰트)
@@ -335,13 +352,13 @@ getAccountTypesForETF(etfId: string): string[]
 
 ## 네비게이션
 
-| Tab | 라벨 | 아이콘 | 페이지 |
-|-----|------|--------|--------|
-| home | 홈 | Home | HomePage |
-| discover | 탐색 | Search | DiscoverPage |
-| investinfo | 투자정보 | BookOpen | InvestInfoPage |
-| compare | 비교 | GitCompare | ComparePage |
-| portfolio | 보유 | Briefcase | PortfolioPage |
+| 순서 | Tab | 라벨 | 아이콘 | 페이지 | 상태 |
+|------|-----|------|--------|--------|------|
+| 1 | home | 홈 | Home | HomePage | 활성 |
+| 2 | discover | 탐색 | Search | DiscoverPage | 활성 |
+| 3 | compare | 비교 | GitCompare | ComparePage | 활성 |
+| 4 | investinfo | 투자정보 | BookOpen | InvestInfoPage | 활성 |
+| - | portfolio | 보유 | Briefcase | PortfolioPage | **숨김** |
 
 ---
 

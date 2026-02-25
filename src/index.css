@@ -222,6 +222,476 @@ input, textarea, select {
   animation: marquee-slow 15s linear infinite;
 }
 
-.animate-marquee-slow:hover {
+.animate-marquee-slow:hover,
+.hover\:animate-paused:hover {
   animation-play-state: paused;
+}
+
+/* Quick search filter styles */
+.quick-search-title-dark {
+  background-color: #1f1a2e !important;
+  border-color: #1f1a2e !important;
+}
+
+.quick-filter-button {
+  background-color: white !important;
+  border-color: #e5e7eb !important;
+}
+
+.quick-filter-button span {
+  color: #374151 !important;
+}
+
+/* Light mode overrides for quick filters */
+.light-mode .quick-search-title-dark {
+  background-color: #f5f5f5 !important;
+  border-color: #f5f5f5 !important;
+}
+
+.light-mode .quick-search-title-dark span {
+  color: #111827 !important;
+}
+
+/* ========================================
+   LIGHT MODE STYLES
+   ======================================== */
+
+/* Light mode CSS variables */
+.light-mode {
+  --background: 0 0% 100%;
+  --foreground: 0 0% 10%;
+  --card: 0 0% 96%;
+  --card-foreground: 0 0% 10%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 10%;
+  --muted: 0 0% 96%;
+  --muted-foreground: 0 0% 45%;
+  --border: 0 0% 90%;
+  --input: 0 0% 96%;
+  --bg-main: #ffffff;
+  --color-bg-card: #f5f5f5;
+  --color-border: #e5e7eb;
+  --color-text-primary: #111827;
+  --color-text-secondary: #6b7280;
+  --color-text-muted: #9ca3af;
+}
+
+/* Light mode base styles */
+.light-mode body {
+  background-color: #ffffff;
+  color: #111827;
+}
+
+/* Light mode scrollbar */
+.light-mode ::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+.light-mode ::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+}
+
+.light-mode ::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Light mode header */
+.light-mode header {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-color: #e5e7eb !important;
+}
+
+.light-mode header h1 {
+  color: #111827 !important;
+}
+
+.light-mode header button {
+  color: #374151 !important;
+}
+
+.light-mode header button:hover {
+  background-color: #f3f4f6 !important;
+}
+
+/* Light mode main container backgrounds */
+/* 메인 배경: 화이트, 섹션/카드: 라이트 그레이 */
+.light-mode .bg-\[\#191322\] {
+  background-color: #ffffff !important;
+}
+
+.light-mode .bg-\[\#1f1a2e\] {
+  background-color: #f5f5f5 !important;
+}
+
+.light-mode .bg-\[\#2d2640\] {
+  background-color: #eeeeee !important;
+}
+
+.light-mode .bg-\[\#2a2438\] {
+  background-color: #f5f5f5 !important;
+}
+
+.light-mode .bg-\[\#3d3650\] {
+  background-color: #e5e5e5 !important;
+}
+
+/* Light mode border colors */
+.light-mode .border-\[\#2d2640\] {
+  border-color: #e5e7eb !important;
+}
+
+.light-mode .border-\[\#3d3650\] {
+  border-color: #d1d5db !important;
+}
+
+/* Light mode text colors */
+.light-mode .text-white {
+  color: #111827 !important;
+}
+
+.light-mode .text-gray-100 {
+  color: #1f2937 !important;
+}
+
+.light-mode .text-gray-200 {
+  color: #374151 !important;
+}
+
+.light-mode .text-gray-300 {
+  color: #4b5563 !important;
+}
+
+.light-mode .text-gray-400 {
+  color: #6b7280 !important;
+}
+
+.light-mode .text-gray-500 {
+  color: #9ca3af !important;
+}
+
+.light-mode .text-gray-600 {
+  color: #4b5563 !important;
+}
+
+/* Light mode cards and containers */
+.light-mode [class*="rounded"][class*="bg-"] {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Light mode bottom navigation */
+.light-mode nav.fixed.bottom-0 {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-color: #e5e7eb !important;
+}
+
+.light-mode nav.fixed.bottom-0 button {
+  color: #6b7280 !important;
+}
+
+.light-mode nav.fixed.bottom-0 button.text-\[\#d64f79\] {
+  color: #d64f79 !important;
+}
+
+/* Light mode dialog/modal */
+.light-mode [role="dialog"] {
+  background-color: #ffffff !important;
+  border-color: #e5e7eb !important;
+}
+
+/* Light mode input fields */
+.light-mode input,
+.light-mode textarea,
+.light-mode select {
+  background-color: #f9fafb !important;
+  color: #111827 !important;
+  border-color: #d1d5db !important;
+}
+
+.light-mode input::placeholder,
+.light-mode textarea::placeholder {
+  color: #9ca3af !important;
+}
+
+/* Light mode badges */
+.light-mode .bg-\[\#d64f79\]\/10 {
+  background-color: rgba(214, 79, 121, 0.1) !important;
+}
+
+.light-mode .bg-\[\#d64f79\]\/20 {
+  background-color: rgba(214, 79, 121, 0.15) !important;
+}
+
+/* Light mode hover states */
+.light-mode .hover\:bg-\[\#2d2640\]:hover {
+  background-color: #f1f5f9 !important;
+}
+
+.light-mode .hover\:bg-\[\#3d3650\]:hover {
+  background-color: #e2e8f0 !important;
+}
+
+/* Light mode chart backgrounds */
+.light-mode .recharts-wrapper {
+  background-color: transparent !important;
+}
+
+/* Light mode table/list items */
+.light-mode tr:hover {
+  background-color: #f9fafb !important;
+}
+
+/* Light mode tabs */
+.light-mode [role="tablist"] {
+  background-color: #e5e7eb !important;
+}
+
+.light-mode [role="tab"] {
+  color: #6b7280 !important;
+  background-color: transparent !important;
+}
+
+.light-mode [role="tab"][data-state="active"] {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+  font-weight: 600 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.light-mode [role="tab"][data-state="inactive"] {
+  background-color: transparent !important;
+  color: #6b7280 !important;
+}
+
+/* Light mode specific component overrides */
+.light-mode .bg-gradient-to-r.from-\[\#191322\] {
+  background: linear-gradient(to right, rgba(248, 249, 250, 0.9), rgba(248, 249, 250, 0)) !important;
+}
+
+.light-mode .bg-gradient-to-l.from-\[\#191322\] {
+  background: linear-gradient(to left, rgba(248, 249, 250, 0.9), rgba(248, 249, 250, 0)) !important;
+}
+
+/* Light mode compare slot */
+.light-mode .fixed.bottom-20 {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-color: #e5e7eb !important;
+}
+
+/* Light mode shimmer effect adjustment */
+.light-mode .animate-shimmer {
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%) !important;
+}
+
+/* Keep primary accent colors */
+.light-mode .text-\[\#d64f79\] {
+  color: #d64f79 !important;
+}
+
+.light-mode .bg-\[\#d64f79\] {
+  background-color: #d64f79 !important;
+}
+
+.light-mode .border-\[\#d64f79\] {
+  border-color: #d64f79 !important;
+}
+
+/* Keep up/down colors consistent */
+.light-mode .text-up,
+.light-mode .text-\[\#d64f79\] {
+  color: #d64f79 !important;
+}
+
+.light-mode .text-down,
+.light-mode .text-\[\#796ec2\] {
+  color: #796ec2 !important;
+}
+
+/* Light mode buttons */
+.light-mode button[class*="bg-\[\#d64f79\]"] {
+  background-color: #d64f79 !important;
+  color: #ffffff !important;
+}
+
+.light-mode button[class*="border-\[\#d64f79\]"] {
+  border-color: #d64f79 !important;
+  color: #d64f79 !important;
+}
+
+/* Light mode for slider/toggle components */
+.light-mode .bg-\[\#796ec2\] {
+  background-color: #796ec2 !important;
+}
+
+/* ========================================
+   LIGHT MODE - ADDITIONAL FIXES
+   ======================================== */
+
+/* 1. 검색창 배경 수정 */
+.light-mode .bg-\[\#2d2640\]\/80 {
+  background-color: rgba(241, 245, 249, 0.9) !important;
+}
+
+.light-mode .bg-\[\#2d2640\]\/50 {
+  background-color: rgba(241, 245, 249, 0.7) !important;
+}
+
+.light-mode .bg-\[\#2d2640\]\/30 {
+  background-color: rgba(241, 245, 249, 0.5) !important;
+}
+
+/* 2. 레이더 차트 라벨 가시성 개선 */
+.light-mode .recharts-polar-angle-axis-tick-value {
+  fill: #374151 !important;
+  font-weight: 500 !important;
+}
+
+.light-mode .recharts-polar-grid-angle line,
+.light-mode .recharts-polar-grid-concentric-circle {
+  stroke: #d1d5db !important;
+}
+
+.light-mode .recharts-text {
+  fill: #374151 !important;
+}
+
+/* 3. 비교 요약 hover 효과 수정 */
+.light-mode .hover\:bg-\[\#2d2640\]\/50:hover {
+  background-color: rgba(241, 245, 249, 0.8) !important;
+}
+
+.light-mode .hover\:bg-\[\#3d3650\]\/50:hover {
+  background-color: rgba(226, 232, 240, 0.7) !important;
+}
+
+/* 4. ETF 상세 가격 영역 그라데이션 배경 수정 */
+.light-mode .bg-gradient-to-b.from-\[\#2a1f3d\] {
+  background: linear-gradient(to bottom, #f1f5f9, #f8f9fa) !important;
+}
+
+.light-mode .from-\[\#2a1f3d\] {
+  --tw-gradient-from: #f1f5f9 !important;
+}
+
+.light-mode .to-\[\#191322\] {
+  --tw-gradient-to: #f8f9fa !important;
+}
+
+/* 5. ETF 상세 개요 카드 스타일 통일 */
+.light-mode [class*="CardContent"] {
+  background-color: #ffffff !important;
+}
+
+.light-mode .bg-\[\#2d2640\]\/50 {
+  background-color: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+}
+
+/* 카드 내 제목/라벨 텍스트 색상 강화 */
+.light-mode .text-xs.text-gray-500 {
+  color: #374151 !important;
+  font-weight: 500 !important;
+}
+
+.light-mode .text-xs.text-gray-400 {
+  color: #4b5563 !important;
+}
+
+.light-mode .text-sm.text-gray-300 {
+  color: #374151 !important;
+}
+
+.light-mode .text-sm.text-gray-400 {
+  color: #4b5563 !important;
+}
+
+/* 카드 내부 값 텍스트 */
+.light-mode .text-sm.font-bold.text-white,
+.light-mode .text-sm.text-white {
+  color: #111827 !important;
+}
+
+/* 더 세부적인 카드 배경 처리 */
+.light-mode [data-slot="card"] {
+  background-color: #ffffff !important;
+  border-color: #e5e7eb !important;
+}
+
+/* 비교 페이지 테이블 hover */
+.light-mode tbody tr:hover {
+  background-color: rgba(241, 245, 249, 0.5) !important;
+}
+
+/* 비교 페이지 요약 카드 */
+.light-mode .rounded-xl.bg-\[\#2d2640\]\/30 {
+  background-color: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+}
+
+/* 지표 레인지 바 배경 */
+.light-mode .bg-\[\#352d4a\] {
+  background-color: #e2e8f0 !important;
+}
+
+/* 모달/다이얼로그 내부 검색창 */
+.light-mode [role="dialog"] .bg-\[\#2d2640\] {
+  background-color: #f1f5f9 !important;
+}
+
+.light-mode [role="dialog"] input {
+  background-color: transparent !important;
+}
+
+/* 플로팅 요소 배경 */
+.light-mode .backdrop-blur {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.light-mode .bg-\[\#191322\]\/95 {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* 하단 고정 버튼 영역 */
+.light-mode .fixed.bottom-16 {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* 탭 트리거 활성화 상태 - TabsTrigger 컴포넌트 전용 */
+.light-mode [data-state="active"][role="tab"],
+.light-mode button[data-state="active"] {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+  font-weight: 600 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.light-mode button[data-state="inactive"] {
+  background-color: transparent !important;
+  color: #6b7280 !important;
+}
+
+/* 차트 영역 배경 투명 처리 */
+.light-mode .recharts-surface {
+  background: transparent !important;
+}
+
+/* 툴팁 스타일 */
+.light-mode .recharts-tooltip-wrapper .recharts-default-tooltip {
+  background-color: #ffffff !important;
+  border-color: #e5e7eb !important;
+  color: #111827 !important;
+}
+
+/* 버튼 outline variant */
+.light-mode button[class*="border"][class*="bg-transparent"] {
+  border-color: #d1d5db !important;
+  color: #374151 !important;
+}
+
+.light-mode button[class*="border"][class*="bg-transparent"]:hover {
+  background-color: #f3f4f6 !important;
+}
+
+/* Search bar exception - 메인 배경과 동일 컬러 */
+.light-mode .search-bar-main {
+  background-color: #ffffff !important;
 }

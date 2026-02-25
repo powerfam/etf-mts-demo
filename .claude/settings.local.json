@@ -7,7 +7,9 @@
       "Bash(npx vercel --prod)",
       "Bash(npx vercel:*)",
       "Bash(npx tsc:*)",
-      "Bash(npx vite build:*)"
+      "Bash(npx vite build:*)",
+      "Bash(npm install:*)",
+      "Bash(git checkout:*)"
     ]
   }
 }

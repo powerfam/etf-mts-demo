@@ -1,5 +1,7 @@
 import { useState } from 'react'
-import { Search, Bell, Menu, FileText, ChevronDown, ChevronUp, X, AlertTriangle, TrendingDown, RefreshCw, Shield, CalendarDays, Compass } from 'lucide-react'
+import { Search, Menu, FileText, ChevronDown, ChevronUp, X, AlertTriangle, TrendingDown, RefreshCw, Shield, CalendarDays, Compass } from 'lucide-react'
+// import { Bell } from 'lucide-react' // 알림 아이콘 숨김
+import { ThemeSwitch } from './ui/switch'
 import { Button } from './ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog'
 import { DividendCalendar } from './DividendCalendar'
@@ -9,6 +11,8 @@ interface HeaderProps {
   onSelectETF?: (etf: ETF) => void
   accountType?: string
   onStartTour?: () => void
+  isDarkMode?: boolean
+  onToggleTheme?: () => void
 }
 
 // 데모 알림 데이터
@@ -72,7 +76,7 @@ function ProductInfoSection({ title, children, defaultOpen = false }: { title: s
   )
 }
 
-export function Header({ onSelectETF, accountType = 'general', onStartTour }: HeaderProps) {
+export function Header({ onSelectETF, accountType = 'general', onStartTour, isDarkMode = true, onToggleTheme }: HeaderProps) {
   const [showProductInfo, setShowProductInfo] = useState(false)
   const [showSearch, setShowSearch] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
@@ -102,13 +106,11 @@ export function Header({ onSelectETF, accountType = 'general', onStartTour }: He
           <Button variant="ghost" size="icon" className="lg:hidden">
             <Menu className="h-5 w-5" />
           </Button>
-          <h1 className="text-lg font-bold text-white">ETF</h1>
+          <h1 className="text-lg font-bold text-white">All that ETF</h1>
         </div>
 
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" onClick={() => setShowSearch(true)}>
-            <Search className="h-5 w-5" />
-          </Button>
+          {/* 돋보기 아이콘 제거 - 홈 검색 기능 활용 */}
           <Button
             variant="ghost"
             size="icon"
@@ -118,10 +120,12 @@ export function Header({ onSelectETF, accountType = 'general', onStartTour }: He
           >
             <CalendarDays className="h-5 w-5" />
           </Button>
+          {/* 알림 아이콘 임시 숨김 - "알림 아이콘 다시 보이게 해줘"로 복구
           <Button variant="ghost" size="icon" className="relative" onClick={() => setShowNotifications(true)}>
             <Bell className="h-5 w-5" />
             <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-[#d64f79]" />
           </Button>
+          */}
           <Button
             variant="ghost"
             size="icon"
@@ -140,6 +144,9 @@ export function Header({ onSelectETF, accountType = 'general', onStartTour }: He
             >
               <Compass className="h-5 w-5" />
             </Button>
+          )}
+          {onToggleTheme && (
+            <ThemeSwitch isDarkMode={isDarkMode} onToggle={onToggleTheme} />
           )}
         </div>
       </div>

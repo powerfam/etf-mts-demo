@@ -1,3 +1,13 @@
+// 수익률 정보
+export interface ETFReturns {
+  '1m': number    // 1개월 수익률 (%)
+  '3m': number    // 3개월 수익률 (%)
+  'ytd': number   // YTD 수익률 (%)
+  '1y': number    // 1년 수익률 (%)
+  '3y': number    // 3년 수익률 (%)
+  '5y': number    // 5년 수익률 (%)
+}
+
 export interface ETF {
   id: string
   ticker: string
@@ -39,6 +49,12 @@ export interface ETF {
   featureTags?: string[]   // 특징 태그 (예: ['월배당', '고배당', '성장'])
   // 배당 주기
   dividendFrequency?: 'monthly' | 'quarterly' | 'annual' | 'none'  // 월배당, 분기배당, 연배당, 무배당
+  // 스크리닝용 추가 필드
+  returns?: ETFReturns             // 기간별 수익률
+  dividendGrowth1y?: number        // 배당성장률 1Y (%)
+  componentCount?: number          // 구성종목 수
+  top10Concentration?: number      // 상위10 비중 합산 (%)
+  investRegion?: 'domestic' | 'us' | 'china' | 'japan' | 'india' | 'vietnam' | 'global' | 'europe' | 'other'  // 투자지역
 }
 
 export const themes = [
@@ -1717,7 +1733,7 @@ export const getPortfolioByAccountType = (accountType: string) => {
 // 기존 호환성 유지
 export const portfolioETFs = generalPortfolioETFs
 
-// 분배금 일정 데이터 (2026년 1월 기준)
+// 분배금 일정 데이터 (2026년 2월 기준)
 export interface DividendSchedule {
   etfId: string
   date: string // YYYY-MM-DD 형식
@@ -1726,36 +1742,58 @@ export interface DividendSchedule {
 }
 
 export const dividendSchedules: DividendSchedule[] = [
-  // 1월 16일 (오늘) - 배당/커버드콜 위주
-  { etfId: '16', date: '2026-01-16', dividendPerShare: 120, exDividendDate: '2026-01-14' }, // ACE 미국배당다우존스
-  { etfId: '62', date: '2026-01-16', dividendPerShare: 850, exDividendDate: '2026-01-14' }, // TIGER 미국나스닥100커버드콜(합성)
+  // 2월 25일 (오늘) - 배당/커버드콜 위주
+  { etfId: '16', date: '2026-02-25', dividendPerShare: 125, exDividendDate: '2026-02-23' }, // ACE 미국배당다우존스
+  { etfId: '62', date: '2026-02-25', dividendPerShare: 870, exDividendDate: '2026-02-23' }, // TIGER 미국나스닥100커버드콜(합성)
+  { etfId: '91', date: '2026-02-25', dividendPerShare: 1280, exDividendDate: '2026-02-23' }, // TIGER 미국AI빅테크10타겟데일리커버드콜
 
-  // 1월 17일
-  { etfId: '8', date: '2026-01-17', dividendPerShare: 180, exDividendDate: '2026-01-15' }, // RISE 고배당
-  { etfId: '91', date: '2026-01-17', dividendPerShare: 1250, exDividendDate: '2026-01-15' }, // TIGER 미국AI빅테크10타겟데일리커버드콜
+  // 2월 26일
+  { etfId: '8', date: '2026-02-26', dividendPerShare: 185, exDividendDate: '2026-02-24' }, // RISE 고배당
+  { etfId: '26', date: '2026-02-26', dividendPerShare: 210, exDividendDate: '2026-02-24' }, // TIGER 미국배당다우존스
 
-  // 1월 20일
-  { etfId: '26', date: '2026-01-20', dividendPerShare: 200, exDividendDate: '2026-01-16' }, // TIGER 미국배당다우존스
-  { etfId: '92', date: '2026-01-20', dividendPerShare: 1100, exDividendDate: '2026-01-16' }, // RISE 미국테크100데일리고정커버드콜
-  { etfId: '93', date: '2026-01-20', dividendPerShare: 1050, exDividendDate: '2026-01-16' }, // RISE 미국배당100데일리고정커버드콜
+  // 2월 27일
+  { etfId: '92', date: '2026-02-27', dividendPerShare: 1120, exDividendDate: '2026-02-25' }, // RISE 미국테크100데일리고정커버드콜
+  { etfId: '93', date: '2026-02-27', dividendPerShare: 1080, exDividendDate: '2026-02-25' }, // RISE 미국배당100데일리고정커버드콜
+  { etfId: '78', date: '2026-02-27', dividendPerShare: 430, exDividendDate: '2026-02-25' }, // TIGER MKF배당귀족
 
-  // 1월 22일
-  { etfId: '94', date: '2026-01-22', dividendPerShare: 130, exDividendDate: '2026-01-20' }, // RISE 미국S&P배당킹
-  { etfId: '78', date: '2026-01-22', dividendPerShare: 420, exDividendDate: '2026-01-20' }, // TIGER MKF배당귀족
+  // 2월 28일 (월말)
+  { etfId: '16', date: '2026-02-28', dividendPerShare: 128, exDividendDate: '2026-02-26' }, // ACE 미국배당다우존스 (월배당)
+  { etfId: '26', date: '2026-02-28', dividendPerShare: 208, exDividendDate: '2026-02-26' }, // TIGER 미국배당다우존스 (월배당)
+  { etfId: '41', date: '2026-02-28', dividendPerShare: 290, exDividendDate: '2026-02-26' }, // TIGER 미국S&P500배당귀족
+  { etfId: '94', date: '2026-02-28', dividendPerShare: 135, exDividendDate: '2026-02-26' }, // RISE 미국S&P배당킹
 
-  // 1월 24일
-  { etfId: '41', date: '2026-01-24', dividendPerShare: 280, exDividendDate: '2026-01-22' }, // TIGER 미국S&P500배당귀족
-  { etfId: '94', date: '2026-01-24', dividendPerShare: 320, exDividendDate: '2026-01-22' }, // RISE 미국S&P배당킹
+  // 3월 2일
+  { etfId: '27', date: '2026-03-02', dividendPerShare: 460, exDividendDate: '2026-02-27' }, // TIGER 리츠부동산인프라
+  { etfId: '29', date: '2026-03-02', dividendPerShare: 520, exDividendDate: '2026-02-27' }, // RISE 고배당
 
-  // 1월 27일
-  { etfId: '29', date: '2026-01-27', dividendPerShare: 500, exDividendDate: '2026-01-23' }, // RISE 고배당
+  // 3월 5일
+  { etfId: '62', date: '2026-03-05', dividendPerShare: 880, exDividendDate: '2026-03-03' }, // TIGER 미국나스닥100커버드콜(합성)
+  { etfId: '91', date: '2026-03-05', dividendPerShare: 1300, exDividendDate: '2026-03-03' }, // TIGER 미국AI빅테크10타겟데일리커버드콜
 
-  // 1월 29일
-  { etfId: '27', date: '2026-01-29', dividendPerShare: 450, exDividendDate: '2026-01-27' }, // TIGER 리츠부동산인프라
+  // 3월 10일
+  { etfId: '8', date: '2026-03-10', dividendPerShare: 190, exDividendDate: '2026-03-06' }, // RISE 고배당
+  { etfId: '78', date: '2026-03-10', dividendPerShare: 440, exDividendDate: '2026-03-06' }, // TIGER MKF배당귀족
 
-  // 1월 31일
-  { etfId: '16', date: '2026-01-31', dividendPerShare: 125, exDividendDate: '2026-01-29' }, // ACE 미국배당다우존스 (월배당)
-  { etfId: '26', date: '2026-01-31', dividendPerShare: 205, exDividendDate: '2026-01-29' }, // TIGER 미국배당다우존스 (월배당)
+  // 3월 13일
+  { etfId: '92', date: '2026-03-13', dividendPerShare: 1150, exDividendDate: '2026-03-11' }, // RISE 미국테크100데일리고정커버드콜
+  { etfId: '93', date: '2026-03-13', dividendPerShare: 1100, exDividendDate: '2026-03-11' }, // RISE 미국배당100데일리고정커버드콜
+
+  // 3월 17일
+  { etfId: '94', date: '2026-03-17', dividendPerShare: 340, exDividendDate: '2026-03-13' }, // RISE 미국S&P배당킹
+  { etfId: '41', date: '2026-03-17', dividendPerShare: 300, exDividendDate: '2026-03-13' }, // TIGER 미국S&P500배당귀족
+
+  // 3월 20일
+  { etfId: '16', date: '2026-03-20', dividendPerShare: 130, exDividendDate: '2026-03-18' }, // ACE 미국배당다우존스
+  { etfId: '26', date: '2026-03-20', dividendPerShare: 215, exDividendDate: '2026-03-18' }, // TIGER 미국배당다우존스
+
+  // 3월 27일
+  { etfId: '27', date: '2026-03-27', dividendPerShare: 470, exDividendDate: '2026-03-25' }, // TIGER 리츠부동산인프라
+
+  // 3월 31일 (월말)
+  { etfId: '16', date: '2026-03-31', dividendPerShare: 132, exDividendDate: '2026-03-27' }, // ACE 미국배당다우존스 (월배당)
+  { etfId: '26', date: '2026-03-31', dividendPerShare: 220, exDividendDate: '2026-03-27' }, // TIGER 미국배당다우존스 (월배당)
+  { etfId: '62', date: '2026-03-31', dividendPerShare: 900, exDividendDate: '2026-03-27' }, // TIGER 미국나스닥100커버드콜(합성)
+  { etfId: '91', date: '2026-03-31', dividendPerShare: 1350, exDividendDate: '2026-03-27' }, // TIGER 미국AI빅테크10타겟데일리커버드콜
 ]
 
 // 특정 날짜의 분배금 ETF 목록 가져오기

@@ -1,4 +1,5 @@
-import { Home, Search, GitCompare, Briefcase, BookOpen } from 'lucide-react'
+import { Home, GitCompare, BookOpen } from 'lucide-react'
+// import { Search, Briefcase } from 'lucide-react' // 탐색, 보유 탭 숨김으로 미사용
 import { cn } from '@/lib/utils'
 
 interface BottomNavProps {
@@ -8,10 +9,10 @@ interface BottomNavProps {
 
 const navItems = [
   { id: 'home', label: '홈', icon: Home },
-  { id: 'discover', label: '탐색', icon: Search },
-  { id: 'investinfo', label: '투자정보', icon: BookOpen },
+  // { id: 'discover', label: '탐색', icon: Search }, // 임시 숨김 - 검색 기능으로 대체
   { id: 'compare', label: '비교', icon: GitCompare },
-  { id: 'portfolio', label: '보유', icon: Briefcase },
+  { id: 'investinfo', label: '투자정보', icon: BookOpen },
+  // { id: 'portfolio', label: '보유', icon: Briefcase }, // 임시 숨김 - "보유 기능 다시 보이게 해줘"로 복구
 ]
 
 export function BottomNav({ activeTab, onTabChange }: BottomNavProps) {

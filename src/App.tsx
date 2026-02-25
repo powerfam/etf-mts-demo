@@ -5,15 +5,18 @@ import { BottomNav } from './components/BottomNav'
 import { CompareSlot } from './components/CompareSlot'
 import { OnboardingTour } from './components/OnboardingTour'
 import { HomePage } from './pages/HomePage'
-import { DiscoverPage } from './pages/DiscoverPage'
+// import { DiscoverPage } from './pages/DiscoverPage' // 탐색 메뉴 숨김
 import { ETFDetailPage } from './pages/ETFDetailPage'
 import { TradePage } from './pages/TradePage'
-import { PortfolioPage } from './pages/PortfolioPage'
+// import { PortfolioPage } from './pages/PortfolioPage' // 보유 기능 숨김
 import { ComparePage } from './pages/ComparePage'
 import { InvestInfoPage } from './pages/InvestInfoPage'
 import { InvestInfoDetailPage } from './pages/InvestInfoDetailPage'
 import { LoginPage } from './pages/LoginPage'
-import type { ETF } from './data/mockData'
+import { SearchPage } from './pages/SearchPage'
+import { QuickSearchPage } from './pages/QuickSearchPage'
+import { ThemeProvider, useTheme } from './contexts/ThemeContext'
+import { mockETFs, type ETF } from './data/mockData'
 import type { InvestContent } from './data/investInfoData'
 import { tourStepsByPage } from './data/tourSteps'
 
@@ -29,16 +32,27 @@ function App() {
   const [selectedContent, setSelectedContent] = useState<InvestContent | null>(null)
   const [showContentDetail, setShowContentDetail] = useState(false)
   const [isChatbotOpen, setIsChatbotOpen] = useState(false)
+  const [showSearch, setShowSearch] = useState(false)
+  const [showQuickSearch, setShowQuickSearch] = useState(false)
+  const [quickSearchTab, setQuickSearchTab] = useState('index')
 
-  // 탐색 페이지 필터 상태 (기본값: 'none' - 아무것도 선택되지 않음)
-  const [selectedTheme, setSelectedTheme] = useState<string>('none')
+  // 탐색 페이지 필터 상태 (기본값: 'none' - 아무것도 선택되지 않음) - 탐색 메뉴 숨김으로 미사용
+  // const [selectedTheme, setSelectedTheme] = useState<string>('none')
 
   // 비교 ETF 목록 (최대 4개)
   const [compareETFs, setCompareETFs] = useState<ETF[]>([])
 
+  // 스와이프 네비게이션용 ETF 목록 (기본값: 전체 ETF 목록 중 상위 20개)
+  const [etfNavigationList, setEtfNavigationList] = useState<ETF[]>(() =>
+    mockETFs.slice(0, 20)
+  )
+
   // 온보딩 투어 상태
   const [showTour, setShowTour] = useState(false)
   const [tourType, setTourType] = useState<string>('welcome')
+
+  // 테마 컨텍스트 사용
+  const { isDarkMode, toggleTheme } = useTheme()
 
   // 첫 방문 시 웰컴 투어 표시
   useEffect(() => {
@@ -75,6 +89,17 @@ function App() {
   const handleSelectETF = (etf: ETF) => {
     setSelectedETF(etf)
     setShowDetail(true)
+    // 네비게이션 리스트에 없으면 맨 앞에 추가
+    setEtfNavigationList(prev => {
+      if (prev.find(e => e.id === etf.id)) return prev
+      return [etf, ...prev].slice(0, 30) // 최대 30개 유지
+    })
+  }
+
+  // 스와이프로 ETF 변경
+  const handleNavigateETF = (etf: ETF) => {
+    setSelectedETF(etf)
+    window.scrollTo(0, 0)
   }
 
   const handleTrade = () => {
@@ -91,15 +116,15 @@ function App() {
     setShowTrade(false)
   }
 
-  const handleNavigate = (tab: string, theme?: string) => {
+  const handleNavigate = (tab: string, _theme?: string) => {
     setActiveTab(tab)
     setShowDetail(false)
     setShowTrade(false)
     setShowContentDetail(false)
-    // 테마가 전달되면 탐색 페이지 필터 설정
-    if (theme) {
-      setSelectedTheme(theme)
-    }
+    // 테마 필터 설정 - 탐색 메뉴 숨김으로 미사용
+    // if (theme) {
+    //   setSelectedTheme(theme)
+    // }
     // 탭 변경 시 스크롤을 맨 위로 초기화
     window.scrollTo(0, 0)
   }
@@ -180,6 +205,7 @@ function App() {
 
   // Show ETF detail page
   if (showDetail && selectedETF) {
+    const currentIdx = etfNavigationList.findIndex(e => e.id === selectedETF.id)
     return (
       <div className="min-h-screen bg-[#191322]">
         <ETFDetailPage
@@ -189,6 +215,9 @@ function App() {
           onBack={handleBackFromDetail}
           onTrade={handleTrade}
           onAddToCompare={handleAddToCompareAndNavigate}
+          etfList={etfNavigationList}
+          currentIndex={currentIdx >= 0 ? currentIdx : 0}
+          onNavigateETF={handleNavigateETF}
         />
         <BottomNav activeTab={activeTab} onTabChange={handleNavigate} />
         {/* FloatingChatbot 임시 숨김 */}
@@ -217,7 +246,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-[#191322]">
-      <Header onSelectETF={handleSelectETF} accountType={accountType} onStartTour={() => handleStartTour(activeTab)} />
+      <Header onSelectETF={handleSelectETF} accountType={accountType} onStartTour={() => handleStartTour(activeTab)} isDarkMode={isDarkMode} onToggleTheme={toggleTheme} />
 
       {activeTab === 'home' && (
         <HomePage
@@ -226,9 +255,15 @@ function App() {
           onNavigate={handleNavigate}
           onLongPressETF={handleAddToCompare}
           onAccountTypeChange={setAccountType}
+          onOpenSearch={() => setShowSearch(true)}
+          onOpenQuickSearch={(tab: string) => {
+            setQuickSearchTab(tab)
+            setShowQuickSearch(true)
+          }}
         />
       )}
 
+      {/* 탐색 페이지 임시 숨김 - 검색 기능으로 대체
       {activeTab === 'discover' && (
         <DiscoverPage
           onSelectETF={handleSelectETF}
@@ -238,6 +273,7 @@ function App() {
           onLongPressETF={handleAddToCompare}
         />
       )}
+      */}
 
       {activeTab === 'compare' && (
         <ComparePage
@@ -255,6 +291,7 @@ function App() {
         />
       )}
 
+      {/* 보유 페이지 임시 숨김 - "보유 기능 다시 보이게 해줘"로 복구
       {activeTab === 'portfolio' && (
         <PortfolioPage
           accountType={accountType}
@@ -263,6 +300,7 @@ function App() {
           onAccountTypeChange={setAccountType}
         />
       )}
+      */}
 
       {/* 비교 슬롯 UI */}
       <CompareSlot
@@ -292,8 +330,50 @@ function App() {
         onComplete={handleTourComplete}
       />
 
+      {/* 검색 페이지 */}
+      <SearchPage
+        isOpen={showSearch}
+        onClose={() => setShowSearch(false)}
+        onSelectETF={(etf) => {
+          setShowSearch(false)
+          handleSelectETF(etf)
+        }}
+        compareETFs={compareETFs}
+        onAddToCompare={handleAddToCompare}
+        onGoToCompare={() => {
+          setShowSearch(false)
+          handleGoToCompare()
+        }}
+      />
+
+      {/* ETF 빠른검색 페이지 */}
+      <QuickSearchPage
+        isOpen={showQuickSearch}
+        onClose={() => setShowQuickSearch(false)}
+        onSelectETF={(etf) => {
+          setShowQuickSearch(false)
+          handleSelectETF(etf)
+        }}
+        initialTab={quickSearchTab}
+        compareETFs={compareETFs}
+        onAddToCompare={handleAddToCompare}
+        onGoToCompare={() => {
+          setShowQuickSearch(false)
+          handleGoToCompare()
+        }}
+      />
+
     </div>
   )
 }
 
-export default App
+// ThemeProvider로 감싼 App
+function AppWithTheme() {
+  return (
+    <ThemeProvider>
+      <App />
+    </ThemeProvider>
+  )
+}
+
+export default AppWithTheme

@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { Search, TrendingUp, Rocket, Coins, Shield, DollarSign, Gem, Zap, Wallet, Layers, SlidersHorizontal, ChevronDown } from 'lucide-react'
+import { useState, useEffect, useMemo } from 'react'
+import { Search, TrendingUp, Rocket, Coins, Shield, DollarSign, Gem, Zap, Wallet, Layers, ChevronDown, X, Filter } from 'lucide-react'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -7,9 +7,22 @@ import { Badge } from '@/components/ui/badge'
 import { ETFCard } from '@/components/ETFCard'
 import { mockETFs, themes } from '@/data/mockData'
 import type { ETF } from '@/data/mockData'
+import { ScreeningSheet, applyFilters, defaultFilters, type ScreeningFilters } from '@/components/ScreeningSheet'
 
 const iconMap: Record<string, React.ElementType> = {
   TrendingUp, Rocket, Coins, Shield, DollarSign, Gem, Zap, Wallet, Layers
+}
+
+// 필터 칩 컴포넌트
+function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }) {
+  return (
+    <div className="shrink-0 flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+      <span>{label}</span>
+      <button onClick={onRemove} className="hover:bg-[#d64f79]/30 rounded-full p-0.5">
+        <X className="h-3 w-3" />
+      </button>
+    </div>
+  )
 }
 
 interface DiscoverPageProps {
@@ -36,6 +49,8 @@ export function DiscoverPage({
   const [showAll, setShowAll] = useState<boolean>(false)
   const [pensionModeManual, setPensionModeManual] = useState<boolean>(false)
   const [marketFilter, setMarketFilter] = useState<string>('all') // 국내/해외/전체
+  const [isScreeningOpen, setIsScreeningOpen] = useState<boolean>(false)
+  const [screeningFilters, setScreeningFilters] = useState<ScreeningFilters>(defaultFilters)
 
   // 외부 테마 변경 시 내부 상태 동기화
   useEffect(() => {
@@ -52,8 +67,38 @@ export function DiscoverPage({
   const isPensionAccount = accountType === 'pension' || accountType === 'isa'
   const pensionMode = isPensionAccount || pensionModeManual
 
-  // 'none' 테마이고 검색어도 없으면 빈 리스트 표시
-  const isEmptyState = selectedTheme === 'none' && searchQuery.trim() === ''
+  // 스크리닝 필터 카운트 계산
+  const screeningFilterCount = useMemo(() => {
+    let count = 0
+    if (screeningFilters.issuers.length > 0) count++
+    if (screeningFilters.assetClasses.length > 0) count++
+    if (screeningFilters.investRegions.length > 0) count++
+    if (screeningFilters.leverageType !== 'all') count++
+    if (screeningFilters.hedgeType !== 'all') count++
+    if (screeningFilters.listingPeriod !== 'all') count++
+    if (screeningFilters.ter[0] !== defaultFilters.ter[0] || screeningFilters.ter[1] !== defaultFilters.ter[1]) count++
+    if (screeningFilters.aum[0] !== defaultFilters.aum[0] || screeningFilters.aum[1] !== defaultFilters.aum[1]) count++
+    if (screeningFilters.adtv[0] !== defaultFilters.adtv[0] || screeningFilters.adtv[1] !== defaultFilters.adtv[1]) count++
+    if (screeningFilters.discrepancy[0] !== defaultFilters.discrepancy[0] || screeningFilters.discrepancy[1] !== defaultFilters.discrepancy[1]) count++
+    if (screeningFilters.trackingError[0] !== defaultFilters.trackingError[0] || screeningFilters.trackingError[1] !== defaultFilters.trackingError[1]) count++
+    if (screeningFilters.return1m[0] !== defaultFilters.return1m[0] || screeningFilters.return1m[1] !== defaultFilters.return1m[1]) count++
+    if (screeningFilters.return3m[0] !== defaultFilters.return3m[0] || screeningFilters.return3m[1] !== defaultFilters.return3m[1]) count++
+    if (screeningFilters.returnYtd[0] !== defaultFilters.returnYtd[0] || screeningFilters.returnYtd[1] !== defaultFilters.returnYtd[1]) count++
+    if (screeningFilters.return1y[0] !== defaultFilters.return1y[0] || screeningFilters.return1y[1] !== defaultFilters.return1y[1]) count++
+    if (screeningFilters.volatility[0] !== defaultFilters.volatility[0] || screeningFilters.volatility[1] !== defaultFilters.volatility[1]) count++
+    if (screeningFilters.healthScore[0] !== defaultFilters.healthScore[0] || screeningFilters.healthScore[1] !== defaultFilters.healthScore[1]) count++
+    if (screeningFilters.dividendYield[0] !== defaultFilters.dividendYield[0] || screeningFilters.dividendYield[1] !== defaultFilters.dividendYield[1]) count++
+    if (screeningFilters.dividendFrequency.length > 0) count++
+    if (screeningFilters.componentCount[0] !== defaultFilters.componentCount[0] || screeningFilters.componentCount[1] !== defaultFilters.componentCount[1]) count++
+    if (screeningFilters.top10Concentration[0] !== defaultFilters.top10Concentration[0] || screeningFilters.top10Concentration[1] !== defaultFilters.top10Concentration[1]) count++
+    return count
+  }, [screeningFilters])
+
+  // 스크리닝 활성화 여부
+  const isScreeningActive = screeningFilterCount > 0
+
+  // 'none' 테마이고 검색어도 없고 스크리닝도 없으면 빈 리스트 표시
+  const isEmptyState = selectedTheme === 'none' && searchQuery.trim() === '' && !isScreeningActive
 
   const filteredETFs = isEmptyState ? [] : mockETFs.filter(etf => {
     const query = searchQuery.toLowerCase().trim()
@@ -83,7 +128,10 @@ export function DiscoverPage({
       (marketFilter === 'domestic' && etf.marketClass === '국내') ||
       (marketFilter === 'overseas' && etf.marketClass === '해외')
 
-    return matchesSearch && matchesTheme && matchesPensionMode && matchesMarket
+    // 스크리닝 필터 적용
+    const matchesScreening = !isScreeningActive || applyFilters(etf, screeningFilters)
+
+    return matchesSearch && matchesTheme && matchesPensionMode && matchesMarket && matchesScreening
   })
 
   // 보유고객 수 계산 (holdersCount가 없으면 AUM 기반 추정)
@@ -123,10 +171,86 @@ export function DiscoverPage({
               className="flex-1 bg-transparent text-sm text-white placeholder:text-gray-500 outline-none"
             />
           </div>
-          <Button variant="outline" size="icon">
-            <SlidersHorizontal className="h-4 w-4" />
+          <Button
+            variant={isScreeningActive ? "default" : "outline"}
+            size="icon"
+            onClick={() => setIsScreeningOpen(true)}
+            className="relative"
+          >
+            <Filter className="h-4 w-4" />
+            {screeningFilterCount > 0 && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#d64f79] text-white text-[10px] rounded-full flex items-center justify-center">
+                {screeningFilterCount}
+              </span>
+            )}
           </Button>
         </div>
+
+        {/* 적용된 스크리닝 필터 요약 칩 */}
+        {isScreeningActive && (
+          <div className="flex gap-2 mb-3 overflow-x-auto scrollbar-hide pb-1">
+            {screeningFilters.issuers.length > 0 && (
+              <FilterChip
+                label={`운용사 ${screeningFilters.issuers.length}개`}
+                onRemove={() => setScreeningFilters(prev => ({ ...prev, issuers: [] }))}
+              />
+            )}
+            {screeningFilters.assetClasses.length > 0 && (
+              <FilterChip
+                label={`자산 ${screeningFilters.assetClasses.join(', ')}`}
+                onRemove={() => setScreeningFilters(prev => ({ ...prev, assetClasses: [] }))}
+              />
+            )}
+            {screeningFilters.investRegions.length > 0 && (
+              <FilterChip
+                label={`지역 ${screeningFilters.investRegions.length}개`}
+                onRemove={() => setScreeningFilters(prev => ({ ...prev, investRegions: [] }))}
+              />
+            )}
+            {screeningFilters.leverageType !== 'all' && (
+              <FilterChip
+                label={screeningFilters.leverageType === 'normal' ? '일반만' : screeningFilters.leverageType === 'leveraged' ? '레버리지' : '인버스'}
+                onRemove={() => setScreeningFilters(prev => ({ ...prev, leverageType: 'all' }))}
+              />
+            )}
+            {(screeningFilters.ter[0] !== defaultFilters.ter[0] || screeningFilters.ter[1] !== defaultFilters.ter[1]) && (
+              <FilterChip
+                label={`TER ${screeningFilters.ter[0].toFixed(2)}~${screeningFilters.ter[1].toFixed(2)}%`}
+                onRemove={() => setScreeningFilters(prev => ({ ...prev, ter: defaultFilters.ter }))}
+              />
+            )}
+            {(screeningFilters.aum[0] !== defaultFilters.aum[0] || screeningFilters.aum[1] !== defaultFilters.aum[1]) && (
+              <FilterChip
+                label={`AUM ${screeningFilters.aum[0]}~${screeningFilters.aum[1]}억`}
+                onRemove={() => setScreeningFilters(prev => ({ ...prev, aum: defaultFilters.aum }))}
+              />
+            )}
+            {(screeningFilters.healthScore[0] !== defaultFilters.healthScore[0] || screeningFilters.healthScore[1] !== defaultFilters.healthScore[1]) && (
+              <FilterChip
+                label={`건전성 ${screeningFilters.healthScore[0]}~${screeningFilters.healthScore[1]}점`}
+                onRemove={() => setScreeningFilters(prev => ({ ...prev, healthScore: defaultFilters.healthScore }))}
+              />
+            )}
+            {(screeningFilters.dividendYield[0] !== defaultFilters.dividendYield[0] || screeningFilters.dividendYield[1] !== defaultFilters.dividendYield[1]) && (
+              <FilterChip
+                label={`배당 ${screeningFilters.dividendYield[0]}~${screeningFilters.dividendYield[1]}%`}
+                onRemove={() => setScreeningFilters(prev => ({ ...prev, dividendYield: defaultFilters.dividendYield }))}
+              />
+            )}
+            {screeningFilters.dividendFrequency.length > 0 && (
+              <FilterChip
+                label={`배당주기 ${screeningFilters.dividendFrequency.length}개`}
+                onRemove={() => setScreeningFilters(prev => ({ ...prev, dividendFrequency: [] }))}
+              />
+            )}
+            <button
+              onClick={() => setScreeningFilters(defaultFilters)}
+              className="shrink-0 px-2 py-1 text-xs text-gray-400 hover:text-white transition-colors"
+            >
+              전체 초기화
+            </button>
+          </div>
+        )}
         {/* 연금계좌 적합 상품만 */}
         <div className="flex items-center justify-between mb-2" data-tour="pension-filter">
           <span className="text-sm text-gray-400">
@@ -385,6 +509,15 @@ export function DiscoverPage({
           )}
         </div>
       )}
+
+      {/* 스크리닝 바텀시트 */}
+      <ScreeningSheet
+        isOpen={isScreeningOpen}
+        onClose={() => setIsScreeningOpen(false)}
+        filters={screeningFilters}
+        onFiltersChange={setScreeningFilters}
+        etfs={mockETFs}
+      />
     </div>
   )
 }
