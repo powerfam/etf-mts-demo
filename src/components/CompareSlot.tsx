@@ -42,11 +42,11 @@ export function CompareSlot({ compareETFs, onRemove, onClear, onGoToCompare }: C
         <div className="flex items-center justify-between">
           <button
             onClick={() => setIsMinimized(!isMinimized)}
-            className="flex items-center gap-2 text-xs text-gray-400 hover:text-white transition-colors"
+            className="flex items-center gap-2 text-[15px] text-gray-400 hover:text-white transition-colors"
           >
             <Scale className="w-3.5 h-3.5 text-[#d64f79]" />
             <span>비교 목록</span>
-            <span className="bg-[#d64f79] text-white text-[11px] px-1.5 py-0.5 rounded-full font-medium">
+            <span className="bg-[#d64f79] text-white text-[14px] px-1.5 py-0.5 rounded-full font-medium">
               {compareETFs.length}
             </span>
             {isMinimized ? (
@@ -60,7 +60,7 @@ export function CompareSlot({ compareETFs, onRemove, onClear, onGoToCompare }: C
             {!isMinimized && (
               <button
                 onClick={onClear}
-                className="text-[11px] text-gray-500 hover:text-red-400 transition-colors"
+                className="text-[14px] text-gray-500 hover:text-red-400 transition-colors"
               >
                 전체삭제
               </button>
@@ -68,7 +68,7 @@ export function CompareSlot({ compareETFs, onRemove, onClear, onGoToCompare }: C
             <button
               onClick={onGoToCompare}
               disabled={compareETFs.length < 2}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+              className={`px-3 py-1.5 rounded-lg text-[15px] font-medium transition-all ${
                 compareETFs.length >= 2
                   ? 'bg-[#d64f79] text-white hover:bg-[#e5608a] active:scale-95'
                   : 'bg-[#3d3650] text-gray-500 cursor-not-allowed'
@@ -93,11 +93,11 @@ export function CompareSlot({ compareETFs, onRemove, onClear, onGoToCompare }: C
                 title={`${etf.name} - 클릭하여 삭제`}
               >
                 {/* 순번 */}
-                <span className="flex-shrink-0 w-4 h-4 rounded-full bg-[#d64f79]/30 text-[#d64f79] text-[11px] flex items-center justify-center font-bold group-hover:bg-red-500/50 group-hover:text-white transition-colors">
+                <span className="flex-shrink-0 w-4 h-4 rounded-full bg-[#d64f79]/30 text-[#d64f79] text-[14px] flex items-center justify-center font-bold group-hover:bg-red-500/50 group-hover:text-white transition-colors">
                   {index + 1}
                 </span>
                 {/* ETF 이름 */}
-                <span className="truncate text-xs text-white font-medium group-hover:line-through group-hover:text-gray-400 transition-all">
+                <span className="truncate text-[15px] text-white font-medium group-hover:line-through group-hover:text-gray-400 transition-all">
                   {etf.shortName}
                 </span>
                 {/* X 아이콘 - 호버 시 표시 */}
@@ -105,8 +105,8 @@ export function CompareSlot({ compareETFs, onRemove, onClear, onGoToCompare }: C
 
                 {/* CSS Tooltip */}
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-[#1f1a2e] border border-[#3d3650] rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none whitespace-nowrap z-50">
-                  <p className="text-xs text-white">{etf.name}</p>
-                  <p className="text-[11px] text-gray-400">{etf.ticker} • 클릭하여 삭제</p>
+                  <p className="text-[15px] text-white">{etf.name}</p>
+                  <p className="text-[14px] text-gray-400">{etf.ticker} • 클릭하여 삭제</p>
                   <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#3d3650]" />
                 </div>
               </button>
@@ -118,7 +118,7 @@ export function CompareSlot({ compareETFs, onRemove, onClear, onGoToCompare }: C
                 key={`empty-${idx}`}
                 className="flex-shrink-0 w-10 h-8 rounded-lg border border-dashed border-[#3d3650] flex items-center justify-center"
               >
-                <span className="text-[11px] text-gray-600">{compareETFs.length + idx + 1}</span>
+                <span className="text-[14px] text-gray-600">{compareETFs.length + idx + 1}</span>
               </div>
             ))}
           </div>
@@ -130,7 +130,7 @@ export function CompareSlot({ compareETFs, onRemove, onClear, onGoToCompare }: C
             {compareETFs.slice(0, 4).map((etf) => (
               <div
                 key={etf.id}
-                className="bg-[#3d3650] rounded px-1.5 py-0.5 text-[11px] text-white truncate max-w-[60px]"
+                className="bg-[#3d3650] rounded px-1.5 py-0.5 text-[14px] text-white truncate max-w-[60px]"
               >
                 {etf.shortName.slice(0, 6)}
               </div>

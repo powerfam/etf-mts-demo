@@ -68,7 +68,7 @@ export function ETFLogo({ shortName, size = 'md', className = '' }: ETFLogoProps
 
   // 기본 ETF 뱃지 (폴백, 원형)
   return (
-    <div className={`flex items-center justify-center ${sizeClass} rounded-full bg-[#2d2640] text-[11px] text-gray-400 font-medium ${className}`}>
+    <div className={`flex items-center justify-center ${sizeClass} rounded-full bg-[#2d2640] text-[14px] text-gray-400 font-medium ${className}`}>
       ETF
     </div>
   )

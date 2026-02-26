@@ -68,10 +68,10 @@ function ProductInfoSection({ title, children, defaultOpen = false }: { title: s
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex items-center justify-between py-3 text-left"
       >
-        <span className="text-sm font-semibold text-white">{title}</span>
+        <span className="text-[17px] font-semibold text-white">{title}</span>
         {isOpen ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
       </button>
-      {isOpen && <div className="pb-4 text-sm text-gray-300">{children}</div>}
+      {isOpen && <div className="pb-4 text-[17px] text-gray-300">{children}</div>}
     </div>
   )
 }
@@ -106,7 +106,7 @@ export function Header({ onSelectETF, accountType = 'general', onStartTour, isDa
           <Button variant="ghost" size="icon" className="lg:hidden">
             <Menu className="h-5 w-5" />
           </Button>
-          <h1 className="text-lg font-bold text-white">All that ETF</h1>
+          <h1 className="text-[21px] font-bold text-white">All that ETF</h1>
         </div>
 
         <div className="flex items-center gap-1">
@@ -173,11 +173,11 @@ export function Header({ onSelectETF, accountType = 'general', onStartTour, isDa
 
         <div className="max-h-[60vh] overflow-y-auto">
           {searchQuery.trim() === '' ? (
-            <div className="p-4 text-center text-gray-500 text-sm">
+            <div className="p-4 text-center text-gray-500 text-[17px]">
               종목명 또는 티커를 입력하세요
             </div>
           ) : searchResults.length === 0 ? (
-            <div className="p-4 text-center text-gray-500 text-sm">
+            <div className="p-4 text-center text-gray-500 text-[17px]">
               검색 결과가 없습니다
             </div>
           ) : (
@@ -189,12 +189,12 @@ export function Header({ onSelectETF, accountType = 'general', onStartTour, isDa
                   className="w-full flex items-center justify-between p-3 hover:bg-[#2d2640] rounded-lg transition-colors"
                 >
                   <div className="text-left">
-                    <div className="text-sm text-white font-medium">{etf.shortName}</div>
-                    <div className="text-xs text-gray-500">{etf.ticker}</div>
+                    <div className="text-[17px] text-white font-medium">{etf.shortName}</div>
+                    <div className="text-[15px] text-gray-500">{etf.ticker}</div>
                   </div>
                   <div className="text-right">
-                    <div className="text-sm text-white">{etf.price.toLocaleString()}원</div>
-                    <div className={`text-xs ${etf.changePercent >= 0 ? 'text-[#d64f79]' : 'text-[#796ec2]'}`}>
+                    <div className="text-[17px] text-white">{etf.price.toLocaleString()}원</div>
+                    <div className={`text-[15px] ${etf.changePercent >= 0 ? 'text-[#d64f79]' : 'text-[#796ec2]'}`}>
                       {etf.changePercent >= 0 ? '+' : ''}{etf.changePercent.toFixed(2)}%
                     </div>
                   </div>
@@ -210,9 +210,9 @@ export function Header({ onSelectETF, accountType = 'general', onStartTour, isDa
     <Dialog open={showNotifications} onOpenChange={setShowNotifications}>
       <DialogContent className="max-w-md bg-[#1f1a2e] border-[#2d2640]">
         <DialogHeader>
-          <DialogTitle className="text-lg text-white flex items-center gap-2">
+          <DialogTitle className="text-[21px] text-white flex items-center gap-2">
             알림
-            <span className="text-xs bg-[#d64f79] text-white px-2 py-0.5 rounded-full">
+            <span className="text-[15px] bg-[#d64f79] text-white px-2 py-0.5 rounded-full">
               {demoNotifications.length}
             </span>
           </DialogTitle>
@@ -232,14 +232,14 @@ export function Header({ onSelectETF, accountType = 'general', onStartTour, isDa
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
-                      <span className={`text-sm font-medium ${notification.color}`}>
+                      <span className={`text-[17px] font-medium ${notification.color}`}>
                         {notification.title}
                       </span>
-                      <span className="text-[11px] text-gray-500 shrink-0">
+                      <span className="text-[14px] text-gray-500 shrink-0">
                         {notification.time}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-[15px] text-gray-400 mt-1">
                       {notification.message}
                     </p>
                   </div>
@@ -250,7 +250,7 @@ export function Header({ onSelectETF, accountType = 'general', onStartTour, isDa
         </div>
 
         <div className="pt-2 border-t border-[#2d2640]">
-          <button className="w-full text-center text-xs text-gray-500 hover:text-gray-300 py-2">
+          <button className="w-full text-center text-[15px] text-gray-500 hover:text-gray-300 py-2">
             모든 알림 지우기
           </button>
         </div>
@@ -269,9 +269,9 @@ export function Header({ onSelectETF, accountType = 'general', onStartTour, isDa
     <Dialog open={showProductInfo} onOpenChange={setShowProductInfo}>
       <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto bg-[#1f1a2e] border-[#2d2640]">
         <DialogHeader>
-          <DialogTitle className="text-xl text-white flex items-center gap-2">
+          <DialogTitle className="text-[23px] text-white flex items-center gap-2">
             ETF MTS Demo
-            <span className="text-xs bg-[#d64f79]/20 text-[#d64f79] px-2 py-0.5 rounded-full">
+            <span className="text-[15px] bg-[#d64f79]/20 text-[#d64f79] px-2 py-0.5 rounded-full">
               제품 소개
             </span>
           </DialogTitle>
@@ -280,15 +280,15 @@ export function Header({ onSelectETF, accountType = 'general', onStartTour, isDa
         <div className="space-y-2">
           {/* 핵심 가치 */}
           <div className="bg-[#2a2438] rounded-lg p-4 text-center">
-            <p className="text-[#d64f79] font-bold text-lg mb-1">"ETF 투자, 더 쉽고 안전하게"</p>
-            <p className="text-gray-400 text-sm">투명한 정보 + 쉬운 검증 + 안전한 투자</p>
+            <p className="text-[#d64f79] font-bold text-[21px] mb-1">"ETF 투자, 더 쉽고 안전하게"</p>
+            <p className="text-gray-400 text-[17px]">투명한 정보 + 쉬운 검증 + 안전한 투자</p>
           </div>
 
           {/* 왜 필요한가 */}
           <ProductInfoSection title="왜 이 서비스가 필요한가?" defaultOpen={true}>
             <div className="space-y-3">
-              <p className="text-gray-400 text-xs mb-2">개인 투자자의 고민</p>
-              <ul className="space-y-1.5 text-sm">
+              <p className="text-gray-400 text-[15px] mb-2">개인 투자자의 고민</p>
+              <ul className="space-y-1.5 text-[17px]">
                 <li className="flex items-start gap-2">
                   <span className="text-[#d64f79]">•</span>
                   "ETF가 좋다는데... 뭘 사야 하지?"
@@ -306,7 +306,7 @@ export function Header({ onSelectETF, accountType = 'general', onStartTour, isDa
                   "비슷한 ETF가 너무 많아서 뭐가 뭔지..."
                 </li>
               </ul>
-              <p className="text-gray-500 text-xs mt-3 italic">
+              <p className="text-gray-500 text-[15px] mt-3 italic">
                 * 실제 투자자 커뮤니티 및 교육 콘텐츠 댓글 분석 기반
               </p>
             </div>
@@ -317,23 +317,23 @@ export function Header({ onSelectETF, accountType = 'general', onStartTour, isDa
             <div className="space-y-4">
               <div>
                 <p className="text-white font-medium mb-1">1. 한눈에 보는 ETF 건전성</p>
-                <p className="text-gray-400 text-xs">복잡한 지표를 0~100점 단일 점수로 이해</p>
-                <p className="text-gray-400 text-xs">괴리율, 스프레드, TER, 거래대금 한눈에</p>
+                <p className="text-gray-400 text-[15px]">복잡한 지표를 0~100점 단일 점수로 이해</p>
+                <p className="text-gray-400 text-[15px]">괴리율, 스프레드, TER, 거래대금 한눈에</p>
               </div>
               <div>
                 <p className="text-white font-medium mb-1">2. 연금계좌 안전장치</p>
-                <p className="text-gray-400 text-xs">레버리지/인버스 자동 필터링</p>
-                <p className="text-gray-400 text-xs">연금적합 상품 필터로 안전한 투자</p>
+                <p className="text-gray-400 text-[15px]">레버리지/인버스 자동 필터링</p>
+                <p className="text-gray-400 text-[15px]">연금적합 상품 필터로 안전한 투자</p>
               </div>
               <div>
                 <p className="text-white font-medium mb-1">3. 쉬운 비교, 빠른 결정</p>
-                <p className="text-gray-400 text-xs">최대 4개 ETF 동시 비교</p>
-                <p className="text-gray-400 text-xs">데이터 기반 선택, 비교 시간 90% 단축</p>
+                <p className="text-gray-400 text-[15px]">최대 4개 ETF 동시 비교</p>
+                <p className="text-gray-400 text-[15px]">데이터 기반 선택, 비교 시간 90% 단축</p>
               </div>
               <div>
                 <p className="text-white font-medium mb-1">4. 투자 교육 통합</p>
-                <p className="text-gray-400 text-xs">ETF 101, 용어사전, AI 챗봇</p>
-                <p className="text-gray-400 text-xs">학습과 투자를 한 앱에서</p>
+                <p className="text-gray-400 text-[15px]">ETF 101, 용어사전, AI 챗봇</p>
+                <p className="text-gray-400 text-[15px]">학습과 투자를 한 앱에서</p>
               </div>
             </div>
           </ProductInfoSection>
@@ -341,7 +341,7 @@ export function Header({ onSelectETF, accountType = 'general', onStartTour, isDa
           {/* 회사 기대효과 */}
           <ProductInfoSection title="회사가 얻는 기대효과">
             <div className="space-y-3">
-              <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="grid grid-cols-2 gap-2 text-[15px]">
                 <div className="bg-[#2a2438] p-2 rounded">
                   <p className="text-[#d64f79] font-bold">거래 활성화</p>
                   <p className="text-gray-400">ETF 거래대금 증가</p>
@@ -359,7 +359,7 @@ export function Header({ onSelectETF, accountType = 'general', onStartTour, isDa
                   <p className="text-gray-400">투자 경험 만족도 향상</p>
                 </div>
               </div>
-              <div className="text-xs space-y-1 mt-2">
+              <div className="text-[15px] space-y-1 mt-2">
                 <p><span className="text-white">투자자 보호:</span> <span className="text-gray-400">부적합 상품 투자 방지 → 민원 감소</span></p>
                 <p><span className="text-white">정보 투명성:</span> <span className="text-gray-400">건전성 지표 공개 → 신뢰도 향상</span></p>
                 <p><span className="text-white">규제 대응:</span> <span className="text-gray-400">적합성 자동 필터 → 컴플라이언스 강화</span></p>
@@ -369,7 +369,7 @@ export function Header({ onSelectETF, accountType = 'general', onStartTour, isDa
 
           {/* 콘텐츠 기획 */}
           <ProductInfoSection title="투자정보 콘텐츠 기획 배경">
-            <div className="space-y-2 text-xs">
+            <div className="space-y-2 text-[15px]">
               <p className="text-gray-400">
                 투자정보 섹션의 ETF 101, 용어사전 콘텐츠는 실제 투자자들의 니즈를 반영하여 기획되었습니다.
               </p>
@@ -386,7 +386,7 @@ export function Header({ onSelectETF, accountType = 'general', onStartTour, isDa
 
           {/* 핵심 화면 */}
           <ProductInfoSection title="핵심 화면">
-            <div className="grid grid-cols-2 gap-2 text-xs">
+            <div className="grid grid-cols-2 gap-2 text-[15px]">
               <div>
                 <p className="text-white font-medium">홈</p>
                 <p className="text-gray-400">포트폴리오, 인기 ETF, 히트맵</p>
@@ -411,7 +411,7 @@ export function Header({ onSelectETF, accountType = 'general', onStartTour, isDa
             <p className="text-white font-bold mb-2">
               "ETF 투자의 진입장벽을 낮추고, 안전하고 현명한 투자를 돕는 MTS"
             </p>
-            <div className="flex justify-center gap-4 text-xs text-gray-400">
+            <div className="flex justify-center gap-4 text-[15px] text-gray-400">
               <span>고객: 쉬운 검증 + 안전한 투자</span>
               <span>|</span>
               <span>회사: 거래 증가 + 신뢰 강화</span>

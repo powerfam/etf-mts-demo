@@ -116,7 +116,7 @@ export function DividendCalendar({ isOpen, onClose, onSelectETF }: DividendCalen
       <DialogContent className="max-w-md h-[85vh] flex flex-col bg-[#1f1a2e] border-[#2d2640] p-0">
         {/* 헤더 - 고정 */}
         <DialogHeader className="shrink-0 p-3 pb-2 border-b border-[#2d2640]">
-          <DialogTitle className="text-base text-white flex items-center gap-2">
+          <DialogTitle className="text-[19px] text-white flex items-center gap-2">
             <Coins className="h-4 w-4 text-[#d64f79]" />
             분배금 캘린더
           </DialogTitle>
@@ -132,7 +132,7 @@ export function DividendCalendar({ isOpen, onClose, onSelectETF }: DividendCalen
             >
               <ChevronLeft className="h-4 w-4 text-gray-400" />
             </button>
-            <span className="text-white font-semibold text-sm">
+            <span className="text-white font-semibold text-[17px]">
               {currentYear}년 {monthNames[currentMonth]}
             </span>
             <button
@@ -148,7 +148,7 @@ export function DividendCalendar({ isOpen, onClose, onSelectETF }: DividendCalen
             {dayNames.map((day, index) => (
               <div
                 key={day}
-                className={`text-[11px] py-0.5 font-medium ${
+                className={`text-[14px] py-0.5 font-medium ${
                   index === 0 ? 'text-red-400' : index === 6 ? 'text-blue-400' : 'text-gray-500'
                 }`}
               >
@@ -170,7 +170,7 @@ export function DividendCalendar({ isOpen, onClose, onSelectETF }: DividendCalen
                   key={`${day.dateString}-${index}`}
                   onClick={() => handleDateClick(day.dateString)}
                   className={`
-                    relative h-8 flex flex-col items-center justify-center rounded text-xs transition-all
+                    relative h-8 flex flex-col items-center justify-center rounded text-[15px] transition-all
                     ${!day.isCurrentMonth ? 'text-gray-600' :
                       dayOfWeek === 0 ? 'text-red-400' :
                       dayOfWeek === 6 ? 'text-blue-400' : 'text-white'}
@@ -196,7 +196,7 @@ export function DividendCalendar({ isOpen, onClose, onSelectETF }: DividendCalen
         {/* 선택된 날짜의 분배금 ETF 리스트 - 나머지 공간 채움 + 스크롤 */}
         <div className="flex-1 flex flex-col min-h-0 border-t border-[#2d2640]">
           <div className="shrink-0 px-3 py-2 bg-[#2a2438]">
-            <p className="text-xs text-gray-400">
+            <p className="text-[15px] text-gray-400">
               {selectedDate.replace(/-/g, '.')} 분배금 지급
               {selectedDividends.length > 0 && (
                 <span className="ml-2 text-[#d64f79] font-medium">
@@ -208,7 +208,7 @@ export function DividendCalendar({ isOpen, onClose, onSelectETF }: DividendCalen
 
           <div className="flex-1 overflow-y-auto">
             {selectedDividends.length === 0 ? (
-              <div className="px-3 py-6 text-center text-gray-500 text-sm">
+              <div className="px-3 py-6 text-center text-gray-500 text-[17px]">
                 해당 날짜에 분배금 지급 예정인 ETF가 없습니다
               </div>
             ) : (
@@ -225,7 +225,7 @@ export function DividendCalendar({ isOpen, onClose, onSelectETF }: DividendCalen
                     >
                       <div className="text-left">
                         <div className="flex items-center gap-1 flex-wrap">
-                          <span className="text-sm text-white font-medium">
+                          <span className="text-[17px] text-white font-medium">
                             {dividend.etf.shortName}
                           </span>
                           {/* 보유계좌 배지 숨김 - "보유종목 표시 다시 보이게 해줘"로 복구
@@ -235,7 +235,7 @@ export function DividendCalendar({ isOpen, onClose, onSelectETF }: DividendCalen
                               <Badge
                                 key={type}
                                 variant="default"
-                                className={`text-[7px] px-1 py-0 ${style.bgColor} hover:${style.bgColor} ${style.textColor}`}
+                                className={`text-[10px] px-1 py-0 ${style.bgColor} hover:${style.bgColor} ${style.textColor}`}
                               >
                                 {style.label}
                               </Badge>
@@ -243,13 +243,13 @@ export function DividendCalendar({ isOpen, onClose, onSelectETF }: DividendCalen
                           })}
                           */}
                         </div>
-                        <div className="text-[11px] text-gray-500">{dividend.etf.ticker}</div>
+                        <div className="text-[14px] text-gray-500">{dividend.etf.ticker}</div>
                       </div>
                       <div className="text-right">
-                        <div className="text-sm text-[#d64f79] font-semibold">
+                        <div className="text-[17px] text-[#d64f79] font-semibold">
                           {dividend.dividendPerShare.toLocaleString()}원
                         </div>
-                        <div className="text-[11px] text-gray-500">
+                        <div className="text-[14px] text-gray-500">
                           주당
                         </div>
                       </div>
@@ -263,7 +263,7 @@ export function DividendCalendar({ isOpen, onClose, onSelectETF }: DividendCalen
 
         {/* 범례 - 고정 하단 */}
         <div className="shrink-0 px-3 py-1.5 border-t border-[#2d2640]">
-          <div className="flex items-center justify-center gap-3 text-[8px] text-gray-500">
+          <div className="flex items-center justify-center gap-3 text-[11px] text-gray-500">
             <div className="flex items-center gap-0.5">
               <span className="w-1.5 h-1.5 rounded-full bg-[#d64f79]/30 border border-[#d64f79]/50" />
               <span>오늘</span>

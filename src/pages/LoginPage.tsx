@@ -91,7 +91,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
 
           {/* Text Content */}
           <div className="text-left space-y-3">
-            <p className="text-gray-400 text-sm font-medium tracking-widest uppercase">
+            <p className="text-gray-400 text-[17px] font-medium tracking-widest uppercase">
               Smart Investment Platform
             </p>
             <ShinyText
@@ -102,7 +102,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
               speed={3}
               spread={90}
             />
-            <p className="text-gray-500 text-base max-w-md leading-relaxed">
+            <p className="text-gray-500 text-[19px] max-w-md leading-relaxed">
               ETF 탐색부터 검증, 투자까지 한 곳에서.
               <br />
               스마트한 투자의 시작.
@@ -132,12 +132,12 @@ export function LoginPage({ onLogin }: LoginPageProps) {
 
           {/* Mobile Text - Centered & Compact */}
           <div className="text-center space-y-1">
-            <p className="text-gray-400 text-xs font-medium tracking-widest uppercase">
+            <p className="text-gray-400 text-[15px] font-medium tracking-widest uppercase">
               Smart Investment Platform
             </p>
             <ShinyText
               text="All that ETF"
-              className="text-xl font-bold tracking-tight"
+              className="text-[23px] font-bold tracking-tight"
               color="#9ca3af"
               shineColor="#d64f79"
               speed={3}
@@ -154,8 +154,8 @@ export function LoginPage({ onLogin }: LoginPageProps) {
             <div className="mx-auto w-12 h-12 lg:w-16 lg:h-16 bg-[#d64f79]/20 rounded-full flex items-center justify-center mb-2">
               <Lock className="w-6 h-6 lg:w-8 lg:h-8 text-[#d64f79]" />
             </div>
-            <CardTitle className="text-lg lg:text-xl text-white">ETF MTS Demo</CardTitle>
-            <CardDescription className="text-gray-400 text-sm">
+            <CardTitle className="text-[21px] lg:text-[23px] text-white">ETF MTS Demo</CardTitle>
+            <CardDescription className="text-gray-400 text-[17px]">
               로그인이 필요합니다
             </CardDescription>
           </CardHeader>
@@ -201,7 +201,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
               </div>
 
               {error && (
-                <p className="text-sm text-red-400 text-center">{error}</p>
+                <p className="text-[17px] text-red-400 text-center">{error}</p>
               )}
 
               <Button

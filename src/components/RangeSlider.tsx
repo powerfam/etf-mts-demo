@@ -106,7 +106,7 @@ export function RangeSlider({
     <div className="py-3">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-1.5">
-          <span className="text-sm text-white font-medium">{label}</span>
+          <span className="text-[17px] text-white font-medium">{label}</span>
           {onHelpClick && (
             <button
               onClick={onHelpClick}
@@ -116,7 +116,7 @@ export function RangeSlider({
             </button>
           )}
         </div>
-        <span className="text-xs text-[#d64f79]">
+        <span className="text-[15px] text-[#d64f79]">
           {formatDisplay(localValue[0])} ~ {formatDisplay(localValue[1])}
         </span>
       </div>
@@ -164,8 +164,8 @@ export function RangeSlider({
 
       {/* Min/Max labels */}
       <div className="flex justify-between mt-1">
-        <span className="text-[11px] text-gray-500">{formatDisplay(min)}</span>
-        <span className="text-[11px] text-gray-500">{formatDisplay(max)}</span>
+        <span className="text-[14px] text-gray-500">{formatDisplay(min)}</span>
+        <span className="text-[14px] text-gray-500">{formatDisplay(max)}</span>
       </div>
     </div>
   )

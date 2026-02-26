@@ -76,10 +76,10 @@ export function TradePage({ etf, accountType, onBack }: TradePageProps) {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="flex-1">
-            <h1 className="text-base font-semibold text-white">{etf.shortName}</h1>
-            <div className="flex items-center gap-2 text-xs text-gray-400">
+            <h1 className="text-[19px] font-semibold text-white">{etf.shortName}</h1>
+            <div className="flex items-center gap-2 text-[15px] text-gray-400">
               <span>{etf.ticker}</span>
-              <Badge variant="outline" className="text-[11px]">{getTaxLabel()}</Badge>
+              <Badge variant="outline" className="text-[14px]">{getTaxLabel()}</Badge>
             </div>
           </div>
         </div>
@@ -89,16 +89,16 @@ export function TradePage({ etf, accountType, onBack }: TradePageProps) {
       <div className="px-4 py-4 border-b border-[#2d2640]">
         <div className="flex items-center justify-between">
           <div>
-            <div className="text-2xl font-bold text-white">{formatNumber(etf.price)}원</div>
-            <div className={`flex items-center gap-1 text-sm ${etf.change >= 0 ? 'text-up' : 'text-down'}`}>
+            <div className="text-[27px] font-bold text-white">{formatNumber(etf.price)}원</div>
+            <div className={`flex items-center gap-1 text-[17px] ${etf.change >= 0 ? 'text-up' : 'text-down'}`}>
               <span>{formatPercent(etf.changePercent)}</span>
               <span className="text-gray-500">({formatNumber(etf.change)})</span>
             </div>
           </div>
           <div className="text-right">
-            <div className="text-xs text-gray-400">iNAV</div>
-            <div className="text-sm text-white">{formatNumber(etf.iNav)}원</div>
-            <div className={`text-xs ${Math.abs(etf.discrepancy) <= 0.1 ? 'text-emerald-400' : 'text-amber-400'}`}>
+            <div className="text-[15px] text-gray-400">iNAV</div>
+            <div className="text-[17px] text-white">{formatNumber(etf.iNav)}원</div>
+            <div className={`text-[15px] ${Math.abs(etf.discrepancy) <= 0.1 ? 'text-emerald-400' : 'text-amber-400'}`}>
               괴리 {etf.discrepancy >= 0 ? '+' : ''}{etf.discrepancy.toFixed(2)}%
             </div>
           </div>
@@ -132,15 +132,15 @@ export function TradePage({ etf, accountType, onBack }: TradePageProps) {
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <Shield className="h-4 w-4 text-gray-400" />
-                <span className="text-sm text-white">체결 가능성</span>
+                <span className="text-[17px] text-white">체결 가능성</span>
                 <Info className="h-3 w-3 text-gray-500" />
               </div>
-              <span className={`text-lg font-bold ${feasibilityScore >= 70 ? 'text-emerald-400' : feasibilityScore >= 50 ? 'text-amber-400' : 'text-red-400'}`}>
+              <span className={`text-[21px] font-bold ${feasibilityScore >= 70 ? 'text-emerald-400' : feasibilityScore >= 50 ? 'text-amber-400' : 'text-red-400'}`}>
                 {feasibilityScore}점
               </span>
             </div>
             <Progress value={feasibilityScore} className="h-2" />
-            <p className="text-[11px] text-gray-500 mt-2">
+            <p className="text-[14px] text-gray-500 mt-2">
               괴리율, 스프레드, 유동성, 주문규모 기반 산출
             </p>
           </CardContent>
@@ -156,7 +156,7 @@ export function TradePage({ etf, accountType, onBack }: TradePageProps) {
                 <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
                 <div className="space-y-1">
                   {warnings.map((warning, i) => (
-                    <p key={i} className="text-xs text-amber-200">{warning}</p>
+                    <p key={i} className="text-[15px] text-amber-200">{warning}</p>
                   ))}
                 </div>
               </div>
@@ -169,7 +169,7 @@ export function TradePage({ etf, accountType, onBack }: TradePageProps) {
       <div className="px-4 space-y-4">
         {/* Price Type */}
         <div>
-          <label className="text-sm text-gray-400 mb-2 block">주문유형</label>
+          <label className="text-[17px] text-gray-400 mb-2 block">주문유형</label>
           <div className="flex gap-2">
             <Button
               variant={priceType === 'limit' ? 'default' : 'outline'}
@@ -194,7 +194,7 @@ export function TradePage({ etf, accountType, onBack }: TradePageProps) {
         {/* Price Input */}
         {priceType === 'limit' && (
           <div>
-            <label className="text-sm text-gray-400 mb-2 block">주문가격</label>
+            <label className="text-[17px] text-gray-400 mb-2 block">주문가격</label>
             <div className="flex items-center gap-2">
               <div className="flex-1 bg-[#1f1a2e] rounded-lg border border-[#2d2640] px-3 py-2">
                 <input
@@ -210,7 +210,7 @@ export function TradePage({ etf, accountType, onBack }: TradePageProps) {
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-xs"
+                className="text-[15px]"
                 onClick={() => setPrice(String(Math.round(etf.iNav * 0.999)))}
               >
                 iNAV-0.1%
@@ -218,7 +218,7 @@ export function TradePage({ etf, accountType, onBack }: TradePageProps) {
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-xs"
+                className="text-[15px]"
                 onClick={() => setPrice(String(etf.iNav))}
               >
                 iNAV
@@ -226,7 +226,7 @@ export function TradePage({ etf, accountType, onBack }: TradePageProps) {
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-xs"
+                className="text-[15px]"
                 onClick={() => setPrice(String(Math.round(etf.iNav * 1.001)))}
               >
                 iNAV+0.1%
@@ -237,7 +237,7 @@ export function TradePage({ etf, accountType, onBack }: TradePageProps) {
 
         {/* Quantity Input */}
         <div>
-          <label className="text-sm text-gray-400 mb-2 block">수량</label>
+          <label className="text-[17px] text-gray-400 mb-2 block">수량</label>
           <div className="flex items-center gap-2">
             <div className="flex-1 bg-[#1f1a2e] rounded-lg border border-[#2d2640] px-3 py-2">
               <input
@@ -255,7 +255,7 @@ export function TradePage({ etf, accountType, onBack }: TradePageProps) {
                 key={q}
                 variant="ghost"
                 size="sm"
-                className="text-xs flex-1"
+                className="text-[15px] flex-1"
                 onClick={() => setQuantity(String(q))}
               >
                 {q}주
@@ -269,7 +269,7 @@ export function TradePage({ etf, accountType, onBack }: TradePageProps) {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Zap className="h-4 w-4 text-gray-400" />
-              <span className="text-sm text-white">분할 주문</span>
+              <span className="text-[17px] text-white">분할 주문</span>
               <Info className="h-3 w-3 text-gray-500" />
             </div>
             <Button
@@ -283,14 +283,14 @@ export function TradePage({ etf, accountType, onBack }: TradePageProps) {
           {splitOrder && (
             <div className="mt-2 bg-[#1f1a2e] rounded-lg p-3">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs text-gray-400">분할 횟수</span>
+                <span className="text-[15px] text-gray-400">분할 횟수</span>
                 <div className="flex items-center gap-2">
                   {[2, 3, 5, 10].map((n) => (
                     <Button
                       key={n}
                       variant={splitCount === n ? 'default' : 'outline'}
                       size="sm"
-                      className="text-xs px-2 h-7"
+                      className="text-[15px] px-2 h-7"
                       onClick={() => setSplitCount(n)}
                     >
                       {n}회
@@ -298,7 +298,7 @@ export function TradePage({ etf, accountType, onBack }: TradePageProps) {
                   ))}
                 </div>
               </div>
-              <p className="text-[11px] text-gray-500">
+              <p className="text-[14px] text-gray-500">
                 {Math.floor(parseInt(quantity || '0') / splitCount)}주씩 {splitCount}회에 걸쳐 주문합니다
               </p>
             </div>
@@ -308,9 +308,9 @@ export function TradePage({ etf, accountType, onBack }: TradePageProps) {
         {/* Order Summary */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm">주문 요약</CardTitle>
+            <CardTitle className="text-[17px]">주문 요약</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2 text-sm">
+          <CardContent className="space-y-2 text-[17px]">
             <div className="flex justify-between">
               <span className="text-gray-400">주문금액</span>
               <span className="text-white font-medium">{formatNumber(orderAmount)}원</span>
@@ -341,7 +341,7 @@ export function TradePage({ etf, accountType, onBack }: TradePageProps) {
         >
           {orderType === 'buy' ? '매수' : '매도'} 주문
         </Button>
-        <p className="text-[11px] text-gray-500 text-center mt-2">
+        <p className="text-[14px] text-gray-500 text-center mt-2">
           주문 전 체결가능성과 예상 비용을 확인해주세요
         </p>
       </div>

@@ -238,11 +238,11 @@ export function ScreeningSheet({
       <div className="fixed inset-x-0 bottom-0 z-[60] bg-[#191322] rounded-t-2xl h-[80vh] flex flex-col animate-slide-up pb-16">
         {/* Header */}
         <div className="shrink-0 flex items-center justify-between px-4 py-3 border-b border-[#2d2640]">
-          <h2 className="text-lg font-semibold text-white">ETF 스크리닝</h2>
+          <h2 className="text-[21px] font-semibold text-white">ETF 스크리닝</h2>
           <div className="flex items-center gap-2">
             <button
               onClick={handleReset}
-              className="flex items-center gap-1 px-2 py-1 text-xs text-gray-400 hover:text-white transition-colors"
+              className="flex items-center gap-1 px-2 py-1 text-[15px] text-gray-400 hover:text-white transition-colors"
             >
               <RotateCcw className="h-3.5 w-3.5" />
               초기화
@@ -282,7 +282,7 @@ export function ScreeningSheet({
           <div className="shrink-0 px-4 py-2 border-b border-[#2d2640] bg-[#1a1424] max-h-20 overflow-y-auto">
             <div className="flex flex-wrap gap-1.5">
               {localFilters.issuers.map(issuer => (
-                <span key={issuer} className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                <span key={issuer} className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-[15px] text-[#d64f79]">
                   {issuer.replace('자산운용', '')}
                   <button onClick={() => updateFilter('issuers', localFilters.issuers.filter(i => i !== issuer))} className="hover:bg-[#d64f79]/30 rounded-full">
                     <X className="h-3 w-3" />
@@ -290,7 +290,7 @@ export function ScreeningSheet({
                 </span>
               ))}
               {localFilters.assetClasses.map(ac => (
-                <span key={ac} className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                <span key={ac} className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-[15px] text-[#d64f79]">
                   {ac}
                   <button onClick={() => updateFilter('assetClasses', localFilters.assetClasses.filter(a => a !== ac))} className="hover:bg-[#d64f79]/30 rounded-full">
                     <X className="h-3 w-3" />
@@ -298,7 +298,7 @@ export function ScreeningSheet({
                 </span>
               ))}
               {localFilters.investRegions.map(region => (
-                <span key={region} className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                <span key={region} className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-[15px] text-[#d64f79]">
                   {getInvestRegionName(region)}
                   <button onClick={() => updateFilter('investRegions', localFilters.investRegions.filter(r => r !== region))} className="hover:bg-[#d64f79]/30 rounded-full">
                     <X className="h-3 w-3" />
@@ -306,7 +306,7 @@ export function ScreeningSheet({
                 </span>
               ))}
               {localFilters.leverageType !== 'all' && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-[15px] text-[#d64f79]">
                   {localFilters.leverageType === 'normal' ? '일반' : localFilters.leverageType === 'leveraged' ? '레버리지' : '인버스'}
                   <button onClick={() => updateFilter('leverageType', 'all')} className="hover:bg-[#d64f79]/30 rounded-full">
                     <X className="h-3 w-3" />
@@ -314,7 +314,7 @@ export function ScreeningSheet({
                 </span>
               )}
               {localFilters.hedgeType !== 'all' && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-[15px] text-[#d64f79]">
                   {localFilters.hedgeType === 'hedged' ? '환헤지' : '환노출'}
                   <button onClick={() => updateFilter('hedgeType', 'all')} className="hover:bg-[#d64f79]/30 rounded-full">
                     <X className="h-3 w-3" />
@@ -322,7 +322,7 @@ export function ScreeningSheet({
                 </span>
               )}
               {localFilters.listingPeriod !== 'all' && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-[15px] text-[#d64f79]">
                   상장{localFilters.listingPeriod === '1y' ? '1년↑' : localFilters.listingPeriod === '3y' ? '3년↑' : '5년↑'}
                   <button onClick={() => updateFilter('listingPeriod', 'all')} className="hover:bg-[#d64f79]/30 rounded-full">
                     <X className="h-3 w-3" />
@@ -330,7 +330,7 @@ export function ScreeningSheet({
                 </span>
               )}
               {(localFilters.ter[0] !== defaultFilters.ter[0] || localFilters.ter[1] !== defaultFilters.ter[1]) && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-[15px] text-[#d64f79]">
                   TER {localFilters.ter[0].toFixed(2)}~{localFilters.ter[1].toFixed(2)}%
                   <button onClick={() => updateFilter('ter', defaultFilters.ter)} className="hover:bg-[#d64f79]/30 rounded-full">
                     <X className="h-3 w-3" />
@@ -338,7 +338,7 @@ export function ScreeningSheet({
                 </span>
               )}
               {(localFilters.aum[0] !== defaultFilters.aum[0] || localFilters.aum[1] !== defaultFilters.aum[1]) && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-[15px] text-[#d64f79]">
                   AUM {localFilters.aum[0]}~{localFilters.aum[1]}억
                   <button onClick={() => updateFilter('aum', defaultFilters.aum)} className="hover:bg-[#d64f79]/30 rounded-full">
                     <X className="h-3 w-3" />
@@ -346,7 +346,7 @@ export function ScreeningSheet({
                 </span>
               )}
               {(localFilters.adtv[0] !== defaultFilters.adtv[0] || localFilters.adtv[1] !== defaultFilters.adtv[1]) && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-[15px] text-[#d64f79]">
                   거래대금 {localFilters.adtv[0]}~{localFilters.adtv[1]}억
                   <button onClick={() => updateFilter('adtv', defaultFilters.adtv)} className="hover:bg-[#d64f79]/30 rounded-full">
                     <X className="h-3 w-3" />
@@ -354,7 +354,7 @@ export function ScreeningSheet({
                 </span>
               )}
               {(localFilters.discrepancy[0] !== defaultFilters.discrepancy[0] || localFilters.discrepancy[1] !== defaultFilters.discrepancy[1]) && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-[15px] text-[#d64f79]">
                   괴리율 {localFilters.discrepancy[0]}~{localFilters.discrepancy[1]}%
                   <button onClick={() => updateFilter('discrepancy', defaultFilters.discrepancy)} className="hover:bg-[#d64f79]/30 rounded-full">
                     <X className="h-3 w-3" />
@@ -362,7 +362,7 @@ export function ScreeningSheet({
                 </span>
               )}
               {(localFilters.healthScore[0] !== defaultFilters.healthScore[0] || localFilters.healthScore[1] !== defaultFilters.healthScore[1]) && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-[15px] text-[#d64f79]">
                   건전성 {localFilters.healthScore[0]}~{localFilters.healthScore[1]}점
                   <button onClick={() => updateFilter('healthScore', defaultFilters.healthScore)} className="hover:bg-[#d64f79]/30 rounded-full">
                     <X className="h-3 w-3" />
@@ -370,7 +370,7 @@ export function ScreeningSheet({
                 </span>
               )}
               {(localFilters.dividendYield[0] !== defaultFilters.dividendYield[0] || localFilters.dividendYield[1] !== defaultFilters.dividendYield[1]) && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-[15px] text-[#d64f79]">
                   배당 {localFilters.dividendYield[0]}~{localFilters.dividendYield[1]}%
                   <button onClick={() => updateFilter('dividendYield', defaultFilters.dividendYield)} className="hover:bg-[#d64f79]/30 rounded-full">
                     <X className="h-3 w-3" />
@@ -378,7 +378,7 @@ export function ScreeningSheet({
                 </span>
               )}
               {localFilters.dividendFrequency.map(freq => (
-                <span key={freq} className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                <span key={freq} className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-[15px] text-[#d64f79]">
                   {getDividendFrequencyName(freq)}
                   <button onClick={() => updateFilter('dividendFrequency', localFilters.dividendFrequency.filter(f => f !== freq))} className="hover:bg-[#d64f79]/30 rounded-full">
                     <X className="h-3 w-3" />
@@ -387,7 +387,7 @@ export function ScreeningSheet({
               ))}
               {/* 비용 카테고리 */}
               {(localFilters.trackingError[0] !== defaultFilters.trackingError[0] || localFilters.trackingError[1] !== defaultFilters.trackingError[1]) && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-[15px] text-[#d64f79]">
                   추적오차 {localFilters.trackingError[0]}~{localFilters.trackingError[1]}%
                   <button onClick={() => updateFilter('trackingError', defaultFilters.trackingError)} className="hover:bg-[#d64f79]/30 rounded-full">
                     <X className="h-3 w-3" />
@@ -396,7 +396,7 @@ export function ScreeningSheet({
               )}
               {/* 수익 카테고리 */}
               {(localFilters.return1m[0] !== defaultFilters.return1m[0] || localFilters.return1m[1] !== defaultFilters.return1m[1]) && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-[15px] text-[#d64f79]">
                   1개월 {localFilters.return1m[0]}~{localFilters.return1m[1]}%
                   <button onClick={() => updateFilter('return1m', defaultFilters.return1m)} className="hover:bg-[#d64f79]/30 rounded-full">
                     <X className="h-3 w-3" />
@@ -404,7 +404,7 @@ export function ScreeningSheet({
                 </span>
               )}
               {(localFilters.return3m[0] !== defaultFilters.return3m[0] || localFilters.return3m[1] !== defaultFilters.return3m[1]) && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-[15px] text-[#d64f79]">
                   3개월 {localFilters.return3m[0]}~{localFilters.return3m[1]}%
                   <button onClick={() => updateFilter('return3m', defaultFilters.return3m)} className="hover:bg-[#d64f79]/30 rounded-full">
                     <X className="h-3 w-3" />
@@ -412,7 +412,7 @@ export function ScreeningSheet({
                 </span>
               )}
               {(localFilters.returnYtd[0] !== defaultFilters.returnYtd[0] || localFilters.returnYtd[1] !== defaultFilters.returnYtd[1]) && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-[15px] text-[#d64f79]">
                   연초대비 {localFilters.returnYtd[0]}~{localFilters.returnYtd[1]}%
                   <button onClick={() => updateFilter('returnYtd', defaultFilters.returnYtd)} className="hover:bg-[#d64f79]/30 rounded-full">
                     <X className="h-3 w-3" />
@@ -420,7 +420,7 @@ export function ScreeningSheet({
                 </span>
               )}
               {(localFilters.return1y[0] !== defaultFilters.return1y[0] || localFilters.return1y[1] !== defaultFilters.return1y[1]) && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-[15px] text-[#d64f79]">
                   1년 {localFilters.return1y[0]}~{localFilters.return1y[1]}%
                   <button onClick={() => updateFilter('return1y', defaultFilters.return1y)} className="hover:bg-[#d64f79]/30 rounded-full">
                     <X className="h-3 w-3" />
@@ -428,7 +428,7 @@ export function ScreeningSheet({
                 </span>
               )}
               {(localFilters.volatility[0] !== defaultFilters.volatility[0] || localFilters.volatility[1] !== defaultFilters.volatility[1]) && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-[15px] text-[#d64f79]">
                   변동성 {localFilters.volatility[0]}~{localFilters.volatility[1]}%
                   <button onClick={() => updateFilter('volatility', defaultFilters.volatility)} className="hover:bg-[#d64f79]/30 rounded-full">
                     <X className="h-3 w-3" />
@@ -437,7 +437,7 @@ export function ScreeningSheet({
               )}
               {/* 구성 카테고리 */}
               {(localFilters.componentCount[0] !== defaultFilters.componentCount[0] || localFilters.componentCount[1] !== defaultFilters.componentCount[1]) && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-[15px] text-[#d64f79]">
                   종목수 {localFilters.componentCount[0]}~{localFilters.componentCount[1]}개
                   <button onClick={() => updateFilter('componentCount', defaultFilters.componentCount)} className="hover:bg-[#d64f79]/30 rounded-full">
                     <X className="h-3 w-3" />
@@ -445,7 +445,7 @@ export function ScreeningSheet({
                 </span>
               )}
               {(localFilters.top10Concentration[0] !== defaultFilters.top10Concentration[0] || localFilters.top10Concentration[1] !== defaultFilters.top10Concentration[1]) && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-[15px] text-[#d64f79]">
                   상위10 {localFilters.top10Concentration[0]}~{localFilters.top10Concentration[1]}%
                   <button onClick={() => updateFilter('top10Concentration', defaultFilters.top10Concentration)} className="hover:bg-[#d64f79]/30 rounded-full">
                     <X className="h-3 w-3" />
@@ -464,7 +464,7 @@ export function ScreeningSheet({
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
-                className={`w-full py-4 text-sm font-medium transition-colors
+                className={`w-full py-4 text-[17px] font-medium transition-colors
                   ${activeCategory === cat.id
                     ? 'bg-[#191322] text-[#d64f79] border-r-2 border-[#d64f79]'
                     : 'text-gray-400 hover:text-white'
@@ -482,7 +482,7 @@ export function ScreeningSheet({
               <div className="space-y-6">
                 {/* 운용사 */}
                 <div>
-                  <h3 className="text-sm font-medium text-white mb-3">운용사</h3>
+                  <h3 className="text-[17px] font-medium text-white mb-3">운용사</h3>
                   <div className="flex flex-wrap gap-2">
                     {issuers.map(issuer => {
                       const shortName = issuer.replace('자산운용', '').replace('투자자산운용', '')
@@ -491,7 +491,7 @@ export function ScreeningSheet({
                         <button
                           key={issuer}
                           onClick={() => toggleArrayFilter('issuers', issuer)}
-                          className={`px-3 py-1.5 text-xs rounded-full transition-colors
+                          className={`px-3 py-1.5 text-[15px] rounded-full transition-colors
                             ${selected
                               ? 'bg-[#d64f79] text-white'
                               : 'bg-[#1f1a2e] text-gray-400 border border-[#2d2640] hover:border-[#d64f79]'
@@ -506,7 +506,7 @@ export function ScreeningSheet({
 
                 {/* 자산분류 */}
                 <div>
-                  <h3 className="text-sm font-medium text-white mb-3">자산분류</h3>
+                  <h3 className="text-[17px] font-medium text-white mb-3">자산분류</h3>
                   <div className="flex flex-wrap gap-2">
                     {assetClasses.map(ac => {
                       const selected = localFilters.assetClasses.includes(ac.id)
@@ -514,7 +514,7 @@ export function ScreeningSheet({
                         <button
                           key={ac.id}
                           onClick={() => toggleArrayFilter('assetClasses', ac.id)}
-                          className={`px-3 py-1.5 text-xs rounded-full transition-colors
+                          className={`px-3 py-1.5 text-[15px] rounded-full transition-colors
                             ${selected
                               ? 'bg-[#d64f79] text-white'
                               : 'bg-[#1f1a2e] text-gray-400 border border-[#2d2640] hover:border-[#d64f79]'
@@ -529,7 +529,7 @@ export function ScreeningSheet({
 
                 {/* 투자지역 */}
                 <div>
-                  <h3 className="text-sm font-medium text-white mb-3">투자지역</h3>
+                  <h3 className="text-[17px] font-medium text-white mb-3">투자지역</h3>
                   <div className="flex flex-wrap gap-2">
                     {investRegions.map(region => {
                       const selected = localFilters.investRegions.includes(region.id)
@@ -537,7 +537,7 @@ export function ScreeningSheet({
                         <button
                           key={region.id}
                           onClick={() => toggleArrayFilter('investRegions', region.id)}
-                          className={`px-3 py-1.5 text-xs rounded-full transition-colors
+                          className={`px-3 py-1.5 text-[15px] rounded-full transition-colors
                             ${selected
                               ? 'bg-[#d64f79] text-white'
                               : 'bg-[#1f1a2e] text-gray-400 border border-[#2d2640] hover:border-[#d64f79]'
@@ -552,7 +552,7 @@ export function ScreeningSheet({
 
                 {/* 레버리지 */}
                 <div>
-                  <h3 className="text-sm font-medium text-white mb-3">레버리지/인버스</h3>
+                  <h3 className="text-[17px] font-medium text-white mb-3">레버리지/인버스</h3>
                   <div className="flex flex-wrap gap-2">
                     {[
                       { id: 'all', name: '전체' },
@@ -563,7 +563,7 @@ export function ScreeningSheet({
                       <button
                         key={opt.id}
                         onClick={() => updateFilter('leverageType', opt.id as ScreeningFilters['leverageType'])}
-                        className={`px-3 py-1.5 text-xs rounded-full transition-colors
+                        className={`px-3 py-1.5 text-[15px] rounded-full transition-colors
                           ${localFilters.leverageType === opt.id
                             ? 'bg-[#d64f79] text-white'
                             : 'bg-[#1f1a2e] text-gray-400 border border-[#2d2640] hover:border-[#d64f79]'
@@ -577,7 +577,7 @@ export function ScreeningSheet({
 
                 {/* 환헤지 */}
                 <div>
-                  <h3 className="text-sm font-medium text-white mb-3">환헤지</h3>
+                  <h3 className="text-[17px] font-medium text-white mb-3">환헤지</h3>
                   <div className="flex flex-wrap gap-2">
                     {[
                       { id: 'all', name: '전체' },
@@ -587,7 +587,7 @@ export function ScreeningSheet({
                       <button
                         key={opt.id}
                         onClick={() => updateFilter('hedgeType', opt.id as ScreeningFilters['hedgeType'])}
-                        className={`px-3 py-1.5 text-xs rounded-full transition-colors
+                        className={`px-3 py-1.5 text-[15px] rounded-full transition-colors
                           ${localFilters.hedgeType === opt.id
                             ? 'bg-[#d64f79] text-white'
                             : 'bg-[#1f1a2e] text-gray-400 border border-[#2d2640] hover:border-[#d64f79]'
@@ -601,7 +601,7 @@ export function ScreeningSheet({
 
                 {/* 상장 기간 */}
                 <div>
-                  <h3 className="text-sm font-medium text-white mb-3">상장 기간</h3>
+                  <h3 className="text-[17px] font-medium text-white mb-3">상장 기간</h3>
                   <div className="flex flex-wrap gap-2">
                     {[
                       { id: 'all', name: '전체' },
@@ -612,7 +612,7 @@ export function ScreeningSheet({
                       <button
                         key={opt.id}
                         onClick={() => updateFilter('listingPeriod', opt.id as ScreeningFilters['listingPeriod'])}
-                        className={`px-3 py-1.5 text-xs rounded-full transition-colors
+                        className={`px-3 py-1.5 text-[15px] rounded-full transition-colors
                           ${localFilters.listingPeriod === opt.id
                             ? 'bg-[#d64f79] text-white'
                             : 'bg-[#1f1a2e] text-gray-400 border border-[#2d2640] hover:border-[#d64f79]'
@@ -768,7 +768,7 @@ export function ScreeningSheet({
                 />
 
                 <div>
-                  <h3 className="text-sm font-medium text-white mb-3">배당주기</h3>
+                  <h3 className="text-[17px] font-medium text-white mb-3">배당주기</h3>
                   <div className="flex flex-wrap gap-2">
                     {dividendFrequencies.map(freq => {
                       const selected = localFilters.dividendFrequency.includes(freq.id)
@@ -776,7 +776,7 @@ export function ScreeningSheet({
                         <button
                           key={freq.id}
                           onClick={() => toggleArrayFilter('dividendFrequency', freq.id)}
-                          className={`px-3 py-1.5 text-xs rounded-full transition-colors
+                          className={`px-3 py-1.5 text-[15px] rounded-full transition-colors
                             ${selected
                               ? 'bg-[#d64f79] text-white'
                               : 'bg-[#1f1a2e] text-gray-400 border border-[#2d2640] hover:border-[#d64f79]'
@@ -817,7 +817,7 @@ export function ScreeningSheet({
                 />
 
                 <div className="mt-4 p-3 bg-[#1f1a2e] rounded-lg">
-                  <p className="text-xs text-gray-400">
+                  <p className="text-[15px] text-gray-400">
                     구성종목 수가 많을수록 분산투자 효과가 크고,
                     상위10 집중도가 낮을수록 특정 종목에 대한 의존도가 낮습니다.
                   </p>
@@ -831,7 +831,7 @@ export function ScreeningSheet({
         <div className="shrink-0 p-4 border-t border-[#2d2640] bg-[#1f1a2e]">
           <Button
             onClick={handleApply}
-            className="w-full h-12 text-base font-semibold bg-[#d64f79] hover:bg-[#c44570] shadow-lg"
+            className="w-full h-12 text-[19px] font-semibold bg-[#d64f79] hover:bg-[#c44570] shadow-lg"
           >
             필터 적용
           </Button>
@@ -849,11 +849,11 @@ export function ScreeningSheet({
                 <div className="p-2 bg-[#d64f79]/20 rounded-full">
                   <Info className="h-4 w-4 text-[#d64f79]" />
                 </div>
-                <h3 className="text-base font-semibold text-white">
+                <h3 className="text-[19px] font-semibold text-white">
                   {tooltipData[showTooltip].title}
                 </h3>
               </div>
-              <p className="text-sm text-gray-300 leading-relaxed mb-4">
+              <p className="text-[17px] text-gray-300 leading-relaxed mb-4">
                 {tooltipData[showTooltip].description}
               </p>
               <Button

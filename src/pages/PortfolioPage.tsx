@@ -156,8 +156,8 @@ export function PortfolioPage({ accountType, onSelectETF, onLongPressETF, onAcco
           >
             <AccountIcon className="h-4 w-4 text-[#d64f79]" />
             <div className="flex-1 text-left">
-              <div className="text-xs text-gray-400">{currentAccount.label}계좌</div>
-              <div className="text-sm text-white">{currentAccount.number}</div>
+              <div className="text-[15px] text-gray-400">{currentAccount.label}계좌</div>
+              <div className="text-[17px] text-white">{currentAccount.number}</div>
             </div>
             <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${showAccountDropdown ? 'rotate-180' : ''}`} />
           </button>
@@ -181,8 +181,8 @@ export function PortfolioPage({ accountType, onSelectETF, onLongPressETF, onAcco
                   >
                     <Icon className={`h-4 w-4 ${isSelected ? 'text-[#d64f79]' : 'text-gray-400'}`} />
                     <div className="flex-1">
-                      <div className="text-xs text-gray-400">{account.label}계좌</div>
-                      <div className="text-sm text-white">{account.number}</div>
+                      <div className="text-[15px] text-gray-400">{account.label}계좌</div>
+                      <div className="text-[17px] text-white">{account.number}</div>
                     </div>
                     {isSelected && (
                       <div className="w-2 h-2 rounded-full bg-[#d64f79]" />
@@ -196,7 +196,7 @@ export function PortfolioPage({ accountType, onSelectETF, onLongPressETF, onAcco
 
         {/* 계좌 타입 아이콘 표시 */}
         <div className="flex items-center gap-2 mb-2" data-tour="account-type-badge">
-          <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
+          <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[15px] font-medium ${
             accountType === 'general' ? 'bg-gray-500/20 text-gray-300' :
             accountType === 'pension' ? 'bg-emerald-500/20 text-emerald-400' :
             'bg-blue-500/20 text-blue-400'
@@ -205,9 +205,9 @@ export function PortfolioPage({ accountType, onSelectETF, onLongPressETF, onAcco
             <span>{taxInfo.label}</span>
           </div>
         </div>
-        <div className="text-sm text-gray-400">ETF 포트폴리오</div>
-        <div className="text-3xl font-bold text-white mt-1">
-          {formatNumber(totalValue)}<span className="text-lg text-gray-400">원</span>
+        <div className="text-[17px] text-gray-400">ETF 포트폴리오</div>
+        <div className="text-[33px] font-bold text-white mt-1">
+          {formatNumber(totalValue)}<span className="text-[21px] text-gray-400">원</span>
         </div>
         <div className={`flex items-center gap-2 mt-2 ${totalProfitLoss >= 0 ? 'text-up' : 'text-down'}`}>
           {totalProfitLoss >= 0 ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
@@ -219,12 +219,12 @@ export function PortfolioPage({ accountType, onSelectETF, onLongPressETF, onAcco
 
         {/* Tax Summary */}
         <div className={`mt-4 p-3 rounded-lg ${accountType !== 'general' ? 'bg-emerald-500/10 border border-emerald-500/30' : 'bg-[#1f1a2e]'}`} data-tour="tax-info">
-          <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center justify-between text-[17px]">
             <span className="text-gray-400">예상 세금 ({taxInfo.rate}%)</span>
             <span className="text-white">{formatNumber(Math.round(taxInfo.tax))}원</span>
           </div>
           {accountType !== 'general' && (
-            <div className="text-xs text-emerald-400 mt-1">
+            <div className="text-[15px] text-emerald-400 mt-1">
               일반계좌 대비 {formatNumber(Math.round(totalProfitLoss * 0.154 - taxInfo.tax))}원 절감
             </div>
           )}
@@ -235,7 +235,7 @@ export function PortfolioPage({ accountType, onSelectETF, onLongPressETF, onAcco
       <div className="px-4 py-4" data-tour="portfolio-chart">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm">자산 배분</CardTitle>
+            <CardTitle className="text-[17px]">자산 배분</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-4">
@@ -269,8 +269,8 @@ export function PortfolioPage({ accountType, onSelectETF, onLongPressETF, onAcco
                           const data = payload[0].payload
                           return (
                             <div className="bg-[#1f1a2e] border border-[#3d3450] rounded-lg px-3 py-2">
-                              <p className="text-white text-sm font-medium">{data.name}</p>
-                              <p className="text-gray-300 text-xs mt-1">
+                              <p className="text-white text-[17px] font-medium">{data.name}</p>
+                              <p className="text-gray-300 text-[15px] mt-1">
                                 {formatNumber(data.value)}원 ({data.percent}%)
                               </p>
                             </div>
@@ -286,8 +286,8 @@ export function PortfolioPage({ accountType, onSelectETF, onLongPressETF, onAcco
                 {pieData.map((item, index) => (
                   <div key={index} className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
-                    <span className="text-xs text-gray-400 flex-1">{item.name}</span>
-                    <span className="text-xs text-white">{item.percent}%</span>
+                    <span className="text-[15px] text-gray-400 flex-1">{item.name}</span>
+                    <span className="text-[15px] text-white">{item.percent}%</span>
                   </div>
                 ))}
               </div>
@@ -296,7 +296,7 @@ export function PortfolioPage({ accountType, onSelectETF, onLongPressETF, onAcco
             {/* 자산 클래스별 비중 바 */}
             <div className="mt-4 pt-4 border-t border-[#2d2640]">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs text-gray-400">자산 클래스 비중</span>
+                <span className="text-[15px] text-gray-400">자산 클래스 비중</span>
               </div>
               <div className="h-3 rounded-full overflow-hidden flex bg-[#2d2640]">
                 {assetClassData.map((item, index) => (
@@ -317,8 +317,8 @@ export function PortfolioPage({ accountType, onSelectETF, onLongPressETF, onAcco
                       className="w-2 h-2 rounded-full"
                       style={{ backgroundColor: assetClassColors[item.name] || '#6b7280' }}
                     />
-                    <span className="text-[11px] text-gray-400">{item.name}</span>
-                    <span className="text-[11px] text-white">{item.percent}%</span>
+                    <span className="text-[14px] text-gray-400">{item.name}</span>
+                    <span className="text-[14px] text-white">{item.percent}%</span>
                   </div>
                 ))}
               </div>
@@ -334,11 +334,11 @@ export function PortfolioPage({ accountType, onSelectETF, onLongPressETF, onAcco
             <CardContent className="p-3">
               <div className="flex items-center gap-2 mb-2">
                 <AlertTriangle className="h-4 w-4 text-amber-400" />
-                <span className="text-sm font-medium text-white">리스크 알림</span>
+                <span className="text-[17px] font-medium text-white">리스크 알림</span>
               </div>
               <div className="space-y-2">
                 {riskAlerts.map((etf) => (
-                  <div key={etf.id} className="flex items-center justify-between text-xs">
+                  <div key={etf.id} className="flex items-center justify-between text-[15px]">
                     <span className="text-gray-400">{etf.shortName}</span>
                     <span className="text-amber-400">
                       {etf.healthScore < 75 && '건전성 주의'}
@@ -359,11 +359,11 @@ export function PortfolioPage({ accountType, onSelectETF, onLongPressETF, onAcco
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <RefreshCw className="h-4 w-4 text-[#d64f79]" />
-                <span className="text-sm font-medium text-white">리밸런싱 제안</span>
+                <span className="text-[17px] font-medium text-white">리밸런싱 제안</span>
               </div>
               <ChevronRight className="h-4 w-4 text-gray-400" />
             </div>
-            <p className="text-xs text-gray-400 mt-2">
+            <p className="text-[15px] text-gray-400 mt-2">
               현재 포트폴리오가 목표 배분과 5% 이상 차이납니다. 리밸런싱을 검토해보세요.
             </p>
           </CardContent>
@@ -380,7 +380,7 @@ export function PortfolioPage({ accountType, onSelectETF, onLongPressETF, onAcco
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <Coins className="h-4 w-4 text-[#d64f79]" />
-                <span className="text-sm font-medium text-white">분배금 일정</span>
+                <span className="text-[17px] font-medium text-white">분배금 일정</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <CalendarDays className="h-3.5 w-3.5 text-gray-400" />
@@ -389,7 +389,7 @@ export function PortfolioPage({ accountType, onSelectETF, onLongPressETF, onAcco
             </div>
 
             {upcomingDividends.length === 0 ? (
-              <p className="text-xs text-gray-500">
+              <p className="text-[15px] text-gray-500">
                 30일 내 예정된 분배금이 없습니다
               </p>
             ) : (
@@ -398,11 +398,11 @@ export function PortfolioPage({ accountType, onSelectETF, onLongPressETF, onAcco
                   const date = new Date(dividend.date)
                   const dateStr = `${date.getMonth() + 1}월 ${date.getDate()}일`
                   return (
-                    <div key={`${dividend.etf.id}-${index}`} className="flex items-center justify-between text-sm">
+                    <div key={`${dividend.etf.id}-${index}`} className="flex items-center justify-between text-[17px]">
                       <span className="text-gray-400">{dividend.etf.shortName}</span>
                       <div className="text-right">
                         <span className="text-white">{dateStr}</span>
-                        <span className="text-xs text-[#d64f79] ml-2 font-medium">
+                        <span className="text-[15px] text-[#d64f79] ml-2 font-medium">
                           {dividend.dividendPerShare.toLocaleString()}원/주
                         </span>
                       </div>
@@ -413,7 +413,7 @@ export function PortfolioPage({ accountType, onSelectETF, onLongPressETF, onAcco
             )}
 
             <div className="mt-3 pt-3 border-t border-[#2d2640]">
-              <p className="text-[11px] text-gray-500 text-center">
+              <p className="text-[14px] text-gray-500 text-center">
                 탭하여 전체 분배금 캘린더 보기
               </p>
             </div>
@@ -424,12 +424,12 @@ export function PortfolioPage({ accountType, onSelectETF, onLongPressETF, onAcco
       {/* Holdings List */}
       <div className="px-4" data-tour="holdings-list">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-semibold text-white">보유 종목</h2>
+          <h2 className="text-[17px] font-semibold text-white">보유 종목</h2>
           <div className="flex gap-2">
             <Button
               variant={selectedFilter === 'all' ? 'default' : 'outline'}
               size="sm"
-              className="text-xs"
+              className="text-[15px]"
               onClick={() => setSelectedFilter('all')}
             >
               전체
@@ -437,7 +437,7 @@ export function PortfolioPage({ accountType, onSelectETF, onLongPressETF, onAcco
             <Button
               variant={selectedFilter === 'profit' ? 'default' : 'outline'}
               size="sm"
-              className="text-xs"
+              className="text-[15px]"
               onClick={() => setSelectedFilter('profit')}
             >
               수익
@@ -445,7 +445,7 @@ export function PortfolioPage({ accountType, onSelectETF, onLongPressETF, onAcco
             <Button
               variant={selectedFilter === 'loss' ? 'default' : 'outline'}
               size="sm"
-              className="text-xs"
+              className="text-[15px]"
               onClick={() => setSelectedFilter('loss')}
             >
               손실
@@ -474,12 +474,12 @@ export function PortfolioPage({ accountType, onSelectETF, onLongPressETF, onAcco
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between mb-3">
                     <div>
-                      <div className="text-xs text-gray-400">{etf.ticker}</div>
+                      <div className="text-[15px] text-gray-400">{etf.ticker}</div>
                       <div className="font-medium text-white">{etf.shortName}</div>
                     </div>
                     <div className="text-right">
-                      <div className="text-lg font-bold text-white">{formatNumber(etf.totalValue)}원</div>
-                      <div className={`text-xs ${etf.profitLoss >= 0 ? 'text-up' : 'text-down'}`}>
+                      <div className="text-[21px] font-bold text-white">{formatNumber(etf.totalValue)}원</div>
+                      <div className={`text-[15px] ${etf.profitLoss >= 0 ? 'text-up' : 'text-down'}`}>
                         {etf.profitLoss >= 0 ? '+' : ''}{formatNumber(etf.profitLoss)}원 ({formatPercent(etf.profitLossPercent)})
                       </div>
                     </div>
@@ -487,20 +487,20 @@ export function PortfolioPage({ accountType, onSelectETF, onLongPressETF, onAcco
 
                   <div className="grid grid-cols-4 gap-2 text-center">
                     <div>
-                      <div className="text-[11px] text-gray-500">보유수량</div>
-                      <div className="text-xs text-white">{etf.quantity}주</div>
+                      <div className="text-[14px] text-gray-500">보유수량</div>
+                      <div className="text-[15px] text-white">{etf.quantity}주</div>
                     </div>
                     <div>
-                      <div className="text-[11px] text-gray-500">평균단가</div>
-                      <div className="text-xs text-white">{formatNumber(etf.avgPrice)}</div>
+                      <div className="text-[14px] text-gray-500">평균단가</div>
+                      <div className="text-[15px] text-white">{formatNumber(etf.avgPrice)}</div>
                     </div>
                     <div>
-                      <div className="text-[11px] text-gray-500">현재가</div>
-                      <div className="text-xs text-white">{formatNumber(etf.price)}</div>
+                      <div className="text-[14px] text-gray-500">현재가</div>
+                      <div className="text-[15px] text-white">{formatNumber(etf.price)}</div>
                     </div>
                     <div>
-                      <div className="text-[11px] text-gray-500">건전성</div>
-                      <div className={`text-xs ${etf.healthScore >= 85 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                      <div className="text-[14px] text-gray-500">건전성</div>
+                      <div className={`text-[15px] ${etf.healthScore >= 85 ? 'text-emerald-400' : 'text-amber-400'}`}>
                         {etf.healthScore}
                       </div>
                     </div>
@@ -510,13 +510,13 @@ export function PortfolioPage({ accountType, onSelectETF, onLongPressETF, onAcco
                   <div className="flex gap-2 mt-3 pt-3 border-t border-[#2d2640]">
                     <Badge
                       variant={Math.abs(etf.discrepancy) <= 0.1 ? 'success' : 'warning'}
-                      className="text-[11px]"
+                      className="text-[14px]"
                     >
                       괴리 {etf.discrepancy >= 0 ? '+' : ''}{etf.discrepancy.toFixed(2)}%
                     </Badge>
                     <Badge
                       variant={etf.spread <= 0.05 ? 'success' : 'warning'}
-                      className="text-[11px]"
+                      className="text-[14px]"
                     >
                       스프레드 {etf.spread.toFixed(2)}%
                     </Badge>

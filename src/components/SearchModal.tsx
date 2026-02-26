@@ -139,7 +139,7 @@ export function SearchModal({ open, onOpenChange, onSelectETF }: SearchModalProp
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="ETF 종목명, 특징, 구성종목 검색..."
-                className="w-full pl-11 pr-4 py-3 bg-[#2a2438] border border-[#3d3650] rounded-xl text-base text-white placeholder-gray-500 focus:outline-none focus:border-[#d64f79]"
+                className="w-full pl-11 pr-4 py-3 bg-[#2a2438] border border-[#3d3650] rounded-xl text-[19px] text-white placeholder-gray-500 focus:outline-none focus:border-[#d64f79]"
                 autoFocus
               />
               {searchQuery && (
@@ -156,7 +156,7 @@ export function SearchModal({ open, onOpenChange, onSelectETF }: SearchModalProp
           {/* 구성종목 검색 입력 */}
           {holdingsSearch && (
             <div className="space-y-3">
-              <div className="text-sm text-gray-400 flex items-center gap-2">
+              <div className="text-[17px] text-gray-400 flex items-center gap-2">
                 <Briefcase className="h-4 w-4" />
                 구성종목으로 ETF 찾기 (AND 조건)
               </div>
@@ -182,11 +182,11 @@ export function SearchModal({ open, onOpenChange, onSelectETF }: SearchModalProp
                       onChange={(e) => setHoldingInput(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && addHoldingChip()}
                       placeholder={holdingChips.length === 0 ? "종목명 입력" : "+"}
-                      className="w-24 px-2 py-1.5 bg-[#2a2438] border border-[#3d3650] rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#d64f79]"
+                      className="w-24 px-2 py-1.5 bg-[#2a2438] border border-[#3d3650] rounded-lg text-[17px] text-white placeholder-gray-500 focus:outline-none focus:border-[#d64f79]"
                     />
                     <button
                       onClick={addHoldingChip}
-                      className="px-2 py-1.5 bg-[#3d3650] rounded-lg text-sm text-white hover:bg-[#4d4660]"
+                      className="px-2 py-1.5 bg-[#3d3650] rounded-lg text-[17px] text-white hover:bg-[#4d4660]"
                     >
                       +
                     </button>
@@ -200,7 +200,7 @@ export function SearchModal({ open, onOpenChange, onSelectETF }: SearchModalProp
           <div className="flex gap-2 mt-3">
             <button
               onClick={() => setPensionOnly(!pensionOnly)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm transition-colors ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[17px] transition-colors ${
                 pensionOnly
                   ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
                   : 'bg-[#2a2438] text-gray-400 border border-[#3d3650]'
@@ -215,7 +215,7 @@ export function SearchModal({ open, onOpenChange, onSelectETF }: SearchModalProp
                 setSearchQuery('')
                 setHoldingChips([])
               }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm transition-colors ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[17px] transition-colors ${
                 holdingsSearch
                   ? 'bg-[#d64f79]/20 text-[#d64f79] border border-[#d64f79]/30'
                   : 'bg-[#2a2438] text-gray-400 border border-[#3d3650]'
@@ -236,7 +236,7 @@ export function SearchModal({ open, onOpenChange, onSelectETF }: SearchModalProp
           )}
 
           {!hasResults && !searchQuery && holdingChips.length === 0 && (
-            <div className="text-center py-8 text-gray-500 text-sm">
+            <div className="text-center py-8 text-gray-500 text-[17px]">
               {holdingsSearch
                 ? '구성종목을 입력하세요 (예: 삼성전자, NVIDIA)'
                 : 'ETF 종목명, 특징, 구성종목을 검색하세요'
@@ -249,7 +249,7 @@ export function SearchModal({ open, onOpenChange, onSelectETF }: SearchModalProp
             <div className="mb-4">
               <div className="flex items-center gap-2 mb-2">
                 <Search className="h-4 w-4 text-[#d64f79]" />
-                <span className="text-sm font-medium text-gray-400">
+                <span className="text-[17px] font-medium text-gray-400">
                   종목명 일치 ({searchResults.nameMatches.length})
                 </span>
               </div>
@@ -266,7 +266,7 @@ export function SearchModal({ open, onOpenChange, onSelectETF }: SearchModalProp
             <div className="mb-4">
               <div className="flex items-center gap-2 mb-2">
                 <Tag className="h-4 w-4 text-purple-400" />
-                <span className="text-sm font-medium text-gray-400">
+                <span className="text-[17px] font-medium text-gray-400">
                   특징 일치 ({searchResults.featureMatches.length})
                 </span>
               </div>
@@ -288,7 +288,7 @@ export function SearchModal({ open, onOpenChange, onSelectETF }: SearchModalProp
             <div className="mb-4">
               <div className="flex items-center gap-2 mb-2">
                 <Briefcase className="h-4 w-4 text-blue-400" />
-                <span className="text-sm font-medium text-gray-400">
+                <span className="text-[17px] font-medium text-gray-400">
                   구성종목 일치 ({searchResults.holdingMatches.length})
                 </span>
               </div>
@@ -327,27 +327,27 @@ function SearchResultItem({
     >
       <div className="flex-1 text-left">
         <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-500">{etf.ticker}</span>
+          <span className="text-[15px] text-gray-500">{etf.ticker}</span>
           {etf.isLeveraged && (
-            <Badge variant="outline" className="text-[11px] px-1 py-0 text-yellow-400 border-yellow-400/30">
+            <Badge variant="outline" className="text-[14px] px-1 py-0 text-yellow-400 border-yellow-400/30">
               레버리지
             </Badge>
           )}
           {etf.isInverse && (
-            <Badge variant="outline" className="text-[11px] px-1 py-0 text-blue-400 border-blue-400/30">
+            <Badge variant="outline" className="text-[14px] px-1 py-0 text-blue-400 border-blue-400/30">
               인버스
             </Badge>
           )}
         </div>
-        <div className="text-sm font-medium text-white mt-0.5">{etf.shortName}</div>
+        <div className="text-[17px] font-medium text-white mt-0.5">{etf.shortName}</div>
         {subText && (
-          <div className="text-xs text-[#d64f79] mt-1">"{subText}"</div>
+          <div className="text-[15px] text-[#d64f79] mt-1">"{subText}"</div>
         )}
       </div>
       <div className="flex items-center gap-3">
         <div className="text-right">
-          <div className="text-sm font-semibold text-white">{formatNumber(etf.price)}</div>
-          <div className={`text-xs ${etf.change >= 0 ? 'text-up' : 'text-down'}`}>
+          <div className="text-[17px] font-semibold text-white">{formatNumber(etf.price)}</div>
+          <div className={`text-[15px] ${etf.change >= 0 ? 'text-up' : 'text-down'}`}>
             {etf.change >= 0 ? '+' : ''}{etf.changePercent.toFixed(2)}%
           </div>
         </div>

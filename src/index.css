@@ -265,6 +265,82 @@ input, textarea, select {
   color: #111827 !important;
 }
 
+/* Quick search card 3D styles */
+.quick-search-card {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+}
+
+.quick-search-card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.2);
+}
+
+.light-mode .quick-search-card {
+  background: linear-gradient(145deg, #ffffff, #f0f0f0) !important;
+  border-color: #e5e7eb !important;
+  box-shadow: 4px 4px 10px #d1d5db, -4px -4px 10px #ffffff;
+}
+
+.light-mode .quick-search-card:hover {
+  box-shadow: 6px 6px 15px #d1d5db, -6px -6px 15px #ffffff;
+}
+
+.light-mode .quick-search-card span {
+  color: #374151 !important;
+}
+
+.light-mode .quick-search-card .rounded-lg {
+  background-color: #f3f4f6 !important;
+}
+
+/* Light mode table styles */
+.light-mode table {
+  background-color: #ffffff !important;
+}
+
+.light-mode thead,
+.light-mode .bg-\[\#2d2640\]\/60 {
+  background-color: #f8f9fa !important;
+}
+
+.light-mode th {
+  color: #374151 !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+.light-mode td {
+  color: #1f2937 !important;
+}
+
+.light-mode tr.border-b,
+.light-mode .border-\[\#3d3650\]\/40,
+.light-mode .border-b {
+  border-color: #e5e7eb !important;
+}
+
+.light-mode .divide-\[\#3d3650\]\/40 > * + * {
+  border-color: #e5e7eb !important;
+}
+
+.light-mode .rounded-xl.border.overflow-x-auto,
+.light-mode .overflow-x-auto.rounded-xl.border,
+.light-mode div[class*="rounded-xl"][class*="border"][class*="overflow"] {
+  border-color: #e5e7eb !important;
+  background-color: #ffffff !important;
+}
+
+.light-mode .overflow-hidden.divide-y {
+  border-color: #e5e7eb !important;
+}
+
+/* Light mode table text colors */
+.light-mode .text-gray-400 {
+  color: #6b7280 !important;
+}
+
+.light-mode .text-gray-500 {
+  color: #4b5563 !important;
+}
+
 /* ========================================
    LIGHT MODE STYLES
    ======================================== */
@@ -1033,21 +1109,21 @@ input, textarea, select {
 }
 
 /* 활성화 상태 */
-.nav-btn-3d-active .nav-icon-wrapper {
-  background: linear-gradient(to bottom, #e05a88, #d64f79);
+.nav-btn-3d.nav-btn-3d-active .nav-icon-wrapper {
+  background: linear-gradient(to bottom, #e05a88, #d64f79) !important;
   box-shadow:
     0 2px 6px rgba(214, 79, 121, 0.4),
     0 1px 3px rgba(214, 79, 121, 0.3),
     inset 0 1px 1px rgba(255, 255, 255, 0.2),
-    inset 0 -1px 1px rgba(0, 0, 0, 0.1);
+    inset 0 -1px 1px rgba(0, 0, 0, 0.1) !important;
 }
 
-.nav-btn-3d-active .nav-icon-wrapper svg {
-  color: #ffffff;
+.nav-btn-3d.nav-btn-3d-active .nav-icon-wrapper svg {
+  color: #ffffff !important;
 }
 
-.nav-btn-3d-active .nav-label {
-  color: #d64f79;
+.nav-btn-3d.nav-btn-3d-active .nav-label {
+  color: #d64f79 !important;
 }
 
 /* 라이트모드 네비게이션 버튼 */
@@ -1086,20 +1162,20 @@ input, textarea, select {
   color: #6b7280;
 }
 
-.light-mode .nav-btn-3d-active .nav-icon-wrapper {
-  background: linear-gradient(to bottom, #e05a88, #d64f79);
+.light-mode .nav-btn-3d.nav-btn-3d-active .nav-icon-wrapper {
+  background: linear-gradient(to bottom, #e05a88, #d64f79) !important;
   box-shadow:
     0 2px 6px rgba(214, 79, 121, 0.3),
     0 1px 3px rgba(214, 79, 121, 0.2),
     inset 0 1px 1px rgba(255, 255, 255, 0.2),
-    inset 0 -1px 1px rgba(0, 0, 0, 0.08);
+    inset 0 -1px 1px rgba(0, 0, 0, 0.08) !important;
 }
 
-.light-mode .nav-btn-3d-active .nav-icon-wrapper svg {
-  color: #ffffff;
+.light-mode .nav-btn-3d.nav-btn-3d-active .nav-icon-wrapper svg {
+  color: #ffffff !important;
   filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.2));
 }
 
-.light-mode .nav-btn-3d-active .nav-label {
-  color: #d64f79;
+.light-mode .nav-btn-3d.nav-btn-3d-active .nav-label {
+  color: #d64f79 !important;
 }

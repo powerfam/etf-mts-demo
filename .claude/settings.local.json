@@ -13,7 +13,8 @@
       "Bash(git add:*)",
       "Bash(git commit -m \"$\\(cat <<''EOF''\nUI/UX 개선: 아이콘 버튼 입체감, 네비게이션 스타일, 스크리닝 레이아웃 최적화\n\n- 아이콘 버튼 3D 입체감 스타일 추가 \\(icon-btn-3d, icon-btn-3d-active\\)\n- 하단 네비게이션 버튼 입체감 적용 \\(nav-btn-3d\\)\n- Header/QuickSearchPage/DiscoverPage 아이콘 버튼 스타일 통일\n- 스크리닝 페이지 컨트롤바 1줄로 통합 \\(뷰모드+정렬+가로보기\\)\n- QuickSearchPage 요약뷰 marquee 제거\n- 가로보기 모드 화면 방향 감지 및 조건부 회전\n- ETF 상세 투자정보 카드 텍스트 가운데 정렬\n- 운용사 풀네임 표시\n- 로그인 카드 테두리 제거\n- 레버리지/인버스 경고 문구 삭제\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
       "Bash(git push:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(find:*)"
     ]
   }
 }

@@ -196,7 +196,7 @@ export function SearchPage({ isOpen, onClose, onSelectETF, compareETFs, onAddToC
           <button onClick={onClose}>
             <ChevronLeft className="h-6 w-6 text-white" />
           </button>
-          <h1 className="text-lg font-semibold text-white">ETF 검색</h1>
+          <h1 className="text-[21px] font-semibold text-white">ETF 검색</h1>
         </div>
 
         {/* 검색 입력창 */}
@@ -212,7 +212,7 @@ export function SearchPage({ isOpen, onClose, onSelectETF, compareETFs, onAddToC
               }}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               placeholder="종목명을 입력해주세요"
-              className="flex-1 bg-transparent text-white placeholder-gray-500 outline-none text-sm"
+              className="flex-1 bg-transparent text-white placeholder-gray-500 outline-none text-[17px]"
               autoFocus
             />
             {searchQuery && (
@@ -235,7 +235,7 @@ export function SearchPage({ isOpen, onClose, onSelectETF, compareETFs, onAddToC
                 setSelectedQuickFilter(selectedQuickFilter === filter.id ? null : filter.id)
                 setShowResults(true)
               }}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
+              className={`px-3 py-1.5 rounded-full text-[15px] font-medium whitespace-nowrap transition-colors ${
                 selectedQuickFilter === filter.id
                   ? 'bg-[#d64f79] text-white'
                   : 'bg-[#2d2640] text-gray-400 hover:text-white'
@@ -244,7 +244,7 @@ export function SearchPage({ isOpen, onClose, onSelectETF, compareETFs, onAddToC
               {filter.label}
             </button>
           ))}
-          <button className="px-3 py-1.5 rounded-full text-xs font-medium bg-[#2d2640] text-gray-400 whitespace-nowrap">
+          <button className="px-3 py-1.5 rounded-full text-[15px] font-medium bg-[#2d2640] text-gray-400 whitespace-nowrap">
             전체삭제
           </button>
         </div>
@@ -256,7 +256,7 @@ export function SearchPage({ isOpen, onClose, onSelectETF, compareETFs, onAddToC
           {/* 자동완성 결과 */}
           {searchQuery && autoCompleteResults.length > 0 && (
             <div className="px-4 py-2 border-b border-[#2d2640]">
-              <div className="text-xs text-gray-500 mb-2">검색 결과</div>
+              <div className="text-[15px] text-gray-500 mb-2">검색 결과</div>
               {autoCompleteResults.map(etf => (
                 <button
                   key={etf.id}
@@ -266,8 +266,8 @@ export function SearchPage({ isOpen, onClose, onSelectETF, compareETFs, onAddToC
                   }}
                   className="w-full flex items-center justify-between py-2 hover:bg-[#2d2640]/50 rounded px-2"
                 >
-                  <span className="text-sm text-white">{etf.shortName}</span>
-                  <span className={`text-xs ${etf.changePercent >= 0 ? 'text-up' : 'text-down'}`}>
+                  <span className="text-[17px] text-white">{etf.shortName}</span>
+                  <span className={`text-[15px] ${etf.changePercent >= 0 ? 'text-up' : 'text-down'}`}>
                     {formatPercent(etf.changePercent)}
                   </span>
                 </button>
@@ -279,8 +279,8 @@ export function SearchPage({ isOpen, onClose, onSelectETF, compareETFs, onAddToC
           {!searchQuery && recentSearches.length > 0 && (
             <div className="px-4 py-3 border-b border-[#2d2640]">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs text-gray-500">최근 ETF 검색</span>
-                <button onClick={clearRecentSearches} className="text-xs text-gray-500 hover:text-[#d64f79]">
+                <span className="text-[15px] text-gray-500">최근 ETF 검색</span>
+                <button onClick={clearRecentSearches} className="text-[15px] text-gray-500 hover:text-[#d64f79]">
                   전체삭제
                 </button>
               </div>
@@ -292,7 +292,7 @@ export function SearchPage({ isOpen, onClose, onSelectETF, compareETFs, onAddToC
                       setSearchQuery(term)
                       handleSearch(term)
                     }}
-                    className="px-3 py-1.5 rounded-full text-xs bg-[#2d2640] text-gray-300 hover:bg-[#3d3650]"
+                    className="px-3 py-1.5 rounded-full text-[15px] bg-[#2d2640] text-gray-300 hover:bg-[#3d3650]"
                   >
                     {term}
                   </button>
@@ -305,10 +305,10 @@ export function SearchPage({ isOpen, onClose, onSelectETF, compareETFs, onAddToC
           <div className="px-4 py-3">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-white">조회수가 집중된 ETF종목은?</span>
+                <span className="text-[17px] font-medium text-white">조회수가 집중된 ETF종목은?</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-[11px] text-gray-500">2026.02.12 16:10:30 기준</span>
+                <span className="text-[14px] text-gray-500">2026.02.12 16:10:30 기준</span>
                 <button className="p-1 text-gray-400 hover:text-[#d64f79]">
                   <RefreshCw className="h-4 w-4" />
                 </button>
@@ -323,19 +323,19 @@ export function SearchPage({ isOpen, onClose, onSelectETF, compareETFs, onAddToC
                   className="flex items-center gap-3 p-3 bg-[#1f1a2e] rounded-lg cursor-pointer hover:bg-[#2a2438] transition-colors"
                 >
                   {/* 순위 */}
-                  <span className={`text-sm font-bold w-4 ${index < 3 ? 'text-[#d64f79]' : 'text-gray-500'}`}>
+                  <span className={`text-[17px] font-bold w-4 ${index < 3 ? 'text-[#d64f79]' : 'text-gray-500'}`}>
                     {index + 1}
                   </span>
 
                   {/* ETF 정보 */}
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-white truncate">{etf.shortName}</div>
+                    <div className="text-[17px] font-medium text-white truncate">{etf.shortName}</div>
                   </div>
 
                   {/* 가격 & 등락률 */}
                   <div className="text-right shrink-0">
-                    <div className="text-sm text-white">{formatNumber(etf.price)}</div>
-                    <div className={`text-xs ${etf.changePercent >= 0 ? 'text-up' : 'text-down'}`}>
+                    <div className="text-[17px] text-white">{formatNumber(etf.price)}</div>
+                    <div className={`text-[15px] ${etf.changePercent >= 0 ? 'text-up' : 'text-down'}`}>
                       {formatPercent(etf.changePercent)}
                     </div>
                   </div>
@@ -362,13 +362,13 @@ export function SearchPage({ isOpen, onClose, onSelectETF, compareETFs, onAddToC
           {/* 결과 헤더 */}
           <div className="sticky top-0 bg-[#191322] px-4 py-2 border-b border-[#2d2640] z-10">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-white">
+              <span className="text-[17px] text-white">
                 총 <span className="text-[#d64f79] font-bold">{searchResults.length}</span>건
               </span>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setShowFilterModal(true)}
-                  className="flex items-center gap-1 text-xs text-gray-400"
+                  className="flex items-center gap-1 text-[15px] text-gray-400"
                 >
                   {getSortLabel()}
                   <ChevronDown className="h-3 w-3" />
@@ -387,7 +387,7 @@ export function SearchPage({ isOpen, onClose, onSelectETF, compareETFs, onAddToC
               <div className="flex rounded-lg overflow-hidden border border-[#3d3650]">
                 <button
                   onClick={() => setViewMode('summary')}
-                  className={`px-3 py-1 text-xs font-medium ${
+                  className={`px-3 py-1 text-[15px] font-medium ${
                     viewMode === 'summary' ? 'bg-[#d64f79] text-white' : 'text-gray-400'
                   }`}
                 >
@@ -395,7 +395,7 @@ export function SearchPage({ isOpen, onClose, onSelectETF, compareETFs, onAddToC
                 </button>
                 <button
                   onClick={() => setViewMode('detail')}
-                  className={`px-3 py-1 text-xs font-medium ${
+                  className={`px-3 py-1 text-[15px] font-medium ${
                     viewMode === 'detail' ? 'bg-[#d64f79] text-white' : 'text-gray-400'
                   }`}
                 >
@@ -409,7 +409,7 @@ export function SearchPage({ isOpen, onClose, onSelectETF, compareETFs, onAddToC
                     <button
                       key={tab.id}
                       onClick={() => setDetailTab(tab.id)}
-                      className={`px-2 py-1 text-xs rounded ${
+                      className={`px-2 py-1 text-[15px] rounded ${
                         detailTab === tab.id ? 'text-white' : 'text-gray-500'
                       }`}
                     >
@@ -431,18 +431,18 @@ export function SearchPage({ isOpen, onClose, onSelectETF, compareETFs, onAddToC
                   className="flex items-center gap-3 p-3 bg-[#1f1a2e] rounded-lg cursor-pointer hover:bg-[#2a2438] transition-colors"
                 >
                   {/* ETF 뱃지 */}
-                  <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-[#2d2640] text-[11px] text-gray-400 font-medium shrink-0">
+                  <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-[#2d2640] text-[14px] text-gray-400 font-medium shrink-0">
                     ETF
                   </div>
 
                   {/* ETF 정보 */}
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-white truncate">{etf.shortName}</div>
-                    <div className="text-xs text-gray-500">{formatNumber(etf.price)}원</div>
+                    <div className="text-[17px] font-medium text-white truncate">{etf.shortName}</div>
+                    <div className="text-[15px] text-gray-500">{formatNumber(etf.price)}원</div>
                   </div>
 
                   {/* 등락률 */}
-                  <div className={`text-sm font-medium ${etf.changePercent >= 0 ? 'text-up' : 'text-down'}`}>
+                  <div className={`text-[17px] font-medium ${etf.changePercent >= 0 ? 'text-up' : 'text-down'}`}>
                     {formatPercent(etf.changePercent)}
                   </div>
 
@@ -472,7 +472,7 @@ export function SearchPage({ isOpen, onClose, onSelectETF, compareETFs, onAddToC
           {/* 결과 리스트 - 상세 뷰 (테이블) */}
           {viewMode === 'detail' && (
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[800px] text-xs">
+              <table className="w-full min-w-[800px] text-[15px]">
                 <thead className="bg-[#1f1a2e] sticky top-0">
                   <tr className="border-b border-[#2d2640]">
                     <th className="text-left py-2 px-3 text-gray-400 font-medium sticky left-0 bg-[#1f1a2e] min-w-[140px]">종목</th>
@@ -605,8 +605,8 @@ export function SearchPage({ isOpen, onClose, onSelectETF, compareETFs, onAddToC
           }}
           className="flex items-center gap-2 px-4 py-2.5 bg-[#1f1a2e] border border-[#3d3650] rounded-full shadow-lg"
         >
-          <span className="text-sm text-white">비교하기</span>
-          <span className="text-sm text-[#d64f79]">({compareETFs.length}/3)</span>
+          <span className="text-[17px] text-white">비교하기</span>
+          <span className="text-[17px] text-[#d64f79]">({compareETFs.length}/3)</span>
           <Search className="h-4 w-4 text-gray-400" />
         </button>
       </div>
@@ -620,13 +620,13 @@ export function SearchPage({ isOpen, onClose, onSelectETF, compareETFs, onAddToC
 
           {/* 종목 필터 기준 */}
           <div className="mb-4">
-            <div className="text-xs text-gray-400 mb-2">종목 필터 기준</div>
+            <div className="text-[15px] text-gray-400 mb-2">종목 필터 기준</div>
             <div className="flex gap-2">
               {stockFilters.map(filter => (
                 <button
                   key={filter.id}
                   onClick={() => setSelectedFilter(filter.id)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                  className={`px-3 py-1.5 rounded-full text-[15px] font-medium transition-colors ${
                     selectedFilter === filter.id
                       ? 'bg-[#d64f79] text-white'
                       : 'bg-[#2d2640] text-gray-400'
@@ -640,13 +640,13 @@ export function SearchPage({ isOpen, onClose, onSelectETF, compareETFs, onAddToC
 
           {/* 결과 정렬 기준 */}
           <div className="mb-4">
-            <div className="text-xs text-gray-400 mb-2">결과 정렬 기준</div>
+            <div className="text-[15px] text-gray-400 mb-2">결과 정렬 기준</div>
             <div className="space-y-1">
               {sortOptions.map(option => (
                 <button
                   key={option.id}
                   onClick={() => setSelectedSort(option.id)}
-                  className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
+                  className={`w-full text-left px-3 py-2 rounded-lg text-[17px] transition-colors ${
                     selectedSort === option.id
                       ? 'bg-[#2d2640] text-white'
                       : 'text-gray-400 hover:bg-[#2d2640]/50'
@@ -660,7 +660,7 @@ export function SearchPage({ isOpen, onClose, onSelectETF, compareETFs, onAddToC
 
           <button
             onClick={() => setShowFilterModal(false)}
-            className="w-full py-2.5 bg-[#d64f79] text-white rounded-lg text-sm font-medium"
+            className="w-full py-2.5 bg-[#d64f79] text-white rounded-lg text-[17px] font-medium"
           >
             확인
           </button>

@@ -87,7 +87,7 @@ export function FloatingChatbot({ onSelectContent, onNavigateToGlossary, hasComp
             <div className="flex items-center justify-between px-4 pb-3 border-b border-[#2d2640]">
               <div>
                 <h3 className="text-white font-semibold">ETF 무엇이든 물어보세요</h3>
-                <p className="text-gray-500 text-xs">검색하거나 자주 묻는 질문을 선택하세요</p>
+                <p className="text-gray-500 text-[15px]">검색하거나 자주 묻는 질문을 선택하세요</p>
               </div>
               <div className="flex items-center gap-2">
                 <button
@@ -95,7 +95,7 @@ export function FloatingChatbot({ onSelectContent, onNavigateToGlossary, hasComp
                     setShowChatbot(false)
                     setIsOpen(false)
                   }}
-                  className="text-xs text-gray-500 hover:text-gray-300"
+                  className="text-[15px] text-gray-500 hover:text-gray-300"
                 >
                   숨기기
                 </button>
@@ -120,7 +120,7 @@ export function FloatingChatbot({ onSelectContent, onNavigateToGlossary, hasComp
                   placeholder="ETF, 세금, 계좌, 용어 등 검색..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-[#2d2640] border border-[#3d3650] rounded-lg text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-[#d64f79]/50 transition-all"
+                  className="w-full pl-10 pr-4 py-2.5 bg-[#2d2640] border border-[#3d3650] rounded-lg text-[17px] text-white placeholder:text-gray-500 focus:outline-none focus:border-[#d64f79]/50 transition-all"
                 />
               </div>
             </div>
@@ -132,7 +132,7 @@ export function FloatingChatbot({ onSelectContent, onNavigateToGlossary, hasComp
                 <div className="space-y-2">
                   {searchResults.length > 0 ? (
                     <>
-                      <p className="text-xs text-gray-500">{searchResults.length}건의 검색 결과</p>
+                      <p className="text-[15px] text-gray-500">{searchResults.length}건의 검색 결과</p>
                       {searchResults.map((content) => {
                         const category = categoryInfo[content.category]
                         return (
@@ -148,10 +148,10 @@ export function FloatingChatbot({ onSelectContent, onNavigateToGlossary, hasComp
                               })()}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <span className="text-sm text-gray-200 line-clamp-1 block">
+                              <span className="text-[17px] text-gray-200 line-clamp-1 block">
                                 {content.question}
                               </span>
-                              <span className="text-[11px] text-gray-500">{category.label}</span>
+                              <span className="text-[14px] text-gray-500">{category.label}</span>
                             </div>
                             <ChevronRight className="h-4 w-4 text-gray-600" />
                           </button>
@@ -160,8 +160,8 @@ export function FloatingChatbot({ onSelectContent, onNavigateToGlossary, hasComp
                     </>
                   ) : (
                     <div className="py-8 text-center">
-                      <p className="text-gray-500 text-sm">검색 결과가 없습니다</p>
-                      <p className="text-gray-600 text-xs mt-1">다른 키워드로 검색해보세요</p>
+                      <p className="text-gray-500 text-[17px]">검색 결과가 없습니다</p>
+                      <p className="text-gray-600 text-[15px] mt-1">다른 키워드로 검색해보세요</p>
                     </div>
                   )}
                 </div>
@@ -214,7 +214,7 @@ export function FloatingChatbot({ onSelectContent, onNavigateToGlossary, hasComp
                   {/* 구분선 */}
                   <div className="flex items-center gap-3 py-2">
                     <div className="flex-1 h-px bg-[#3d3650]" />
-                    <span className="text-xs text-gray-500">자주 묻는 질문</span>
+                    <span className="text-[15px] text-gray-500">자주 묻는 질문</span>
                     <div className="flex-1 h-px bg-[#3d3650]" />
                   </div>
 
@@ -226,8 +226,8 @@ export function FloatingChatbot({ onSelectContent, onNavigateToGlossary, hasComp
                         onClick={() => handleContentClick(content)}
                         className="w-full flex items-center gap-3 px-3 py-2.5 bg-[#2d2640] hover:bg-[#3d3650] rounded-lg transition-all text-left"
                       >
-                        <span className="text-xs text-gray-500 w-4">{idx + 1}</span>
-                        <span className="text-sm text-gray-200 flex-1 line-clamp-1">
+                        <span className="text-[15px] text-gray-500 w-4">{idx + 1}</span>
+                        <span className="text-[17px] text-gray-200 flex-1 line-clamp-1">
                           {content.question}
                         </span>
                         <ChevronRight className="h-4 w-4 text-gray-600" />
@@ -245,7 +245,7 @@ export function FloatingChatbot({ onSelectContent, onNavigateToGlossary, hasComp
       {!showChatbot && (
         <button
           onClick={() => setShowChatbot(true)}
-          className="fixed bottom-24 right-4 px-3 py-2 bg-[#2d2640] border border-[#3d3650] rounded-full text-xs text-gray-400 hover:text-white transition-colors z-50"
+          className="fixed bottom-24 right-4 px-3 py-2 bg-[#2d2640] border border-[#3d3650] rounded-full text-[15px] text-gray-400 hover:text-white transition-colors z-50"
         >
           ETF 도움말
         </button>
@@ -275,8 +275,8 @@ function IntentButton({
       <div className="rounded-full p-2 bg-[#d64f79]/20">
         <Icon className="h-5 w-5 text-[#d64f79]" />
       </div>
-      <span className="text-sm font-medium text-white">{title}</span>
-      <span className="text-[11px] text-gray-400">{subtitle}</span>
+      <span className="text-[17px] font-medium text-white">{title}</span>
+      <span className="text-[14px] text-gray-400">{subtitle}</span>
     </button>
   )
 }

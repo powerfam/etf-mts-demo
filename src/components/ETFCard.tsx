@@ -74,27 +74,27 @@ export function ETFCard({ etf, onClick, onLongPress }: ETFCardProps) {
         <div className="flex items-start justify-between mb-3">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs text-gray-400">{etf.ticker}</span>
+              <span className="text-[15px] text-gray-400">{etf.ticker}</span>
               {etf.isLeveraged && (
-                <Badge variant="destructive" className="text-[11px] px-1.5">
+                <Badge variant="destructive" className="text-[14px] px-1.5">
                   <Zap className="h-3 w-3 mr-0.5" />
                   레버리지
                 </Badge>
               )}
               {etf.isInverse && (
-                <Badge variant="secondary" className="text-[11px] px-1.5">
+                <Badge variant="secondary" className="text-[14px] px-1.5">
                   <ArrowDownUp className="h-3 w-3 mr-0.5" />
                   인버스
                 </Badge>
               )}
               {etf.isHedged && (
-                <Badge variant="info" className="text-[11px] px-1.5">
+                <Badge variant="info" className="text-[14px] px-1.5">
                   <Shield className="h-3 w-3 mr-0.5" />
                   환헤지
                 </Badge>
               )}
             </div>
-            <h3 className="font-semibold text-white text-sm leading-tight">{etf.shortName}</h3>
+            <h3 className="font-semibold text-white text-[17px] leading-tight">{etf.shortName}</h3>
           </div>
 
           {/* Sparkline */}
@@ -111,10 +111,10 @@ export function ETFCard({ etf, onClick, onLongPress }: ETFCardProps) {
         {/* Price */}
         <div className="flex items-end justify-between mb-3">
           <div>
-            <div className="text-xl font-bold text-white">
-              {formatNumber(etf.price)}<span className="text-sm font-normal text-gray-400">원</span>
+            <div className="text-[23px] font-bold text-white">
+              {formatNumber(etf.price)}<span className="text-[17px] font-normal text-gray-400">원</span>
             </div>
-            <div className={`flex items-center gap-1 text-sm ${isUp ? 'text-up' : 'text-down'}`}>
+            <div className={`flex items-center gap-1 text-[17px] ${isUp ? 'text-up' : 'text-down'}`}>
               {isUp ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
               <span>{formatPercent(etf.changePercent)}</span>
               <span className="text-gray-500">({formatNumber(etf.change)})</span>
@@ -123,9 +123,9 @@ export function ETFCard({ etf, onClick, onLongPress }: ETFCardProps) {
 
           {/* iNAV & Discrepancy */}
           <div className="text-right">
-            <div className="text-xs text-gray-400">iNAV</div>
-            <div className="text-sm text-white">{formatNumber(etf.iNav)}</div>
-            <div className={`text-xs ${Math.abs(etf.discrepancy) < 0.1 ? 'text-emerald-400' : 'text-amber-400'}`}>
+            <div className="text-[15px] text-gray-400">iNAV</div>
+            <div className="text-[17px] text-white">{formatNumber(etf.iNav)}</div>
+            <div className={`text-[15px] ${Math.abs(etf.discrepancy) < 0.1 ? 'text-emerald-400' : 'text-amber-400'}`}>
               괴리 {etf.discrepancy >= 0 ? '+' : ''}{etf.discrepancy.toFixed(2)}%
             </div>
           </div>
@@ -136,20 +136,20 @@ export function ETFCard({ etf, onClick, onLongPress }: ETFCardProps) {
         {/* Key Metrics */}
         <div className="grid grid-cols-4 gap-2 text-center border-t border-[#2d2640] pt-3">
           <div>
-            <div className="text-[11px] text-gray-500 mb-0.5">TER</div>
-            <div className="text-xs font-medium text-white">{etf.ter.toFixed(2)}%</div>
+            <div className="text-[14px] text-gray-500 mb-0.5">TER</div>
+            <div className="text-[15px] font-medium text-white">{etf.ter.toFixed(2)}%</div>
           </div>
           <div>
-            <div className="text-[11px] text-gray-500 mb-0.5">거래대금</div>
-            <div className="text-xs font-medium text-white">{formatCurrency(etf.adtv)}</div>
+            <div className="text-[14px] text-gray-500 mb-0.5">거래대금</div>
+            <div className="text-[15px] font-medium text-white">{formatCurrency(etf.adtv)}</div>
           </div>
           <div>
-            <div className="text-[11px] text-gray-500 mb-0.5">순자산</div>
-            <div className="text-xs font-medium text-white">{formatCurrency(etf.aum)}</div>
+            <div className="text-[14px] text-gray-500 mb-0.5">순자산</div>
+            <div className="text-[15px] font-medium text-white">{formatCurrency(etf.aum)}</div>
           </div>
           <div>
-            <div className="text-[11px] text-gray-500 mb-0.5">스프레드</div>
-            <div className="text-xs font-medium text-white">{etf.spread.toFixed(2)}%</div>
+            <div className="text-[14px] text-gray-500 mb-0.5">스프레드</div>
+            <div className="text-[15px] font-medium text-white">{etf.spread.toFixed(2)}%</div>
           </div>
         </div>
 

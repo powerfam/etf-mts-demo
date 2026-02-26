@@ -116,21 +116,21 @@ export function InvestInfoDetailPage({
         // 헤더
         if (line.startsWith('## ')) {
           return (
-            <h2 key={idx} className="text-lg font-bold text-white mt-6 mb-3">
+            <h2 key={idx} className="text-[21px] font-bold text-white mt-6 mb-3">
               {line.replace('## ', '')}
             </h2>
           )
         }
         if (line.startsWith('### ')) {
           return (
-            <h3 key={idx} className="text-base font-semibold text-white mt-4 mb-2">
+            <h3 key={idx} className="text-[19px] font-semibold text-white mt-4 mb-2">
               {line.replace('### ', '')}
             </h3>
           )
         }
         if (line.startsWith('#### ')) {
           return (
-            <h4 key={idx} className="text-sm font-semibold text-white mt-3 mb-2">
+            <h4 key={idx} className="text-[17px] font-semibold text-white mt-3 mb-2">
               {line.replace('#### ', '')}
             </h4>
           )
@@ -141,7 +141,7 @@ export function InvestInfoDetailPage({
           return (
             <blockquote
               key={idx}
-              className="border-l-4 border-[#d64f79] pl-4 py-2 my-3 bg-[#d64f79]/10 rounded-r-lg text-gray-300 text-sm"
+              className="border-l-4 border-[#d64f79] pl-4 py-2 my-3 bg-[#d64f79]/10 rounded-r-lg text-gray-300 text-[17px]"
             >
               {line.replace('> ', '')}
             </blockquote>
@@ -161,7 +161,7 @@ export function InvestInfoDetailPage({
           return (
             <div
               key={idx}
-              className={`grid gap-2 py-2 px-3 text-sm ${
+              className={`grid gap-2 py-2 px-3 text-[17px] ${
                 idx === 0 ? 'bg-[#3d3650] rounded-t-lg font-medium' : 'border-b border-[#3d3650]'
               }`}
               style={{ gridTemplateColumns: `repeat(${cells.length}, 1fr)` }}
@@ -184,12 +184,12 @@ export function InvestInfoDetailPage({
         const processedLine = line
           .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white font-semibold">$1</strong>')
           .replace(/\*(.*?)\*/g, '<em class="text-[#d64f79]">$1</em>')
-          .replace(/`(.*?)`/g, '<code class="bg-[#3d3650] px-1.5 py-0.5 rounded text-[#d64f79] text-sm">$1</code>')
+          .replace(/`(.*?)`/g, '<code class="bg-[#3d3650] px-1.5 py-0.5 rounded text-[#d64f79] text-[17px]">$1</code>')
 
         return (
           <p
             key={idx}
-            className="text-gray-300 text-sm leading-relaxed mb-2"
+            className="text-gray-300 text-[17px] leading-relaxed mb-2"
             dangerouslySetInnerHTML={{ __html: processedLine }}
           />
         )
@@ -208,7 +208,7 @@ export function InvestInfoDetailPage({
               className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
             >
               <ArrowLeft className="h-5 w-5" />
-              <span className="text-sm">목록으로</span>
+              <span className="text-[17px]">목록으로</span>
             </button>
             <button
               onClick={handleShare}
@@ -227,13 +227,13 @@ export function InvestInfoDetailPage({
             <div className="flex items-center gap-2 mb-2">
               <Badge
                 variant="outline"
-                className="text-xs border-0 flex items-center gap-1 bg-[#d64f79]/20 text-[#d64f79]"
+                className="text-[15px] border-0 flex items-center gap-1 bg-[#d64f79]/20 text-[#d64f79]"
               >
                 <CategoryIcon className="h-3 w-3" />
                 {category.label}
               </Badge>
             </div>
-            <h1 className="text-lg font-bold text-white leading-tight">
+            <h1 className="text-[21px] font-bold text-white leading-tight">
               {content.question}
             </h1>
           </div>
@@ -252,7 +252,7 @@ export function InvestInfoDetailPage({
                 onClick={() => setExpanded(!expanded)}
                 className="w-full flex items-center justify-between mb-2"
               >
-                <h2 className="text-sm font-semibold text-[#d64f79]">핵심 요약</h2>
+                <h2 className="text-[17px] font-semibold text-[#d64f79]">핵심 요약</h2>
                 <ChevronRight
                   className={`h-4 w-4 text-gray-500 transition-transform ${
                     expanded ? 'rotate-90' : ''
@@ -262,7 +262,7 @@ export function InvestInfoDetailPage({
               {expanded && (
                 <ul className="space-y-2">
                   {content.summary.map((item, idx) => (
-                    <li key={idx} className="flex items-start gap-2 text-sm">
+                    <li key={idx} className="flex items-start gap-2 text-[17px]">
                       <span className="text-[#d64f79] mt-0.5 font-bold">{idx + 1}</span>
                       <span className="text-gray-200">{item}</span>
                     </li>
@@ -281,11 +281,11 @@ export function InvestInfoDetailPage({
           {content.misunderstandingReason && (
             <Card className="bg-[#2d2640] border-[#3d3650]">
               <CardContent className="p-4">
-                <h3 className="flex items-center gap-2 text-sm font-semibold text-yellow-500 mb-3">
+                <h3 className="flex items-center gap-2 text-[17px] font-semibold text-yellow-500 mb-3">
                   <AlertTriangle className="h-4 w-4" />
                   오해가 생긴 이유
                 </h3>
-                <p className="text-gray-300 text-sm leading-relaxed">
+                <p className="text-gray-300 text-[17px] leading-relaxed">
                   {content.misunderstandingReason}
                 </p>
               </CardContent>
@@ -295,7 +295,7 @@ export function InvestInfoDetailPage({
           {/* 출처 및 관련 링크 */}
           <Card className="bg-[#2d2640] border-[#3d3650]">
             <CardContent className="p-4 space-y-3">
-              <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+              <h3 className="text-[17px] font-semibold text-white flex items-center gap-2">
                 <ExternalLink className="h-4 w-4 text-[#d64f79]" />
                 출처 및 참고자료
               </h3>
@@ -306,7 +306,7 @@ export function InvestInfoDetailPage({
                     href={source.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300 transition-colors"
+                    className="flex items-center gap-2 text-[17px] text-blue-400 hover:text-blue-300 transition-colors"
                   >
                     <span className="w-1.5 h-1.5 bg-blue-400 rounded-full" />
                     {source.name}
@@ -319,18 +319,18 @@ export function InvestInfoDetailPage({
           {/* 업데이트 정보 & 면책 */}
           <Card className="bg-[#1f1a2e] border-[#2d2640]">
             <CardContent className="p-4 space-y-2">
-              <div className="flex items-center gap-2 text-xs text-gray-400">
+              <div className="flex items-center gap-2 text-[15px] text-gray-400">
                 <Clock className="h-3 w-3" />
                 <span>최종 업데이트: {content.updatedAt}</span>
               </div>
-              <div className="flex items-center gap-2 text-xs text-gray-400">
+              <div className="flex items-center gap-2 text-[15px] text-gray-400">
                 <Eye className="h-3 w-3" />
                 <span>조회 {formatNumber(content.viewCount)}</span>
                 <span className="mx-1">•</span>
                 <ThumbsUp className="h-3 w-3" />
                 <span>도움됨 {formatNumber(content.helpfulCount)}</span>
               </div>
-              <p className="text-xs text-gray-500 mt-2 leading-relaxed">
+              <p className="text-[15px] text-gray-500 mt-2 leading-relaxed">
                 {content.legalDisclaimer}
               </p>
             </CardContent>
@@ -339,7 +339,7 @@ export function InvestInfoDetailPage({
           {/* 피드백 버튼 */}
           <Card className="bg-[#2d2640] border-[#3d3650]">
             <CardContent className="p-4">
-              <p className="text-sm text-gray-300 mb-3 text-center">
+              <p className="text-[17px] text-gray-300 mb-3 text-center">
                 이 콘텐츠가 도움이 되었나요?
               </p>
               <div className="flex gap-3 justify-center">
@@ -371,7 +371,7 @@ export function InvestInfoDetailPage({
                 </Button>
               </div>
               {feedback && (
-                <p className="text-xs text-center text-gray-500 mt-3">
+                <p className="text-[15px] text-center text-gray-500 mt-3">
                   소중한 피드백 감사합니다!
                 </p>
               )}
@@ -381,7 +381,7 @@ export function InvestInfoDetailPage({
           {/* 관련 콘텐츠 */}
           {relatedContents.length > 0 && (
             <section className="space-y-3">
-              <h3 className="text-sm font-semibold text-white">관련 콘텐츠</h3>
+              <h3 className="text-[17px] font-semibold text-white">관련 콘텐츠</h3>
               <div className="space-y-2">
                 {relatedContents.map((related) => {
                   const relCategory = categoryInfo[related.category]
@@ -396,14 +396,14 @@ export function InvestInfoDetailPage({
                         <div className="flex items-center gap-2 mb-1.5">
                           <Badge
                             variant="outline"
-                            className="text-[11px] border-0 px-1.5 py-0 flex items-center gap-1 bg-[#d64f79]/20 text-[#d64f79]"
+                            className="text-[14px] border-0 px-1.5 py-0 flex items-center gap-1 bg-[#d64f79]/20 text-[#d64f79]"
                           >
                             <RelIcon className="h-2.5 w-2.5" />
                             {relCategory.label}
                           </Badge>
                         </div>
                         <div className="flex items-center justify-between">
-                          <p className="text-sm text-gray-200 line-clamp-1">
+                          <p className="text-[17px] text-gray-200 line-clamp-1">
                             {related.question}
                           </p>
                           <ChevronRight className="h-4 w-4 text-gray-500 flex-shrink-0" />
@@ -421,7 +421,7 @@ export function InvestInfoDetailPage({
             {content.tags.map((tag) => (
               <span
                 key={tag}
-                className="text-xs px-3 py-1.5 bg-[#2d2640] text-gray-400 rounded-full border border-[#3d3650]"
+                className="text-[15px] px-3 py-1.5 bg-[#2d2640] text-gray-400 rounded-full border border-[#3d3650]"
               >
                 #{tag}
               </span>

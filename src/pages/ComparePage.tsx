@@ -383,8 +383,8 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
       {/* Header */}
       <div className="sticky top-[52px] z-40 bg-[#191322] px-4 py-3 border-b border-[#2d2640]">
         <div className="flex items-center justify-between">
-          <h1 className="text-lg font-semibold text-white">ETF 비교</h1>
-          <Badge variant="outline" className="text-xs">{selectedETFs.length}/3</Badge>
+          <h1 className="text-[21px] font-semibold text-white">ETF 비교</h1>
+          <Badge variant="outline" className="text-[15px]">{selectedETFs.length}/3</Badge>
         </div>
       </div>
 
@@ -396,14 +396,14 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
               <Card className="h-[100px]">
                 <CardContent className="p-2.5 h-full flex flex-col justify-between">
                   <div>
-                    <div className="text-xs text-gray-400">{etf.ticker}</div>
-                    <div className="text-sm font-medium text-white truncate">{etf.shortName}</div>
+                    <div className="text-[15px] text-gray-400">{etf.ticker}</div>
+                    <div className="text-[17px] font-medium text-white truncate">{etf.shortName}</div>
                   </div>
-                  <div>
-                    <div className="text-base font-bold text-white">{formatNumber(etf.price)}</div>
-                    <div className={`text-xs ${etf.change >= 0 ? 'text-up' : 'text-down'}`}>
+                  <div className="flex items-center gap-1.5 text-[14px]">
+                    <span className="font-bold text-white whitespace-nowrap">{formatNumber(etf.price)}원</span>
+                    <span className={`whitespace-nowrap ${etf.change >= 0 ? 'text-up' : 'text-down'}`}>
                       {etf.change >= 0 ? '+' : ''}{etf.changePercent.toFixed(2)}%
-                    </div>
+                    </span>
                   </div>
                 </CardContent>
               </Card>
@@ -422,7 +422,7 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
               className="h-[100px] border-2 border-dashed border-[#2d2640] rounded-xl flex flex-col items-center justify-center gap-2 hover:border-[#d64f79]/50 transition-colors"
             >
               <Plus className="h-5 w-5 text-gray-500" />
-              <span className="text-sm text-gray-500">ETF 추가</span>
+              <span className="text-[17px] text-gray-500">ETF 추가</span>
             </button>
           )}
         </div>
@@ -447,7 +447,7 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="종목명, 티커, 테마 검색..."
-                  className="w-full pl-10 pr-4 py-2.5 bg-[#2a2438] border border-[#3d3650] rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#d64f79]"
+                  className="w-full pl-10 pr-4 py-2.5 bg-[#2a2438] border border-[#3d3650] rounded-lg text-[17px] text-white placeholder-gray-500 focus:outline-none focus:border-[#d64f79]"
                   autoFocus
                 />
               </div>
@@ -455,7 +455,7 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
             <ScrollArea className="h-[55vh]">
               <div className="p-4 space-y-2">
                 {filteredETFs.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500 text-sm">
+                  <div className="text-center py-8 text-gray-500 text-[17px]">
                     검색 결과가 없습니다
                   </div>
                 ) : (
@@ -467,14 +467,14 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
                     >
                       <CardContent className="p-3 flex items-center justify-between">
                         <div>
-                          <div className="text-xs text-gray-400">{etf.ticker}</div>
-                          <div className="text-sm font-medium text-white">{etf.shortName}</div>
+                          <div className="text-[15px] text-gray-400">{etf.ticker}</div>
+                          <div className="text-[17px] font-medium text-white">{etf.shortName}</div>
                         </div>
-                        <div className="text-right">
-                          <div className="text-sm font-bold text-white">{formatNumber(etf.price)}</div>
-                          <div className={`text-xs ${etf.change >= 0 ? 'text-up' : 'text-down'}`}>
+                        <div className="flex items-center gap-1.5 text-[14px]">
+                          <span className="font-bold text-white whitespace-nowrap">{formatNumber(etf.price)}원</span>
+                          <span className={`whitespace-nowrap ${etf.change >= 0 ? 'text-up' : 'text-down'}`}>
                             {etf.change >= 0 ? '+' : ''}{etf.changePercent.toFixed(2)}%
-                          </div>
+                          </span>
                         </div>
                       </CardContent>
                     </Card>
@@ -491,11 +491,11 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
         <div className="px-4 pt-4">
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg font-semibold flex items-center gap-2">
+              <CardTitle className="text-[21px] font-semibold flex items-center gap-2">
                 <RadarIcon className="h-5 w-5 text-[#d64f79]" />
                 ETF Radar
               </CardTitle>
-              <p className="text-sm text-gray-400">선택 종목 간 상대 비교</p>
+              <p className="text-[17px] text-gray-400">선택 종목 간 상대 비교</p>
             </CardHeader>
             <CardContent className="pb-4">
               <div className="h-[280px] w-full">
@@ -535,7 +535,7 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
                                 style={{ backgroundColor: chartColors[idx % chartColors.length] }}
                               />
                               <div className="legend-marquee">
-                                <div className="legend-marquee-inner text-[13px] text-white whitespace-nowrap">
+                                <div className="legend-marquee-inner text-[16px] text-white whitespace-nowrap">
                                   {etf.shortName}
                                 </div>
                               </div>
@@ -557,8 +557,8 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
         <div className="px-4 pt-3">
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm">비교 요약</CardTitle>
-              <p className="text-xs text-gray-500">우위 지표 많은 순</p>
+              <CardTitle className="text-[17px]">비교 요약</CardTitle>
+              <p className="text-[15px] text-gray-500">우위 지표 많은 순</p>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
@@ -577,9 +577,9 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
                             className="w-3 h-3 rounded-full"
                             style={{ backgroundColor: chartColors[originalIndex % chartColors.length] }}
                           />
-                          <span className="text-sm text-white">{etf.shortName}</span>
+                          <span className="text-[17px] text-white">{etf.shortName}</span>
                         </div>
-                        <span className="text-xs text-gray-400">
+                        <span className="text-[15px] text-gray-400">
                           우위 항목 {ranks.first}개
                         </span>
                       </div>
@@ -632,14 +632,14 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
 
       {/* Comparison Table - 탭 형태로 변경 */}
       <div className="px-4 pt-4" data-tour="compare-table">
-        <h3 className="text-sm font-medium text-white mb-2">상세 지표 비교</h3>
+        <h3 className="text-[17px] font-medium text-white mb-2">상세 지표 비교</h3>
 
         {/* 탭 버튼 */}
         <Tabs value={compareTab} onValueChange={(v) => setCompareTab(v as 'key' | 'basic' | 'holdings')} className="mb-3">
           <TabsList className="w-full grid grid-cols-3 h-auto bg-[#2a2438]">
-            <TabsTrigger value="key" className="text-xs py-2">주요지표</TabsTrigger>
-            <TabsTrigger value="basic" className="text-xs py-2">기본정보</TabsTrigger>
-            <TabsTrigger value="holdings" className="text-xs py-2">보유종목</TabsTrigger>
+            <TabsTrigger value="key" className="text-[15px] py-2">주요지표</TabsTrigger>
+            <TabsTrigger value="basic" className="text-[15px] py-2">기본정보</TabsTrigger>
+            <TabsTrigger value="holdings" className="text-[15px] py-2">보유종목</TabsTrigger>
           </TabsList>
 
           {/* 주요지표 탭 */}
@@ -655,16 +655,16 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
                 </colgroup>
                 <thead>
                   <tr>
-                    <th className="p-2 text-sm font-medium text-gray-500 text-left rounded-tl-xl"></th>
+                    <th className="p-2 text-[17px] font-medium text-gray-500 text-left rounded-tl-xl"></th>
                     {selectedETFs.map((etf, index) => (
                       <th key={etf.id} className={`p-2 text-center border-l border-[#2d2640] ${index === selectedETFs.length - 1 ? 'rounded-tr-xl' : ''}`}>
                         <div
                           className="w-2.5 h-2.5 rounded-full mx-auto mb-1"
                           style={{ backgroundColor: chartColors[index % chartColors.length] }}
                         />
-                        <div className="text-xs text-gray-400 font-normal">{etf.ticker}</div>
+                        <div className="text-[15px] text-gray-400 font-normal">{etf.ticker}</div>
                         <div className="marquee-cell">
-                          <div className="marquee-inner text-sm font-medium text-white whitespace-nowrap">
+                          <div className="marquee-inner text-[17px] font-medium text-white whitespace-nowrap">
                             {etf.shortName}
                           </div>
                         </div>
@@ -689,7 +689,7 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
                     {/* Category Header */}
                     <tr key={`cat-key-${category.category}`} className={catIdx > 0 ? 'border-t border-[#2d2640]' : ''}>
                       <td colSpan={selectedETFs.length + 1} className="bg-[#2a2438] px-3 py-2">
-                        <span className="text-sm font-semibold text-[#d64f79]">{category.category}</span>
+                        <span className="text-[17px] font-semibold text-[#d64f79]">{category.category}</span>
                       </td>
                     </tr>
 
@@ -699,7 +699,7 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
                         <td className="p-2">
                           <button
                             onClick={() => setSelectedMetric(item.key)}
-                            className="text-sm text-gray-400 hover:text-[#d64f79] transition-colors text-left"
+                            className="text-[17px] text-gray-400 hover:text-[#d64f79] transition-colors text-left"
                           >
                             {item.label}
                           </button>
@@ -720,7 +720,7 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
                               key={etf.id}
                               className={`p-2 text-center border-l border-[#2d2640] ${isBest ? 'bg-emerald-500/10' : ''}`}
                             >
-                              <span className={`text-base font-semibold ${isBest ? 'text-emerald-400' : 'text-white'}`}>
+                              <span className={`text-[19px] font-semibold ${isBest ? 'text-emerald-400' : 'text-white'}`}>
                                 {displayValue}
                               </span>
                             </td>
@@ -747,16 +747,16 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
                 </colgroup>
                 <thead>
                   <tr>
-                    <th className="p-2 text-sm font-medium text-gray-500 text-left rounded-tl-xl"></th>
+                    <th className="p-2 text-[17px] font-medium text-gray-500 text-left rounded-tl-xl"></th>
                     {selectedETFs.map((etf, index) => (
                       <th key={etf.id} className={`p-2 text-center border-l border-[#2d2640] ${index === selectedETFs.length - 1 ? 'rounded-tr-xl' : ''}`}>
                         <div
                           className="w-2.5 h-2.5 rounded-full mx-auto mb-1"
                           style={{ backgroundColor: chartColors[index % chartColors.length] }}
                         />
-                        <div className="text-xs text-gray-400 font-normal">{etf.ticker}</div>
+                        <div className="text-[15px] text-gray-400 font-normal">{etf.ticker}</div>
                         <div className="marquee-cell">
-                          <div className="marquee-inner text-sm font-medium text-white whitespace-nowrap">
+                          <div className="marquee-inner text-[17px] font-medium text-white whitespace-nowrap">
                             {etf.shortName}
                           </div>
                         </div>
@@ -781,7 +781,7 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
                     {/* Category Header */}
                     <tr key={`cat-basic-${category.category}`} className={catIdx > 0 ? 'border-t border-[#2d2640]' : ''}>
                       <td colSpan={selectedETFs.length + 1} className="bg-[#2a2438] px-3 py-2">
-                        <span className="text-sm font-semibold text-[#d64f79]">{category.category}</span>
+                        <span className="text-[17px] font-semibold text-[#d64f79]">{category.category}</span>
                       </td>
                     </tr>
 
@@ -791,7 +791,7 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
                         <td className="p-2">
                           <button
                             onClick={() => setSelectedMetric(item.key)}
-                            className="text-sm text-gray-400 hover:text-[#d64f79] transition-colors text-left"
+                            className="text-[17px] text-gray-400 hover:text-[#d64f79] transition-colors text-left"
                           >
                             {item.label}
                           </button>
@@ -824,16 +824,16 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
                               {showBar ? (
                                 <div className="flex flex-col items-center gap-1">
                                   <div className="flex items-center gap-1">
-                                    <span className={`text-base font-semibold ${newHigh ? 'text-up' : newLow ? 'text-down' : isBest ? 'text-emerald-400' : 'text-white'}`}>
+                                    <span className={`text-[19px] font-semibold ${newHigh ? 'text-up' : newLow ? 'text-down' : isBest ? 'text-emerald-400' : 'text-white'}`}>
                                       {displayValue}
                                     </span>
                                     {newHigh && (
-                                      <span className="text-[11px] px-1 py-0.5 bg-red-500/20 text-up rounded font-medium">
+                                      <span className="text-[14px] px-1 py-0.5 bg-red-500/20 text-up rounded font-medium">
                                         신고가
                                       </span>
                                     )}
                                     {newLow && (
-                                      <span className="text-[11px] px-1 py-0.5 bg-blue-500/20 text-down rounded font-medium">
+                                      <span className="text-[14px] px-1 py-0.5 bg-blue-500/20 text-down rounded font-medium">
                                         신저가
                                       </span>
                                     )}
@@ -853,13 +853,13 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
                                       style={{ left: `calc(${positionClamped}% - 4px)` }}
                                     />
                                   </div>
-                                  <div className="flex justify-between w-full text-[11px] text-gray-500">
+                                  <div className="flex justify-between w-full text-[14px] text-gray-500">
                                     <span>저가</span>
                                     <span>고가</span>
                                   </div>
                                 </div>
                               ) : isMultiLine && typeof displayValue === 'string' && displayValue.includes('\n') ? (
-                                <span className={`text-sm font-semibold ${isBest ? 'text-emerald-400' : 'text-white'} leading-tight`}>
+                                <span className={`text-[17px] font-semibold ${isBest ? 'text-emerald-400' : 'text-white'} leading-tight`}>
                                   {displayValue.split('\n').map((line, i) => (
                                     <span key={i}>
                                       {i > 0 && <br />}
@@ -868,7 +868,7 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
                                   ))}
                                 </span>
                               ) : (
-                                <span className={`text-base font-semibold ${isBest ? 'text-emerald-400' : 'text-white'}`}>
+                                <span className={`text-[19px] font-semibold ${isBest ? 'text-emerald-400' : 'text-white'}`}>
                                   {displayValue}
                                 </span>
                               )}
@@ -928,16 +928,16 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
                       </colgroup>
                       <thead>
                         <tr>
-                          <th className="p-2 text-sm font-medium text-gray-500 text-center rounded-tl-xl">순위</th>
+                          <th className="p-2 text-[17px] font-medium text-gray-500 text-center rounded-tl-xl">순위</th>
                           {selectedETFs.map((etf, index) => (
                             <th key={etf.id} className={`p-2 text-center border-l border-[#2d2640] ${index === selectedETFs.length - 1 ? 'rounded-tr-xl' : ''}`}>
                               <div
                                 className="w-2.5 h-2.5 rounded-full mx-auto mb-1"
                                 style={{ backgroundColor: chartColors[index % chartColors.length] }}
                               />
-                              <div className="text-xs text-gray-400 font-normal">{etf.ticker}</div>
+                              <div className="text-[15px] text-gray-400 font-normal">{etf.ticker}</div>
                               <div className="marquee-cell">
-                                <div className="marquee-inner text-sm font-medium text-white whitespace-nowrap">
+                                <div className="marquee-inner text-[17px] font-medium text-white whitespace-nowrap">
                                   {etf.shortName}
                                 </div>
                               </div>
@@ -960,7 +960,7 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
                       {[0, 1, 2, 3, 4].map((rank) => (
                         <tr key={rank} className={rank > 0 ? 'border-t border-[#2d2640]' : ''}>
                           <td className="p-2 text-center">
-                            <span className="text-sm font-medium text-[#d64f79]">{rank + 1}</span>
+                            <span className="text-[17px] font-medium text-[#d64f79]">{rank + 1}</span>
                           </td>
                           {selectedETFs.map((etf, etfIdx) => {
                             const holdings = allHoldings[etfIdx]
@@ -976,13 +976,13 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
                               >
                                 {holding ? (
                                   <div className="flex flex-col">
-                                    <span className={`text-sm font-medium ${colors ? colors.text : 'text-white'}`}>
+                                    <span className={`text-[17px] font-medium ${colors ? colors.text : 'text-white'}`}>
                                       {holding.name}
                                     </span>
-                                    <span className="text-xs text-gray-400">{holding.weight.toFixed(1)}%</span>
+                                    <span className="text-[15px] text-gray-400">{holding.weight.toFixed(1)}%</span>
                                   </div>
                                 ) : (
-                                  <span className="text-xs text-gray-500">-</span>
+                                  <span className="text-[15px] text-gray-500">-</span>
                                 )}
                               </td>
                             )
@@ -992,14 +992,14 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
                       {/* 기타 비중 */}
                       <tr className="border-t border-[#2d2640] bg-[#2a2438]/50">
                         <td className="p-2 text-center">
-                          <span className="text-xs text-gray-500">기타</span>
+                          <span className="text-[15px] text-gray-500">기타</span>
                         </td>
                         {selectedETFs.map((etf, etfIdx) => {
                           const holdings = allHoldings[etfIdx]
                           const total = holdings.reduce((sum, h) => sum + h.weight, 0)
                           return (
                             <td key={etf.id} className="p-2 border-l border-[#2d2640]">
-                              <span className="text-sm text-gray-400">{(100 - total).toFixed(1)}%</span>
+                              <span className="text-[17px] text-gray-400">{(100 - total).toFixed(1)}%</span>
                             </td>
                           )
                         })}
@@ -1025,7 +1025,7 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
                   {metricDescriptions[selectedMetric].title}
                 </DialogTitle>
               </DialogHeader>
-              <div className="text-sm">
+              <div className="text-[17px]">
                 <p className="text-gray-300 leading-relaxed">
                   {metricDescriptions[selectedMetric].description}
                 </p>

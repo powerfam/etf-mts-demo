@@ -123,15 +123,15 @@ export function InvestInfoPage({
         <div className="px-4 py-4 pb-24 space-y-5">
           {/* 헤더 */}
           <div>
-            <h1 className="text-xl font-bold text-white">ETF All In One</h1>
-            <p className="text-gray-500 text-[13px]">ETF 정보의 모든 것</p>
+            <h1 className="text-[23px] font-bold text-white">ETF All In One</h1>
+            <p className="text-gray-500 text-[16px]">ETF 정보의 모든 것</p>
           </div>
 
           {/* 메인 탭 */}
           <div className="flex bg-[#2d2640] rounded-lg p-1" data-tour="etf-101">
             <button
               onClick={() => handleTabChange('concepts')}
-              className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-all ${
+              className={`flex-1 py-2 px-3 rounded-md text-[17px] font-medium transition-all ${
                 mainTab === 'concepts'
                   ? 'bg-[#d64f79] text-white'
                   : 'text-gray-400 hover:text-gray-200'
@@ -141,7 +141,7 @@ export function InvestInfoPage({
             </button>
             <button
               onClick={() => handleTabChange('glossary')}
-              className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-all ${
+              className={`flex-1 py-2 px-3 rounded-md text-[17px] font-medium transition-all ${
                 mainTab === 'glossary'
                   ? 'bg-[#d64f79] text-white'
                   : 'text-gray-400 hover:text-gray-200'
@@ -152,7 +152,7 @@ export function InvestInfoPage({
             </button>
             <button
               onClick={() => handleTabChange('research')}
-              className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-all ${
+              className={`flex-1 py-2 px-3 rounded-md text-[17px] font-medium transition-all ${
                 mainTab === 'research'
                   ? 'bg-[#d64f79] text-white'
                   : 'text-gray-400 hover:text-gray-200'
@@ -172,7 +172,7 @@ export function InvestInfoPage({
                 placeholder="검색어를 입력하세요"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-[#2d2640] border border-[#3d3650] rounded-lg text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-[#d64f79]/50 transition-all"
+                className="w-full pl-10 pr-4 py-2.5 bg-[#2d2640] border border-[#3d3650] rounded-lg text-[17px] text-white placeholder:text-gray-500 focus:outline-none focus:border-[#d64f79]/50 transition-all"
               />
             </div>
           )}
@@ -186,7 +186,7 @@ export function InvestInfoPage({
                   <button
                     key={key}
                     onClick={() => setSelectedCategory(selectedCategory === key ? 'all' : key)}
-                    className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-medium transition-all ${
+                    className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[16px] font-medium transition-all ${
                       selectedCategory === key
                         ? 'bg-[#d64f79] text-white'
                         : 'bg-[#2d2640] text-gray-400 hover:text-gray-200'
@@ -203,7 +203,7 @@ export function InvestInfoPage({
           {/* 용어사전 탭 헤더 */}
           {mainTab === 'glossary' && (
             <div className="bg-[#2d2640] border border-[#3d3650] rounded-lg p-3">
-              <p className="text-sm text-gray-300 flex items-center gap-2">
+              <p className="text-[17px] text-gray-300 flex items-center gap-2">
                 <BookOpen className="h-4 w-4 text-[#d64f79]" />
                 ETF 전문용어를 쉽게 설명합니다
               </p>
@@ -219,7 +219,7 @@ export function InvestInfoPage({
                   {/* 뒤로가기 버튼 */}
                   <button
                     onClick={() => setSelectedPDF(null)}
-                    className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
+                    className="flex items-center gap-2 text-[17px] text-gray-400 hover:text-white transition-colors"
                   >
                     <ArrowLeft className="h-4 w-4" />
                     목록으로
@@ -243,7 +243,7 @@ export function InvestInfoPage({
                   </div>
 
                   {/* 페이지 안내 */}
-                  <p className="text-xs text-gray-500 text-center">
+                  <p className="text-[15px] text-gray-500 text-center">
                     PDF 뷰어에서 페이지 넘김, 확대/축소가 가능합니다
                   </p>
 
@@ -253,7 +253,7 @@ export function InvestInfoPage({
                       href={`https://etf-mts-demo.vercel.app/pdf/${selectedPDF}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#2d2640] border border-[#3d3650] rounded-lg text-sm text-gray-300 hover:bg-[#3d3650] transition-colors"
+                      className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#2d2640] border border-[#3d3650] rounded-lg text-[17px] text-gray-300 hover:bg-[#3d3650] transition-colors"
                     >
                       <ExternalLink className="h-4 w-4" />
                       새 탭에서 열기
@@ -261,7 +261,7 @@ export function InvestInfoPage({
                     <a
                       href={`https://etf-mts-demo.vercel.app/pdf/${selectedPDF}`}
                       download
-                      className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#d64f79] rounded-lg text-sm text-white hover:bg-[#b33d5f] transition-colors"
+                      className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#d64f79] rounded-lg text-[17px] text-white hover:bg-[#b33d5f] transition-colors"
                     >
                       <Download className="h-4 w-4" />
                       다운로드
@@ -274,7 +274,7 @@ export function InvestInfoPage({
                   <div className="flex gap-2">
                     <button
                       onClick={() => setResearchSubTab('weekly')}
-                      className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all ${
+                      className={`flex-1 py-2.5 px-4 rounded-lg text-[17px] font-medium transition-all ${
                         researchSubTab === 'weekly'
                           ? 'bg-[#d64f79] text-white'
                           : 'bg-[#2d2640] text-gray-400 hover:text-gray-200 border border-[#3d3650]'
@@ -284,7 +284,7 @@ export function InvestInfoPage({
                     </button>
                     <button
                       onClick={() => setResearchSubTab('lineup')}
-                      className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all ${
+                      className={`flex-1 py-2.5 px-4 rounded-lg text-[17px] font-medium transition-all ${
                         researchSubTab === 'lineup'
                           ? 'bg-[#d64f79] text-white'
                           : 'bg-[#2d2640] text-gray-400 hover:text-gray-200 border border-[#3d3650]'
@@ -296,7 +296,7 @@ export function InvestInfoPage({
 
                   {/* 리서치 헤더 */}
                   <div className="bg-[#2d2640] border border-[#3d3650] rounded-lg p-3">
-                    <p className="text-sm text-gray-300 flex items-center gap-2">
+                    <p className="text-[17px] text-gray-300 flex items-center gap-2">
                       <FileText className="h-4 w-4 text-[#d64f79]" />
                       {researchSubTab === 'weekly'
                         ? '키움증권 ETF 주간 리서치 보고서'
@@ -320,14 +320,14 @@ export function InvestInfoPage({
 
                           {/* PDF 정보 */}
                           <div className="flex-1 min-w-0">
-                            <h3 className="text-sm font-medium text-white mb-1">
+                            <h3 className="text-[17px] font-medium text-white mb-1">
                               {pdf.title}
                             </h3>
-                            <div className="flex items-center gap-2 text-xs text-gray-500">
+                            <div className="flex items-center gap-2 text-[15px] text-gray-500">
                               <Calendar className="h-3 w-3" />
                               {pdf.date}
                             </div>
-                            <p className="text-[12px] text-gray-300 mt-1.5 line-clamp-1">
+                            <p className="text-[15px] text-gray-300 mt-1.5 line-clamp-1">
                               {pdf.summary}
                             </p>
                           </div>
@@ -349,7 +349,7 @@ export function InvestInfoPage({
           {mainTab !== 'research' && (searchQuery || selectedCategory !== 'all') ? (
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <p className="text-sm text-gray-400">
+                <p className="text-[17px] text-gray-400">
                   {filteredContents.length}건의 결과
                 </p>
                 <button
@@ -357,7 +357,7 @@ export function InvestInfoPage({
                     setSelectedCategory('all')
                     setSearchQuery('')
                   }}
-                  className="text-[13px] text-[#d64f79]"
+                  className="text-[16px] text-[#d64f79]"
                 >
                   초기화
                 </button>
@@ -374,7 +374,7 @@ export function InvestInfoPage({
                 </div>
               ) : (
                 <div className="py-12 text-center">
-                  <p className="text-gray-500 text-sm">검색 결과가 없습니다</p>
+                  <p className="text-gray-500 text-[17px]">검색 결과가 없습니다</p>
                 </div>
               )}
             </div>
@@ -395,7 +395,7 @@ export function InvestInfoPage({
               <section className="space-y-3">
                 <div className="flex items-center gap-2">
                   <Flame className="h-4 w-4 text-[#d64f79]" />
-                  <h2 className="text-[15px] font-semibold text-white">인기 질문</h2>
+                  <h2 className="text-[18px] font-semibold text-white">인기 질문</h2>
                 </div>
                 <div className="space-y-2">
                   {popularContents
@@ -415,7 +415,7 @@ export function InvestInfoPage({
               <section className="space-y-3">
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-[#d64f79]" />
-                  <h2 className="text-[15px] font-semibold text-white">최신 업데이트</h2>
+                  <h2 className="text-[18px] font-semibold text-white">최신 업데이트</h2>
                 </div>
                 <div className="space-y-2">
                   {recentUpdates
@@ -467,7 +467,7 @@ export function InvestInfoPage({
             <div className="flex items-center justify-between px-4 pb-3 border-b border-[#2d2640]">
               <div>
                 <h3 className="text-white font-semibold">ETF 무엇이든 물어보세요</h3>
-                <p className="text-gray-500 text-xs">자주 묻는 질문을 선택하세요</p>
+                <p className="text-gray-500 text-[15px]">자주 묻는 질문을 선택하세요</p>
               </div>
               <div className="flex items-center gap-2">
                 <button
@@ -475,7 +475,7 @@ export function InvestInfoPage({
                     setShowChatbot(false)
                     setIsChatbotOpen(false)
                   }}
-                  className="text-xs text-gray-500 hover:text-gray-300"
+                  className="text-[15px] text-gray-500 hover:text-gray-300"
                 >
                   숨기기
                 </button>
@@ -546,7 +546,7 @@ export function InvestInfoPage({
               {/* 구분선 */}
               <div className="flex items-center gap-3 py-2">
                 <div className="flex-1 h-px bg-[#3d3650]" />
-                <span className="text-xs text-gray-500">자주 묻는 질문</span>
+                <span className="text-[15px] text-gray-500">자주 묻는 질문</span>
                 <div className="flex-1 h-px bg-[#3d3650]" />
               </div>
 
@@ -561,8 +561,8 @@ export function InvestInfoPage({
                     }}
                     className="w-full flex items-center gap-3 px-3 py-2.5 bg-[#2d2640] hover:bg-[#3d3650] rounded-lg transition-all text-left"
                   >
-                    <span className="text-xs text-gray-500 w-4">{idx + 1}</span>
-                    <span className="text-sm text-gray-200 flex-1 line-clamp-1">
+                    <span className="text-[15px] text-gray-500 w-4">{idx + 1}</span>
+                    <span className="text-[17px] text-gray-200 flex-1 line-clamp-1">
                       {content.question}
                     </span>
                     <ChevronRight className="h-4 w-4 text-gray-600" />
@@ -578,7 +578,7 @@ export function InvestInfoPage({
       {!showChatbot && (
         <button
           onClick={() => setShowChatbot(true)}
-          className="fixed bottom-24 right-4 px-3 py-2 bg-[#2d2640] border border-[#3d3650] rounded-full text-xs text-gray-400 hover:text-white transition-colors z-50"
+          className="fixed bottom-24 right-4 px-3 py-2 bg-[#2d2640] border border-[#3d3650] rounded-full text-[15px] text-gray-400 hover:text-white transition-colors z-50"
         >
           💬 도움말
         </button>
@@ -610,8 +610,8 @@ function IntentButton({
       <div className="rounded-full p-2" style={{ backgroundColor: `${color}20` }}>
         <Icon className="h-5 w-5" style={{ color }} />
       </div>
-      <span className="text-sm font-medium text-white">{title}</span>
-      <span className="text-[11px] text-gray-500">{subtitle}</span>
+      <span className="text-[17px] font-medium text-white">{title}</span>
+      <span className="text-[14px] text-gray-500">{subtitle}</span>
     </button>
   )
 }
@@ -637,16 +637,16 @@ function RankCard({
       <CardContent className="p-3">
         <div className="flex items-center gap-3">
           {/* 순위 */}
-          <span className="flex-shrink-0 w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold bg-[#3d3650] text-gray-400">
+          <span className="flex-shrink-0 w-6 h-6 rounded-md flex items-center justify-center text-[15px] font-bold bg-[#3d3650] text-gray-400">
             {rank}
           </span>
 
           {/* 콘텐츠 */}
           <div className="flex-1 min-w-0">
-            <p className="text-[13px] text-white font-medium line-clamp-1">
+            <p className="text-[16px] text-white font-medium line-clamp-1">
               {content.question}
             </p>
-            <p className="text-[11px] text-gray-500 mt-0.5 flex items-center gap-1">
+            <p className="text-[14px] text-gray-500 mt-0.5 flex items-center gap-1">
               <Icon className="h-3 w-3 text-gray-500" />
               {category.label}
             </p>
@@ -686,14 +686,14 @@ function SimpleCard({
 
           {/* 콘텐츠 */}
           <div className="flex-1 min-w-0">
-            <p className="text-[13px] text-white font-medium line-clamp-2 leading-snug">
+            <p className="text-[16px] text-white font-medium line-clamp-2 leading-snug">
               {content.question}
             </p>
-            <p className="text-[12px] text-gray-500 mt-1 line-clamp-1">
+            <p className="text-[15px] text-gray-500 mt-1 line-clamp-1">
               {content.summary[0]}
             </p>
             {showDate && (
-              <p className="text-[11px] text-gray-600 mt-1">
+              <p className="text-[14px] text-gray-600 mt-1">
                 {content.updatedAt} 업데이트
               </p>
             )}
@@ -726,17 +726,17 @@ function GlossaryMiniCard({
       className="flex flex-col items-center justify-center p-4 bg-[#2d2640] border border-[#3d3650] rounded-xl hover:border-[#d64f79]/50 hover:bg-[#352d48] transition-all active:scale-[0.97] min-h-[100px]"
     >
       {/* 용어 (영문 약어) */}
-      <span className="text-lg font-bold text-[#d64f79]">
+      <span className="text-[21px] font-bold text-[#d64f79]">
         {content.title}
       </span>
       {/* 한글 용어명 */}
       {koreanTerm && (
-        <span className="text-[11px] text-gray-300 mb-1">
+        <span className="text-[14px] text-gray-300 mb-1">
           {koreanTerm}
         </span>
       )}
       {/* 한글 설명 */}
-      <span className="text-[11px] text-gray-500 text-center line-clamp-2">
+      <span className="text-[14px] text-gray-500 text-center line-clamp-2">
         {description}
       </span>
     </button>

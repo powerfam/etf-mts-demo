@@ -475,19 +475,19 @@ export function QuickSearchPage({
           }}
         >
           {/* 가로보기 헤더 */}
-          <div className="flex items-center justify-between px-4 py-2 bg-[#191322] border-b border-[#2d2640]">
-            <h1 className="text-sm font-semibold text-white">ETF 스크리닝 (가로보기)</h1>
+          <div className="flex items-center justify-between px-4 py-2 bg-[#191322] border-b border-[#3d3650]/40">
+            <h1 className="text-[17px] font-semibold text-white">ETF 스크리닝 (가로보기)</h1>
             <button
               onClick={() => setIsLandscape(false)}
-              className="px-3 py-1 rounded-lg bg-[#d64f79] text-white text-xs"
+              className="px-3 py-1 rounded-lg bg-[#d64f79] text-white text-[15px]"
             >
               세로로 돌아가기
             </button>
           </div>
           {/* 가로보기 테이블 */}
-          <div className="flex-1 overflow-auto p-2">
-            <table className="w-full min-w-[800px] text-xs">
-              <thead className="bg-[#2d2640] sticky top-0">
+          <div className="flex-1 overflow-auto p-2 rounded-xl border border-[#3d3650]/40">
+            <table className="w-full min-w-[800px] text-[15px]">
+              <thead className="bg-[#2d2640]/60 sticky top-0">
                 <tr>
                   <th className="text-left text-gray-400 font-medium px-2 py-2">종목</th>
                   <th className="text-right text-gray-400 font-medium px-2 py-2 cursor-pointer hover:text-white" onClick={() => handleColumnSort('price')}>
@@ -524,7 +524,7 @@ export function QuickSearchPage({
                       setIsLandscape(false)
                       onSelectETF(etf)
                     }}
-                    className="border-b border-[#2d2640] hover:bg-[#2d2640]/30 cursor-pointer"
+                    className="border-b border-[#3d3650]/40 hover:bg-[#2d2640]/30 cursor-pointer"
                   >
                     <td className="px-2 py-2">
                       <div className="marquee-wrapper max-w-[120px]">
@@ -543,7 +543,7 @@ export function QuickSearchPage({
                     <td className="text-right px-2 py-2 text-white">{(etf.aum / 100000000).toFixed(0)}억</td>
                     <td className="text-right px-2 py-2 text-white">{etf.dividendYield.toFixed(1)}%</td>
                     <td className="text-right px-2 py-2">
-                      <span className={`px-1.5 py-0.5 rounded text-[11px] ${
+                      <span className={`px-1.5 py-0.5 rounded text-[14px] ${
                         etf.healthScore >= 85 ? 'bg-green-500/20 text-green-400' :
                         etf.healthScore >= 70 ? 'bg-yellow-500/20 text-yellow-400' :
                         'bg-red-500/20 text-red-400'
@@ -564,7 +564,7 @@ export function QuickSearchPage({
   return (
     <div className={containerClass}>
       {/* 헤더 */}
-      <div className={`${embedded ? '' : 'sticky top-0'} bg-[#191322] border-b border-[#2d2640] z-10`}>
+      <div className={`${embedded ? '' : 'sticky top-0'} bg-[#191322] border-b border-[#3d3650]/40 z-10`}>
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
             {!embedded && (
@@ -572,7 +572,7 @@ export function QuickSearchPage({
                 <ChevronLeft className="h-6 w-6 text-white" />
               </button>
             )}
-            <h1 className="text-lg font-semibold text-white">ETF 빠른검색</h1>
+            <h1 className="text-[21px] font-semibold text-white">ETF 빠른검색</h1>
           </div>
         </div>
 
@@ -582,7 +582,7 @@ export function QuickSearchPage({
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2 rounded-full text-sm whitespace-nowrap transition-colors ${
+              className={`px-4 py-2 rounded-full text-[17px] whitespace-nowrap transition-colors ${
                 activeTab === tab.id
                   ? 'bg-[#d64f79] text-white'
                   : 'bg-[#2d2640] text-gray-400 hover:text-white'
@@ -596,10 +596,10 @@ export function QuickSearchPage({
 
       {/* 서브 필터 (지수/국가/섹터 선택) */}
       {(activeTab === 'index' || activeTab === 'country') && (
-        <div className="px-4 py-2 border-b border-[#2d2640]">
+        <div className="px-4 py-2 border-b border-[#3d3650]/40">
           <button
             onClick={() => setShowIndexModal(true)}
-            className="flex items-center gap-2 px-3 py-2 bg-[#2d2640] rounded-lg text-sm text-white"
+            className="flex items-center gap-2 px-3 py-2 bg-[#2d2640] rounded-lg text-[17px] text-white"
           >
             <span>{selectedIndex}</span>
             <ChevronDown className="h-4 w-4" />
@@ -608,13 +608,13 @@ export function QuickSearchPage({
       )}
 
       {activeTab === 'sector' && (
-        <div className="px-4 py-2 border-b border-[#2d2640]">
+        <div className="px-4 py-2 border-b border-[#3d3650]/40">
           <div className="flex flex-wrap gap-2">
             {sectorCategories.slice(0, 6).map((sector) => (
               <button
                 key={sector}
                 onClick={() => setSelectedSector(sector)}
-                className={`px-3 py-1.5 rounded-full text-xs transition-colors ${
+                className={`px-3 py-1.5 rounded-full text-[15px] transition-colors ${
                   selectedSector === sector
                     ? 'bg-[#d64f79] text-white'
                     : 'bg-[#2d2640] text-gray-400'
@@ -629,13 +629,13 @@ export function QuickSearchPage({
 
       {/* 통합 컨트롤 바: 결과수 + 뷰모드 + 정렬 + 가로보기 */}
       <div className="flex items-center justify-between px-4 py-3">
-        <span className="text-sm text-gray-400 font-medium">{filteredETFs.length}개 ETF</span>
+        <span className="text-[17px] text-gray-400 font-medium">{filteredETFs.length}개 ETF</span>
         <div className="flex items-center gap-2">
           {/* 요약/상세 토글 */}
           <div className="flex bg-[#2d2640] rounded-lg p-0.5">
             <button
               onClick={() => setViewMode('summary')}
-              className={`px-3 py-1 rounded text-xs transition-colors ${
+              className={`px-3 py-1 rounded text-[15px] transition-colors ${
                 viewMode === 'summary' ? 'bg-[#d64f79] text-white' : 'text-gray-400'
               }`}
             >
@@ -643,7 +643,7 @@ export function QuickSearchPage({
             </button>
             <button
               onClick={() => setViewMode('detail')}
-              className={`px-3 py-1 rounded text-xs transition-colors ${
+              className={`px-3 py-1 rounded text-[15px] transition-colors ${
                 viewMode === 'detail' ? 'bg-[#d64f79] text-white' : 'text-gray-400'
               }`}
             >
@@ -662,7 +662,7 @@ export function QuickSearchPage({
           <div className="relative">
             <button
               onClick={() => setShowSortDropdown(!showSortDropdown)}
-              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#2d2640] text-xs text-white"
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#2d2640] text-[15px] text-white"
             >
               <span>
                 {sortOptions.find(o => o.id === selectedSort)?.label || '정렬'} - {stockFilters.find(f => f.id === selectedStockFilter)?.label || '전체'}
@@ -670,16 +670,16 @@ export function QuickSearchPage({
               <ChevronDown className={`h-3.5 w-3.5 transition-transform ${showSortDropdown ? 'rotate-180' : ''}`} />
             </button>
             {showSortDropdown && (
-              <div className="absolute right-0 top-full mt-1 w-48 bg-[#1f1a2e] border border-[#2d2640] rounded-lg shadow-lg z-50 overflow-hidden">
+              <div className="absolute right-0 top-full mt-1 w-48 bg-[#1f1a2e] border border-[#3d3650]/40 rounded-lg shadow-lg z-50 overflow-hidden">
                 {/* 종목 필터 */}
-                <div className="px-3 py-2 border-b border-[#2d2640]">
-                  <div className="text-[11px] text-gray-500 mb-1.5">종목 필터</div>
+                <div className="px-3 py-2 border-b border-[#3d3650]/40">
+                  <div className="text-[14px] text-gray-500 mb-1.5">종목 필터</div>
                   <div className="flex flex-wrap gap-1">
                     {stockFilters.map((filter) => (
                       <button
                         key={filter.id}
                         onClick={() => setSelectedStockFilter(filter.id)}
-                        className={`px-2 py-0.5 rounded text-[11px] transition-colors ${
+                        className={`px-2 py-0.5 rounded text-[14px] transition-colors ${
                           selectedStockFilter === filter.id
                             ? 'bg-[#d64f79] text-white'
                             : 'bg-[#2d2640] text-gray-400'
@@ -699,7 +699,7 @@ export function QuickSearchPage({
                         setSelectedSort(option.id)
                         setShowSortDropdown(false)
                       }}
-                      className={`w-full text-left px-3 py-2 text-xs transition-colors ${
+                      className={`w-full text-left px-3 py-2 text-[15px] transition-colors ${
                         selectedSort === option.id
                           ? 'bg-[#d64f79] text-white font-medium'
                           : 'text-gray-300 hover:bg-[#2d2640]'
@@ -717,12 +717,12 @@ export function QuickSearchPage({
 
       {/* 상세 뷰 탭 (상세 모드일 때만) */}
       {viewMode === 'detail' && (
-        <div className="flex gap-4 px-4 pb-2 border-b border-[#2d2640]">
+        <div className="flex gap-4 px-4 pb-2 border-b border-[#3d3650]/40">
           {detailTabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setDetailTab(tab.id)}
-              className={`text-sm pb-2 transition-colors ${
+              className={`text-[17px] pb-2 transition-colors ${
                 detailTab === tab.id
                   ? 'text-[#d64f79] border-b-2 border-[#d64f79] font-medium'
                   : 'text-gray-500'
@@ -738,7 +738,7 @@ export function QuickSearchPage({
       <div className="flex-1 overflow-y-auto pb-24" style={{ maxHeight: 'calc(100vh - 220px)' }}>
         {viewMode === 'summary' ? (
           // 요약 뷰
-          <div className="divide-y divide-[#2d2640]">
+          <div className="mx-4 rounded-xl overflow-hidden">
             {sortedETFs.map((etf) => (
               <div
                 key={etf.id}
@@ -757,10 +757,12 @@ export function QuickSearchPage({
                   onClick={() => onSelectETF(etf)}
                   className="flex-1 min-w-0 text-left"
                 >
-                  <div className="text-[13px] text-white truncate">{etf.shortName}</div>
+                  <div className="marquee-wrapper max-w-[180px]">
+                    <span className="marquee-text text-[16px] text-white">{etf.shortName}</span>
+                  </div>
                   <div className="flex items-center gap-1 mt-0.5">
-                    <span className="text-[11px] text-gray-400">{formatNumber(etf.price)}원</span>
-                    <span className={`text-[11px] ${etf.changePercent >= 0 ? 'text-up' : 'text-down'}`}>
+                    <span className="text-[14px] text-gray-400">{formatNumber(etf.price)}원</span>
+                    <span className={`text-[14px] ${etf.changePercent >= 0 ? 'text-up' : 'text-down'}`}>
                       {formatPercent(etf.changePercent)}
                     </span>
                   </div>
@@ -787,29 +789,29 @@ export function QuickSearchPage({
           </div>
         ) : (
           // 상세 뷰 - 테이블 형식
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto rounded-xl border border-[#3d3650]/40">
             <table className="w-full min-w-[600px]">
-              <thead className="bg-[#2d2640] sticky top-0">
+              <thead className="bg-[#2d2640]/60 sticky top-0">
                 <tr>
-                  <th className="text-left text-xs text-gray-400 font-medium px-4 py-2 w-40">종목</th>
+                  <th className="text-left text-[15px] text-gray-400 font-medium px-4 py-2 w-40 whitespace-nowrap">종목</th>
                   {detailTab === 'basic' && (
                     <>
-                      <th className="text-right text-xs text-gray-400 font-medium px-2 py-2 cursor-pointer hover:text-white" onClick={() => handleColumnSort('price')}>
+                      <th className="text-right text-[15px] text-gray-400 font-medium px-2 py-2 whitespace-nowrap cursor-pointer hover:text-white" onClick={() => handleColumnSort('price')}>
                         <span className="inline-flex items-center gap-0.5">현재가 {renderSortIcon('price')}</span>
                       </th>
-                      <th className="text-right text-xs text-gray-400 font-medium px-2 py-2 cursor-pointer hover:text-white" onClick={() => handleColumnSort('change')}>
+                      <th className="text-right text-[15px] text-gray-400 font-medium px-2 py-2 whitespace-nowrap cursor-pointer hover:text-white" onClick={() => handleColumnSort('change')}>
                         <span className="inline-flex items-center gap-0.5">등락률 {renderSortIcon('change')}</span>
                       </th>
-                      <th className="text-right text-xs text-gray-400 font-medium px-2 py-2 cursor-pointer hover:text-white" onClick={() => handleColumnSort('inav')}>
+                      <th className="text-right text-[15px] text-gray-400 font-medium px-2 py-2 whitespace-nowrap cursor-pointer hover:text-white" onClick={() => handleColumnSort('inav')}>
                         <span className="inline-flex items-center gap-0.5">iNAV {renderSortIcon('inav')}</span>
                       </th>
-                      <th className="text-right text-xs text-gray-400 font-medium px-2 py-2 cursor-pointer hover:text-white" onClick={() => handleColumnSort('discrepancy')}>
+                      <th className="text-right text-[15px] text-gray-400 font-medium px-2 py-2 whitespace-nowrap cursor-pointer hover:text-white" onClick={() => handleColumnSort('discrepancy')}>
                         <span className="inline-flex items-center gap-0.5">괴리율 {renderSortIcon('discrepancy')}</span>
                       </th>
-                      <th className="text-right text-xs text-gray-400 font-medium px-2 py-2 cursor-pointer hover:text-white" onClick={() => handleColumnSort('volume')}>
+                      <th className="text-right text-[15px] text-gray-400 font-medium px-2 py-2 whitespace-nowrap cursor-pointer hover:text-white" onClick={() => handleColumnSort('volume')}>
                         <span className="inline-flex items-center gap-0.5">거래량 {renderSortIcon('volume')}</span>
                       </th>
-                      <th className="text-right text-xs text-gray-400 font-medium px-2 py-2 cursor-pointer hover:text-white" onClick={() => handleColumnSort('adtv')}>
+                      <th className="text-right text-[15px] text-gray-400 font-medium px-2 py-2 whitespace-nowrap cursor-pointer hover:text-white" onClick={() => handleColumnSort('adtv')}>
                         <span className="inline-flex items-center gap-0.5">거래대금 {renderSortIcon('adtv')}</span>
                       </th>
                     </>
@@ -821,7 +823,7 @@ export function QuickSearchPage({
                         return (
                           <th
                             key={period}
-                            className="text-right text-xs text-gray-400 font-medium px-2 py-2 cursor-pointer hover:text-white whitespace-nowrap"
+                            className="text-right text-[15px] text-gray-400 font-medium px-2 py-2 whitespace-nowrap cursor-pointer hover:text-white whitespace-nowrap"
                             onClick={() => handleColumnSort(colId)}
                           >
                             <span className="inline-flex items-center gap-0.5">
@@ -839,7 +841,7 @@ export function QuickSearchPage({
                         return (
                           <th
                             key={period}
-                            className="text-right text-xs text-gray-400 font-medium px-2 py-2 cursor-pointer hover:text-white whitespace-nowrap"
+                            className="text-right text-[15px] text-gray-400 font-medium px-2 py-2 whitespace-nowrap cursor-pointer hover:text-white whitespace-nowrap"
                             onClick={() => handleColumnSort(colId)}
                           >
                             <span className="inline-flex items-center gap-0.5">
@@ -850,8 +852,8 @@ export function QuickSearchPage({
                       })}
                     </>
                   )}
-                  <th className="text-center text-xs text-gray-400 font-medium px-2 py-2">비교담기</th>
-                  <th className="text-center text-xs text-gray-400 font-medium px-2 py-2">관심추가</th>
+                  <th className="text-center text-[15px] text-gray-400 font-medium px-2 py-2 whitespace-nowrap">비교담기</th>
+                  <th className="text-center text-[15px] text-gray-400 font-medium px-2 py-2 whitespace-nowrap">관심추가</th>
                 </tr>
               </thead>
               <tbody>
@@ -861,7 +863,7 @@ export function QuickSearchPage({
                   return (
                     <tr
                       key={etf.id}
-                      className="border-b border-[#2d2640] hover:bg-[#2d2640]/30 transition-colors"
+                      className="border-b border-[#3d3650]/40 hover:bg-[#2d2640]/30 transition-colors"
                     >
                       <td className="px-4 py-3">
                         <button
@@ -869,28 +871,28 @@ export function QuickSearchPage({
                           className="text-left"
                         >
                           <div className="marquee-wrapper max-w-[140px]">
-                            <span className="marquee-text text-sm text-white">{etf.shortName}</span>
+                            <span className="marquee-text text-[17px] text-white">{etf.shortName}</span>
                           </div>
                         </button>
                       </td>
                       {detailTab === 'basic' && (
                         <>
-                          <td className="text-right text-sm text-white px-2 py-3">
+                          <td className="text-right text-[17px] text-white px-2 py-3">
                             {formatNumber(etf.price)}원
                           </td>
-                          <td className={`text-right text-sm px-2 py-3 ${etf.changePercent >= 0 ? 'text-up' : 'text-down'}`}>
+                          <td className={`text-right text-[17px] px-2 py-3 ${etf.changePercent >= 0 ? 'text-up' : 'text-down'}`}>
                             {formatPercent(etf.changePercent)}
                           </td>
-                          <td className="text-right text-sm text-white px-2 py-3">
+                          <td className="text-right text-[17px] text-white px-2 py-3">
                             {formatNumber(etf.iNav)}
                           </td>
-                          <td className={`text-right text-sm px-2 py-3 ${Math.abs(etf.discrepancy) > 0.1 ? 'text-yellow-400' : 'text-white'}`}>
+                          <td className={`text-right text-[17px] px-2 py-3 ${Math.abs(etf.discrepancy) > 0.1 ? 'text-yellow-400' : 'text-white'}`}>
                             {etf.discrepancy.toFixed(2)}%
                           </td>
-                          <td className="text-right text-sm text-white px-2 py-3">
+                          <td className="text-right text-[17px] text-white px-2 py-3">
                             {Math.floor(etf.adtv / etf.price / 1000).toLocaleString()}천주
                           </td>
-                          <td className="text-right text-sm text-white px-2 py-3">
+                          <td className="text-right text-[17px] text-white px-2 py-3">
                             {(etf.adtv / 100000000).toFixed(0)}억
                           </td>
                         </>
@@ -904,7 +906,7 @@ export function QuickSearchPage({
                             return (
                               <td
                                 key={period}
-                                className={`text-right text-sm px-2 py-3 ${
+                                className={`text-right text-[17px] px-2 py-3 ${
                                   isNull ? 'text-gray-500' :
                                   numValue >= 0 ? 'text-up' : 'text-down'
                                 }`}
@@ -922,7 +924,7 @@ export function QuickSearchPage({
                             return (
                               <td
                                 key={period}
-                                className={`text-right text-sm px-2 py-3 ${
+                                className={`text-right text-[17px] px-2 py-3 ${
                                   value >= 0 ? 'text-up' : 'text-down'
                                 }`}
                               >
@@ -979,7 +981,7 @@ export function QuickSearchPage({
 
       {/* 지수 선택 모달 */}
       <Dialog open={showIndexModal} onOpenChange={setShowIndexModal}>
-        <DialogContent className="bg-[#1f1a2e] border-[#2d2640] max-w-sm">
+        <DialogContent className="bg-[#1f1a2e] border-[#3d3650]/40 max-w-sm">
           <DialogHeader>
             <DialogTitle className="text-white">중분류 선택</DialogTitle>
           </DialogHeader>
@@ -987,7 +989,7 @@ export function QuickSearchPage({
             {Object.entries(indexCategories).map(([country, indices]) => (
               <div key={country}>
                 <div className="flex items-center gap-3 mb-2">
-                  <span className="px-2 py-1 rounded bg-[#d64f79] text-white text-xs font-medium">
+                  <span className="px-2 py-1 rounded bg-[#d64f79] text-white text-[15px] font-medium">
                     {country}
                   </span>
                 </div>
@@ -999,7 +1001,7 @@ export function QuickSearchPage({
                         setSelectedIndex(index)
                         setShowIndexModal(false)
                       }}
-                      className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                      className={`px-3 py-1.5 rounded-lg text-[17px] transition-colors ${
                         selectedIndex === index
                           ? 'bg-[#2d2640] text-white border border-[#d64f79]'
                           : 'bg-[#2d2640] text-gray-400 hover:text-white'

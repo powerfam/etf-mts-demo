@@ -324,8 +324,8 @@ export function OnboardingTour({ steps, isOpen, onClose, onComplete }: Onboardin
 
         {/* Content */}
         <div className="mb-4 pr-6">
-          <h3 className="text-[#d64f79] font-bold text-sm mb-2">{step.title}</h3>
-          <p className="text-gray-300 text-xs leading-relaxed">{step.content}</p>
+          <h3 className="text-[#d64f79] font-bold text-[17px] mb-2">{step.title}</h3>
+          <p className="text-gray-300 text-[15px] leading-relaxed">{step.content}</p>
         </div>
 
         {/* Progress & Navigation */}
@@ -343,14 +343,14 @@ export function OnboardingTour({ steps, isOpen, onClose, onComplete }: Onboardin
           </div>
 
           {/* Step counter for mobile */}
-          <div className="sm:hidden text-xs text-gray-400">
+          <div className="sm:hidden text-[15px] text-gray-400">
             {currentStep + 1} / {steps.length}
           </div>
 
           <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
             <button
               onClick={handleSkip}
-              className="text-xs text-gray-400 hover:text-white px-2 py-1"
+              className="text-[15px] text-gray-400 hover:text-white px-2 py-1"
             >
               건너뛰기
             </button>
@@ -367,7 +367,7 @@ export function OnboardingTour({ steps, isOpen, onClose, onComplete }: Onboardin
             <Button
               size="sm"
               onClick={handleNext}
-              className="h-7 px-3 text-xs"
+              className="h-7 px-3 text-[15px]"
             >
               {currentStep === steps.length - 1 ? '완료' : '다음'}
               {currentStep < steps.length - 1 && <ChevronRight className="w-4 h-4 ml-0.5" />}

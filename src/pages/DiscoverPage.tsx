@@ -57,7 +57,7 @@ const generateMockFlow = (etf: ETF) => {
 // 필터 칩 컴포넌트
 function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
-    <div className="shrink-0 flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+    <div className="shrink-0 flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-[15px] text-[#d64f79]">
       <span>{label}</span>
       <button onClick={onRemove} className="hover:bg-[#d64f79]/30 rounded-full p-0.5">
         <X className="h-3 w-3" />
@@ -300,17 +300,17 @@ export function DiscoverPage({
 
   return (
     <div className="pb-20">
-      <div className="sticky top-[52px] z-40 bg-[#191322] px-4 py-3 border-b border-[#2d2640]">
+      <div className="sticky top-[52px] z-40 bg-[#191322] px-4 py-3 border-b border-[#3d3650]/40">
         {/* 검색바 (최상단) */}
         <div className="flex gap-2 mb-3">
-          <div className="flex-1 flex items-center gap-2 bg-[#1f1a2e] rounded-lg px-3 py-2 border border-[#2d2640]" data-tour="search-input">
+          <div className="flex-1 flex items-center gap-2 bg-[#1f1a2e] rounded-lg px-3 py-2 border border-[#3d3650]/40" data-tour="search-input">
             <Search className="h-4 w-4 text-gray-400" />
             <input
               type="text"
               placeholder="ETF 종목명, 티커 검색"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1 bg-transparent text-sm text-white placeholder:text-gray-500 outline-none"
+              className="flex-1 bg-transparent text-[17px] text-white placeholder:text-gray-500 outline-none"
             />
           </div>
           <button
@@ -320,7 +320,7 @@ export function DiscoverPage({
           >
             <Filter className="h-4 w-4" />
             {screeningFilterCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#d64f79] text-white text-[11px] rounded-full flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#d64f79] text-white text-[14px] rounded-full flex items-center justify-center">
                 {screeningFilterCount}
               </span>
             )}
@@ -458,7 +458,7 @@ export function DiscoverPage({
             )}
             <button
               onClick={() => setScreeningFilters(defaultFilters)}
-              className="shrink-0 px-2 py-1 text-xs text-gray-400 hover:text-white transition-colors"
+              className="shrink-0 px-2 py-1 text-[15px] text-gray-400 hover:text-white transition-colors"
             >
               전체 초기화
             </button>
@@ -469,7 +469,7 @@ export function DiscoverPage({
       {/* 통합 컨트롤 바: 결과수 + 뷰모드 + 정렬 + 가로보기 */}
       <div className="px-4 py-3 flex items-center justify-between" data-tour="screening-sort">
         {/* 왼쪽: 결과 카운트 */}
-        <div className="text-sm text-gray-400 font-medium">{sortedETFs.length}개 ETF</div>
+        <div className="text-[17px] text-gray-400 font-medium">{sortedETFs.length}개 ETF</div>
 
         {/* 오른쪽: 컨트롤 그룹 */}
         <div className="flex items-center gap-2" data-tour="sort-options">
@@ -477,7 +477,7 @@ export function DiscoverPage({
           <div className="flex bg-[#2d2640] rounded-lg p-0.5" data-tour="screening-view">
             <button
               onClick={() => setViewMode('summary')}
-              className={`px-2.5 py-1 rounded text-xs transition-colors ${
+              className={`px-2.5 py-1 rounded text-[15px] transition-colors ${
                 viewMode === 'summary' ? 'bg-[#d64f79] text-white' : 'text-gray-400'
               }`}
             >
@@ -485,7 +485,7 @@ export function DiscoverPage({
             </button>
             <button
               onClick={() => setViewMode('detail')}
-              className={`px-2.5 py-1 rounded text-xs transition-colors ${
+              className={`px-2.5 py-1 rounded text-[15px] transition-colors ${
                 viewMode === 'detail' ? 'bg-[#d64f79] text-white' : 'text-gray-400'
               }`}
             >
@@ -497,7 +497,7 @@ export function DiscoverPage({
           <div className="relative">
             <button
               onClick={() => setShowSortDropdown(!showSortDropdown)}
-              className="flex items-center gap-1 px-2.5 py-1.5 bg-[#2d2640] rounded-lg text-xs text-white"
+              className="flex items-center gap-1 px-2.5 py-1.5 bg-[#2d2640] rounded-lg text-[15px] text-white"
             >
               <span>
                 {sortBy === 'return' ? '수익률' :
@@ -509,7 +509,7 @@ export function DiscoverPage({
               <ChevronDown className={`h-3.5 w-3.5 transition-transform ${showSortDropdown ? 'rotate-180' : ''}`} />
             </button>
             {showSortDropdown && (
-              <div className="absolute right-0 top-full mt-1 w-28 bg-[#1f1a2e] border border-[#2d2640] rounded-lg shadow-lg z-50 overflow-hidden">
+              <div className="absolute right-0 top-full mt-1 w-28 bg-[#1f1a2e] border border-[#3d3650]/40 rounded-lg shadow-lg z-50 overflow-hidden">
                 {[
                   { id: 'return', label: '수익률순' },
                   { id: 'liquidity', label: '유동성순' },
@@ -522,7 +522,7 @@ export function DiscoverPage({
                       setSortBy(option.id)
                       setShowSortDropdown(false)
                     }}
-                    className={`w-full text-left px-3 py-2 text-xs transition-colors ${
+                    className={`w-full text-left px-3 py-2 text-[15px] transition-colors ${
                       sortBy === option.id
                         ? 'bg-[#d64f79] text-white font-medium'
                         : 'text-gray-300 hover:bg-[#2d2640]'
@@ -548,12 +548,12 @@ export function DiscoverPage({
 
       {/* 상세 뷰 탭 (상세 모드일 때만) */}
       {viewMode === 'detail' && (
-        <div className="flex gap-4 px-4 pb-2 border-b border-[#2d2640]">
+        <div className="flex gap-4 px-4 pb-2 border-b border-[#3d3650]/40">
           {detailTabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setDetailTab(tab.id)}
-              className={`text-sm pb-2 transition-colors ${
+              className={`text-[17px] pb-2 transition-colors ${
                 detailTab === tab.id
                   ? 'text-[#d64f79] border-b-2 border-[#d64f79] font-medium'
                   : 'text-gray-500'
@@ -567,7 +567,7 @@ export function DiscoverPage({
 
       {/* 요약 뷰 */}
       {viewMode === 'summary' && (
-        <div className="divide-y divide-[#2d2640]">
+        <div className="mx-4 rounded-xl overflow-hidden">
           {displayedETFs.map((etf) => (
             <div
               key={etf.id}
@@ -586,10 +586,12 @@ export function DiscoverPage({
                 onClick={() => onSelectETF(etf)}
                 className="flex-1 min-w-0 text-left"
               >
-                <div className="text-[13px] text-white truncate">{etf.shortName}</div>
+                <div className="marquee-wrapper max-w-[180px]">
+                  <span className="marquee-text text-[16px] text-white">{etf.shortName}</span>
+                </div>
                 <div className="flex items-center gap-1 mt-0.5">
-                  <span className="text-[11px] text-gray-400">{formatNumber(etf.price)}원</span>
-                  <span className={`text-[11px] ${etf.changePercent >= 0 ? 'text-up' : 'text-down'}`}>
+                  <span className="text-[14px] text-gray-400">{formatNumber(etf.price)}원</span>
+                  <span className={`text-[14px] ${etf.changePercent >= 0 ? 'text-up' : 'text-down'}`}>
                     {formatPercent(etf.changePercent)}
                   </span>
                 </div>
@@ -613,13 +615,13 @@ export function DiscoverPage({
             </div>
           ))}
           {hasMoreETFs && !showAll && (
-            <button onClick={() => setShowAll(true)} className="w-full py-3 flex items-center justify-center gap-2 bg-[#2d2640] hover:bg-[#3d3650] text-sm text-gray-300 transition-colors">
+            <button onClick={() => setShowAll(true)} className="w-full py-3 flex items-center justify-center gap-2 bg-[#2d2640] hover:bg-[#3d3650] text-[17px] text-gray-300 transition-colors">
               <span>더보기 ({sortedETFs.length - INITIAL_DISPLAY_COUNT}개 더)</span>
               <ChevronDown className="h-4 w-4" />
             </button>
           )}
           {showAll && hasMoreETFs && (
-            <button onClick={() => setShowAll(false)} className="w-full py-3 flex items-center justify-center gap-2 bg-[#2d2640] hover:bg-[#3d3650] text-sm text-gray-300 transition-colors">
+            <button onClick={() => setShowAll(false)} className="w-full py-3 flex items-center justify-center gap-2 bg-[#2d2640] hover:bg-[#3d3650] text-[17px] text-gray-300 transition-colors">
               <span>접기</span>
               <ChevronDown className="h-4 w-4 rotate-180" />
             </button>
@@ -630,29 +632,29 @@ export function DiscoverPage({
       {/* 상세 뷰 - 테이블 형식 */}
       {viewMode === 'detail' && (
         <div className="px-4">
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto rounded-xl border border-[#3d3650]/40">
             <table className="w-full min-w-[600px]">
-              <thead className="bg-[#2d2640] sticky top-0" data-tour="column-sort">
+              <thead className="bg-[#2d2640]/60 sticky top-0" data-tour="column-sort">
                 <tr>
-                  <th className="text-left text-xs text-gray-400 font-medium px-3 py-2 w-40">종목</th>
+                  <th className="text-left text-[15px] text-gray-400 font-medium px-3 py-2 w-40 whitespace-nowrap">종목</th>
                   {detailTab === 'basic' && (
                     <>
-                      <th className="text-right text-xs text-gray-400 font-medium px-2 py-2 whitespace-nowrap cursor-pointer hover:text-white" onClick={() => handleColumnSort('price')}>
+                      <th className="text-right text-[15px] text-gray-400 font-medium px-2 py-2 whitespace-nowrap cursor-pointer hover:text-white" onClick={() => handleColumnSort('price')}>
                         <span className="inline-flex items-center gap-0.5">현재가 {renderSortIcon('price')}</span>
                       </th>
-                      <th className="text-right text-xs text-gray-400 font-medium px-2 py-2 whitespace-nowrap cursor-pointer hover:text-white" onClick={() => handleColumnSort('change')}>
+                      <th className="text-right text-[15px] text-gray-400 font-medium px-2 py-2 whitespace-nowrap cursor-pointer hover:text-white" onClick={() => handleColumnSort('change')}>
                         <span className="inline-flex items-center gap-0.5">등락률 {renderSortIcon('change')}</span>
                       </th>
-                      <th className="text-right text-xs text-gray-400 font-medium px-2 py-2 whitespace-nowrap cursor-pointer hover:text-white" onClick={() => handleColumnSort('inav')}>
+                      <th className="text-right text-[15px] text-gray-400 font-medium px-2 py-2 whitespace-nowrap cursor-pointer hover:text-white" onClick={() => handleColumnSort('inav')}>
                         <span className="inline-flex items-center gap-0.5">iNAV {renderSortIcon('inav')}</span>
                       </th>
-                      <th className="text-right text-xs text-gray-400 font-medium px-2 py-2 whitespace-nowrap cursor-pointer hover:text-white" onClick={() => handleColumnSort('discrepancy')}>
+                      <th className="text-right text-[15px] text-gray-400 font-medium px-2 py-2 whitespace-nowrap cursor-pointer hover:text-white" onClick={() => handleColumnSort('discrepancy')}>
                         <span className="inline-flex items-center gap-0.5">괴리율 {renderSortIcon('discrepancy')}</span>
                       </th>
-                      <th className="text-right text-xs text-gray-400 font-medium px-2 py-2 whitespace-nowrap cursor-pointer hover:text-white" onClick={() => handleColumnSort('volume')}>
+                      <th className="text-right text-[15px] text-gray-400 font-medium px-2 py-2 whitespace-nowrap cursor-pointer hover:text-white" onClick={() => handleColumnSort('volume')}>
                         <span className="inline-flex items-center gap-0.5">거래량 {renderSortIcon('volume')}</span>
                       </th>
-                      <th className="text-right text-xs text-gray-400 font-medium px-2 py-2 whitespace-nowrap cursor-pointer hover:text-white" onClick={() => handleColumnSort('adtv')}>
+                      <th className="text-right text-[15px] text-gray-400 font-medium px-2 py-2 whitespace-nowrap cursor-pointer hover:text-white" onClick={() => handleColumnSort('adtv')}>
                         <span className="inline-flex items-center gap-0.5">거래대금 {renderSortIcon('adtv')}</span>
                       </th>
                     </>
@@ -664,7 +666,7 @@ export function DiscoverPage({
                         return (
                           <th
                             key={period}
-                            className="text-right text-xs text-gray-400 font-medium px-2 py-2 cursor-pointer hover:text-white whitespace-nowrap"
+                            className="text-right text-[15px] text-gray-400 font-medium px-2 py-2 cursor-pointer hover:text-white whitespace-nowrap"
                             onClick={() => handleColumnSort(colId)}
                           >
                             <span className="inline-flex items-center gap-0.5">
@@ -682,7 +684,7 @@ export function DiscoverPage({
                         return (
                           <th
                             key={period}
-                            className="text-right text-xs text-gray-400 font-medium px-2 py-2 cursor-pointer hover:text-white whitespace-nowrap"
+                            className="text-right text-[15px] text-gray-400 font-medium px-2 py-2 cursor-pointer hover:text-white whitespace-nowrap"
                             onClick={() => handleColumnSort(colId)}
                           >
                             <span className="inline-flex items-center gap-0.5">
@@ -693,8 +695,8 @@ export function DiscoverPage({
                       })}
                     </>
                   )}
-                  <th className="text-center text-xs text-gray-400 font-medium px-2 py-2">비교</th>
-                  <th className="text-center text-xs text-gray-400 font-medium px-2 py-2">관심</th>
+                  <th className="text-center text-[15px] text-gray-400 font-medium px-2 py-2 whitespace-nowrap">비교</th>
+                  <th className="text-center text-[15px] text-gray-400 font-medium px-2 py-2 whitespace-nowrap">관심</th>
                 </tr>
               </thead>
               <tbody>
@@ -704,33 +706,33 @@ export function DiscoverPage({
                   return (
                     <tr
                       key={etf.id}
-                      className="border-b border-[#2d2640] hover:bg-[#2d2640]/30 transition-colors cursor-pointer"
+                      className="border-b border-[#3d3650]/40 hover:bg-[#2d2640]/30 transition-colors cursor-pointer"
                       onClick={() => onSelectETF(etf)}
                     >
                       <td className="px-3 py-3">
                         <div className="marquee-wrapper max-w-[140px]">
-                          <span className="marquee-text text-sm text-white">{etf.shortName}</span>
+                          <span className="marquee-text text-[17px] text-white">{etf.shortName}</span>
                         </div>
-                        <div className="text-xs text-gray-500">{etf.ticker}</div>
+                        <div className="text-[15px] text-gray-500">{etf.ticker}</div>
                       </td>
                       {detailTab === 'basic' && (
                         <>
-                          <td className="text-right text-sm text-white px-2 py-3 whitespace-nowrap">
+                          <td className="text-right text-[17px] text-white px-2 py-3 whitespace-nowrap">
                             {formatNumber(etf.price)}원
                           </td>
-                          <td className={`text-right text-sm px-2 py-3 whitespace-nowrap ${etf.changePercent >= 0 ? 'text-up' : 'text-down'}`}>
+                          <td className={`text-right text-[17px] px-2 py-3 whitespace-nowrap ${etf.changePercent >= 0 ? 'text-up' : 'text-down'}`}>
                             {formatPercent(etf.changePercent)}
                           </td>
-                          <td className="text-right text-sm text-white px-2 py-3 whitespace-nowrap">
+                          <td className="text-right text-[17px] text-white px-2 py-3 whitespace-nowrap">
                             {formatNumber(etf.iNav)}
                           </td>
-                          <td className={`text-right text-sm px-2 py-3 whitespace-nowrap ${Math.abs(etf.discrepancy) > 0.1 ? 'text-yellow-400' : 'text-white'}`}>
+                          <td className={`text-right text-[17px] px-2 py-3 whitespace-nowrap ${Math.abs(etf.discrepancy) > 0.1 ? 'text-yellow-400' : 'text-white'}`}>
                             {etf.discrepancy.toFixed(2)}%
                           </td>
-                          <td className="text-right text-sm text-white px-2 py-3 whitespace-nowrap">
+                          <td className="text-right text-[17px] text-white px-2 py-3 whitespace-nowrap">
                             {Math.floor(etf.adtv / etf.price / 1000).toLocaleString()}천주
                           </td>
-                          <td className="text-right text-sm text-white px-2 py-3 whitespace-nowrap">
+                          <td className="text-right text-[17px] text-white px-2 py-3 whitespace-nowrap">
                             {(etf.adtv / 100000000).toFixed(0)}억
                           </td>
                         </>
@@ -744,7 +746,7 @@ export function DiscoverPage({
                             return (
                               <td
                                 key={period}
-                                className={`text-right text-sm px-2 py-3 whitespace-nowrap ${
+                                className={`text-right text-[17px] px-2 py-3 whitespace-nowrap ${
                                   isNull ? 'text-gray-500' :
                                   numValue >= 0 ? 'text-up' : 'text-down'
                                 }`}
@@ -762,7 +764,7 @@ export function DiscoverPage({
                             return (
                               <td
                                 key={period}
-                                className={`text-right text-sm px-2 py-3 whitespace-nowrap ${
+                                className={`text-right text-[17px] px-2 py-3 whitespace-nowrap ${
                                   value >= 0 ? 'text-up' : 'text-down'
                                 }`}
                               >
@@ -795,13 +797,13 @@ export function DiscoverPage({
             </table>
           </div>
           {hasMoreETFs && !showAll && (
-            <button onClick={() => setShowAll(true)} className="w-full mt-3 py-3 flex items-center justify-center gap-2 bg-[#2d2640] hover:bg-[#3d3650] rounded-xl text-sm text-gray-300 transition-colors">
+            <button onClick={() => setShowAll(true)} className="w-full mt-3 py-3 flex items-center justify-center gap-2 bg-[#2d2640] hover:bg-[#3d3650] rounded-xl text-[17px] text-gray-300 transition-colors">
               <span>더보기 ({sortedETFs.length - INITIAL_DISPLAY_COUNT}개 더)</span>
               <ChevronDown className="h-4 w-4" />
             </button>
           )}
           {showAll && hasMoreETFs && (
-            <button onClick={() => setShowAll(false)} className="w-full mt-3 py-3 flex items-center justify-center gap-2 bg-[#2d2640] hover:bg-[#3d3650] rounded-xl text-sm text-gray-300 transition-colors">
+            <button onClick={() => setShowAll(false)} className="w-full mt-3 py-3 flex items-center justify-center gap-2 bg-[#2d2640] hover:bg-[#3d3650] rounded-xl text-[17px] text-gray-300 transition-colors">
               <span>접기</span>
               <ChevronDown className="h-4 w-4 rotate-180" />
             </button>
@@ -828,18 +830,18 @@ export function DiscoverPage({
               height: '100%',
             }}
           >
-            <div className="flex items-center justify-between px-4 py-2 bg-[#191322] border-b border-[#2d2640]">
-              <h1 className="text-sm font-semibold text-white">ETF 스크리닝 (가로보기)</h1>
+            <div className="flex items-center justify-between px-4 py-2 bg-[#191322] border-b border-[#3d3650]/40">
+              <h1 className="text-[17px] font-semibold text-white">ETF 스크리닝 (가로보기)</h1>
               <button
                 onClick={() => setIsLandscape(false)}
-                className="px-3 py-1 rounded-lg bg-[#d64f79] text-white text-xs"
+                className="px-3 py-1 rounded-lg bg-[#d64f79] text-white text-[15px]"
               >
                 세로로 돌아가기
               </button>
             </div>
-            <div className="flex-1 overflow-auto p-2">
-              <table className="w-full min-w-[800px] text-xs">
-                <thead className="bg-[#2d2640] sticky top-0">
+            <div className="flex-1 overflow-auto p-2 rounded-xl border border-[#3d3650]/40">
+              <table className="w-full min-w-[800px] text-[15px]">
+                <thead className="bg-[#2d2640]/60 sticky top-0">
                   <tr>
                     <th className="text-left text-gray-400 font-medium px-2 py-2 min-w-[130px]">종목</th>
                     <th className="text-right text-gray-400 font-medium px-2 py-2 whitespace-nowrap cursor-pointer hover:text-white" onClick={() => handleColumnSort('price')}>
@@ -873,7 +875,7 @@ export function DiscoverPage({
                         setIsLandscape(false)
                         onSelectETF(etf)
                       }}
-                      className="border-b border-[#2d2640] hover:bg-[#2d2640]/30 cursor-pointer"
+                      className="border-b border-[#3d3650]/40 hover:bg-[#2d2640]/30 cursor-pointer"
                     >
                       <td className="px-2 py-2">
                         <div className="marquee-wrapper max-w-[130px]">
