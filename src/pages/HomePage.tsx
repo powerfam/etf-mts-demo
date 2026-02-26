@@ -150,11 +150,11 @@ const domesticStocks = [
 ]
 
 const overseasStocks = [
-  { name: 'TSLA', ticker: 'TSLA', change: 5.34 },
-  { name: 'GOOGL', ticker: 'GOOGL', change: -1.23 },
-  { name: 'SNDK', ticker: 'SNDK', change: 2.87 },
-  { name: 'AAPL', ticker: 'AAPL', change: 0.92 },
-  { name: 'KO', ticker: 'KO', change: -0.31 },
+  { name: '테슬라', ticker: 'TSLA', change: 5.34 },
+  { name: '알파벳', ticker: 'GOOGL', change: -1.23 },
+  { name: '샌디스크', ticker: 'SNDK', change: 2.87 },
+  { name: '애플', ticker: 'AAPL', change: 0.92 },
+  { name: '코카콜라', ticker: 'KO', change: -0.31 },
 ]
 
 export function HomePage({ onSelectETF, onNavigate, onLongPressETF, onOpenSearch, onOpenQuickSearch }: HomePageProps) {
