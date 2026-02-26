@@ -235,7 +235,7 @@ export function Header({ onSelectETF, accountType = 'general', onStartTour, isDa
                       <span className={`text-sm font-medium ${notification.color}`}>
                         {notification.title}
                       </span>
-                      <span className="text-[10px] text-gray-500 shrink-0">
+                      <span className="text-[11px] text-gray-500 shrink-0">
                         {notification.time}
                       </span>
                     </div>

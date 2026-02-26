@@ -396,7 +396,7 @@ export function InvestInfoDetailPage({
                         <div className="flex items-center gap-2 mb-1.5">
                           <Badge
                             variant="outline"
-                            className="text-[10px] border-0 px-1.5 py-0 flex items-center gap-1 bg-[#d64f79]/20 text-[#d64f79]"
+                            className="text-[11px] border-0 px-1.5 py-0 flex items-center gap-1 bg-[#d64f79]/20 text-[#d64f79]"
                           >
                             <RelIcon className="h-2.5 w-2.5" />
                             {relCategory.label}

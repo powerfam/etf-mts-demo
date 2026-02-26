@@ -62,6 +62,19 @@
   color: #796ec2;
 }
 
+/* ========================================
+   DARK MODE - GRAY TEXT READABILITY FIX
+   다크모드에서 회색 텍스트 가독성 개선
+   ======================================== */
+/* 기본 다크모드에서 회색 텍스트를 더 밝게 표시 */
+.text-gray-500 {
+  color: #9ca3af !important; /* 기존 #6b7280 → 더 밝게 */
+}
+
+.text-gray-400 {
+  color: #c9cdd3 !important; /* 기존 #9ca3af → 더 밝게 */
+}
+
 .bg-up {
   background-color: #d64f79;
 }
@@ -335,6 +348,10 @@ input, textarea, select {
   background-color: #e5e5e5 !important;
 }
 
+.light-mode .bg-\[\#1a1424\] {
+  background-color: #f0f0f0 !important;
+}
+
 /* Light mode border colors */
 .light-mode .border-\[\#2d2640\] {
   border-color: #e5e7eb !important;
@@ -362,15 +379,15 @@ input, textarea, select {
 }
 
 .light-mode .text-gray-400 {
-  color: #6b7280 !important;
+  color: #4b5563 !important;
 }
 
 .light-mode .text-gray-500 {
-  color: #9ca3af !important;
+  color: #6b7280 !important;
 }
 
 .light-mode .text-gray-600 {
-  color: #4b5563 !important;
+  color: #374151 !important;
 }
 
 /* Light mode cards and containers */
@@ -602,6 +619,22 @@ input, textarea, select {
 
 .light-mode .text-sm.text-gray-400 {
   color: #4b5563 !important;
+}
+
+/* 투자정보 라벨 (text-[11px]) 가독성 강화 */
+.light-mode .text-\[11px\].text-gray-500 {
+  color: #374151 !important;
+  font-weight: 500 !important;
+}
+
+.light-mode .text-\[11px\].text-gray-400 {
+  color: #4b5563 !important;
+}
+
+/* 자세히보기 모달 라벨 가독성 강화 */
+.light-mode .text-sm.text-gray-400 {
+  color: #4b5563 !important;
+  font-weight: 500 !important;
 }
 
 /* 카드 내부 값 텍스트 */

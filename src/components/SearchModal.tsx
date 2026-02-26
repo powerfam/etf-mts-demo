@@ -329,12 +329,12 @@ function SearchResultItem({
         <div className="flex items-center gap-2">
           <span className="text-xs text-gray-500">{etf.ticker}</span>
           {etf.isLeveraged && (
-            <Badge variant="outline" className="text-[10px] px-1 py-0 text-yellow-400 border-yellow-400/30">
+            <Badge variant="outline" className="text-[11px] px-1 py-0 text-yellow-400 border-yellow-400/30">
               레버리지
             </Badge>
           )}
           {etf.isInverse && (
-            <Badge variant="outline" className="text-[10px] px-1 py-0 text-blue-400 border-blue-400/30">
+            <Badge variant="outline" className="text-[11px] px-1 py-0 text-blue-400 border-blue-400/30">
               인버스
             </Badge>
           )}

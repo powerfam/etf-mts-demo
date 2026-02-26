@@ -317,8 +317,8 @@ export function PortfolioPage({ accountType, onSelectETF, onLongPressETF, onAcco
                       className="w-2 h-2 rounded-full"
                       style={{ backgroundColor: assetClassColors[item.name] || '#6b7280' }}
                     />
-                    <span className="text-[10px] text-gray-400">{item.name}</span>
-                    <span className="text-[10px] text-white">{item.percent}%</span>
+                    <span className="text-[11px] text-gray-400">{item.name}</span>
+                    <span className="text-[11px] text-white">{item.percent}%</span>
                   </div>
                 ))}
               </div>
@@ -413,7 +413,7 @@ export function PortfolioPage({ accountType, onSelectETF, onLongPressETF, onAcco
             )}
 
             <div className="mt-3 pt-3 border-t border-[#2d2640]">
-              <p className="text-[10px] text-gray-500 text-center">
+              <p className="text-[11px] text-gray-500 text-center">
                 탭하여 전체 분배금 캘린더 보기
               </p>
             </div>
@@ -487,19 +487,19 @@ export function PortfolioPage({ accountType, onSelectETF, onLongPressETF, onAcco
 
                   <div className="grid grid-cols-4 gap-2 text-center">
                     <div>
-                      <div className="text-[10px] text-gray-500">보유수량</div>
+                      <div className="text-[11px] text-gray-500">보유수량</div>
                       <div className="text-xs text-white">{etf.quantity}주</div>
                     </div>
                     <div>
-                      <div className="text-[10px] text-gray-500">평균단가</div>
+                      <div className="text-[11px] text-gray-500">평균단가</div>
                       <div className="text-xs text-white">{formatNumber(etf.avgPrice)}</div>
                     </div>
                     <div>
-                      <div className="text-[10px] text-gray-500">현재가</div>
+                      <div className="text-[11px] text-gray-500">현재가</div>
                       <div className="text-xs text-white">{formatNumber(etf.price)}</div>
                     </div>
                     <div>
-                      <div className="text-[10px] text-gray-500">건전성</div>
+                      <div className="text-[11px] text-gray-500">건전성</div>
                       <div className={`text-xs ${etf.healthScore >= 85 ? 'text-emerald-400' : 'text-amber-400'}`}>
                         {etf.healthScore}
                       </div>
@@ -510,13 +510,13 @@ export function PortfolioPage({ accountType, onSelectETF, onLongPressETF, onAcco
                   <div className="flex gap-2 mt-3 pt-3 border-t border-[#2d2640]">
                     <Badge
                       variant={Math.abs(etf.discrepancy) <= 0.1 ? 'success' : 'warning'}
-                      className="text-[10px]"
+                      className="text-[11px]"
                     >
                       괴리 {etf.discrepancy >= 0 ? '+' : ''}{etf.discrepancy.toFixed(2)}%
                     </Badge>
                     <Badge
                       variant={etf.spread <= 0.05 ? 'success' : 'warning'}
-                      className="text-[10px]"
+                      className="text-[11px]"
                     >
                       스프레드 {etf.spread.toFixed(2)}%
                     </Badge>

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { mockETFs } from '@/data/mockData'
 import { formatNumber, formatPercent } from '@/lib/utils'
+import { ETFLogo } from '@/components/ETFLogo'
 import type { ETF } from '@/data/mockData'
 
 // 테마 키워드 매핑 (ETF shortName/name 기반 필터링) - 히트맵용 확장 키워드 포함
@@ -141,19 +142,19 @@ const heatmapDataByPeriod: Record<string, { theme: string; change: number; isInd
 
 // 구성종목 검색 데이터 (전일 대비 수익률 포함)
 const domesticStocks = [
-  { name: '삼성전자', icon: '📱', change: 2.15 },
-  { name: '현대차', icon: '🚗', change: 4.07 },
-  { name: 'SK하이닉스', icon: '💾', change: 1.82 },
-  { name: '키움증권', icon: '📊', change: -0.54 },
-  { name: '한화솔루션', icon: '☀️', change: 3.21 },
+  { name: '삼성전자', ticker: '005930', change: 2.15 },
+  { name: '현대차', ticker: '005380', change: 4.07 },
+  { name: 'SK하이닉스', ticker: '000660', change: 1.82 },
+  { name: '키움증권', ticker: '039490', change: -0.54 },
+  { name: '한화솔루션', ticker: '009830', change: 3.21 },
 ]
 
 const overseasStocks = [
-  { name: 'TSLA', icon: '⚡', change: 5.34 },
-  { name: 'GOOGL', icon: '🔍', change: -1.23 },
-  { name: 'SNDK', icon: '💿', change: 2.87 },
-  { name: 'AAPL', icon: '🍎', change: 0.92 },
-  { name: 'KO', icon: '🥤', change: -0.31 },
+  { name: 'TSLA', ticker: 'TSLA', change: 5.34 },
+  { name: 'GOOGL', ticker: 'GOOGL', change: -1.23 },
+  { name: 'SNDK', ticker: 'SNDK', change: 2.87 },
+  { name: 'AAPL', ticker: 'AAPL', change: 0.92 },
+  { name: 'KO', ticker: 'KO', change: -0.31 },
 ]
 
 export function HomePage({ onSelectETF, onNavigate, onLongPressETF, onOpenSearch, onOpenQuickSearch }: HomePageProps) {
@@ -277,22 +278,22 @@ export function HomePage({ onSelectETF, onNavigate, onLongPressETF, onOpenSearch
                   key={filter.id}
                   className="flex items-center justify-center p-3 rounded-xl bg-[#1f1a2e] border border-[#1f1a2e] quick-search-title-dark"
                 >
-                  <span className="text-sm text-white text-center whitespace-pre-line leading-tight font-bold">{filter.label}</span>
+                  <span className="text-[13px] text-white text-center whitespace-pre-line leading-snug font-bold">{filter.label}</span>
                 </div>
               )
             }
 
-            // 나머지 버튼들 - 흰색 배경
+            // 나머지 버튼들 - 다크모드 대응
             return (
               <button
                 key={filter.id}
                 onClick={() => onOpenQuickSearch?.(filter.id)}
-                className="flex items-center gap-2 p-3 rounded-xl bg-white border border-gray-200 hover:border-[#d64f79]/50 transition-colors shadow-sm"
+                className="flex items-center gap-2.5 p-3 rounded-xl bg-[#2d2640] border border-[#3d3650] hover:border-[#d64f79]/50 transition-colors"
               >
-                <div className="rounded-lg bg-gray-100 p-2">
+                <div className="rounded-lg bg-[#3d3650] p-2 shrink-0">
                   <Icon className="h-4 w-4 text-[#d64f79]" />
                 </div>
-                <span className="text-xs text-gray-700 text-left whitespace-pre-line leading-tight font-medium">{filter.label}</span>
+                <span className="text-[13px] text-white text-left whitespace-pre-line leading-snug font-medium">{filter.label}</span>
               </button>
             )
           })}
@@ -328,10 +329,10 @@ export function HomePage({ onSelectETF, onNavigate, onLongPressETF, onOpenSearch
                   {theme.rank}
                 </div>
                 <div className="text-left">
-                  <div className="text-sm font-medium text-white">{theme.name}</div>
+                  <div className="text-[13px] font-medium text-white">{theme.name}</div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] text-gray-500">▲ {theme.count}</span>
-                    <span className={`text-xs font-medium ${theme.change >= 0 ? 'text-up' : 'text-down'}`}>
+                    <span className="text-[11px] text-gray-500">▲ {theme.count}</span>
+                    <span className={`text-[11px] font-medium ${theme.change >= 0 ? 'text-up' : 'text-down'}`}>
                       {theme.change >= 0 ? '+' : ''}{theme.change.toFixed(2)}%
                     </span>
                   </div>
@@ -376,22 +377,20 @@ export function HomePage({ onSelectETF, onNavigate, onLongPressETF, onOpenSearch
               onTouchEnd={handleLongPressEnd}
               className="flex items-center gap-3 p-3 border-b border-[#2d2640] last:border-b-0 cursor-pointer hover:bg-[#3d3650]/50 transition-colors select-none"
             >
-              {/* ETF 뱃지 */}
-              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#2d2640] text-[10px] text-gray-400 font-medium">
-                ETF
-              </div>
+              {/* ETF 로고 */}
+              <ETFLogo shortName={etf.shortName} size="md" />
 
-              {/* 종목명 & 가격 */}
+              {/* 종목명 */}
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-sm font-medium text-white truncate">{etf.shortName}</span>
-                </div>
-                <div className="text-xs text-gray-500">{formatNumber(etf.price)}원</div>
+                <span className="text-[13px] font-medium text-white truncate block">{etf.shortName}</span>
               </div>
 
-              {/* 등락률 */}
-              <div className={`text-sm font-medium ${etf.changePercent >= 0 ? 'text-up' : 'text-down'}`}>
-                {etf.changePercent >= 0 ? '+' : ''}{etf.changePercent.toFixed(2)}%
+              {/* 가격 & 수익률 (세로 배치, 오른쪽 정렬) */}
+              <div className="text-right shrink-0">
+                <div className="text-[11px] text-gray-400">{formatNumber(etf.price)}원</div>
+                <div className={`text-[11px] font-medium ${etf.changePercent >= 0 ? 'text-up' : 'text-down'}`}>
+                  {etf.changePercent >= 0 ? '+' : ''}{etf.changePercent.toFixed(2)}%
+                </div>
               </div>
 
               {/* 즐겨찾기 */}
@@ -429,9 +428,9 @@ export function HomePage({ onSelectETF, onNavigate, onLongPressETF, onOpenSearch
           ))}
           {/* 스케일 바 */}
           <div className="flex-1 flex items-center justify-end gap-1">
-            <span className="text-[10px] text-gray-500">-5%</span>
+            <span className="text-[11px] text-gray-500">-5%</span>
             <div className="w-20 h-2 rounded-full bg-gradient-to-r from-blue-500 via-gray-600 to-red-500" />
-            <span className="text-[10px] text-gray-500">+5%</span>
+            <span className="text-[11px] text-gray-500">+5%</span>
           </div>
         </div>
 
@@ -477,10 +476,10 @@ export function HomePage({ onSelectETF, onNavigate, onLongPressETF, onOpenSearch
                     }}
                   />
                 )}
-                <div className={`relative text-[10px] font-medium truncate ${isIndex ? (item.change >= 0 ? 'text-red-500' : 'text-blue-500') : 'text-white drop-shadow-sm'}`}>
+                <div className={`relative text-[13px] font-medium truncate ${isIndex ? (item.change >= 0 ? 'text-red-500' : 'text-blue-500') : 'text-white drop-shadow-sm'}`}>
                   {item.theme}
                 </div>
-                <div className={`relative text-xs font-bold mt-0.5 ${isIndex ? (item.change >= 0 ? 'text-red-500' : 'text-blue-500') : 'text-white drop-shadow-sm'}`}>
+                <div className={`relative text-[11px] font-bold mt-0.5 ${isIndex ? (item.change >= 0 ? 'text-red-500' : 'text-blue-500') : 'text-white drop-shadow-sm'}`}>
                   {item.change >= 0 ? '+' : ''}{item.change.toFixed(2)}%
                 </div>
               </div>
@@ -505,7 +504,7 @@ export function HomePage({ onSelectETF, onNavigate, onLongPressETF, onOpenSearch
         <div className="grid grid-cols-2 gap-4">
           {/* 국내 */}
           <div>
-            <div className="text-xs text-gray-400 font-medium mb-2 pb-1 border-b border-[#3d3650]">국내</div>
+            <div className="text-[13px] text-gray-400 font-medium mb-2 pb-1 border-b border-[#3d3650]">국내</div>
             <div className="space-y-1">
               {domesticStocks.map((stock) => (
                 <button
@@ -513,11 +512,15 @@ export function HomePage({ onSelectETF, onNavigate, onLongPressETF, onOpenSearch
                   onClick={() => handleConstituentSearch(stock.name)}
                   className="w-full flex items-center gap-2 py-1.5 hover:bg-[#3d3650]/50 rounded transition-colors"
                 >
-                  <div className="w-5 h-5 rounded-full bg-[#3d3650] flex items-center justify-center shrink-0">
-                    <span className="text-[9px]">{stock.icon}</span>
+                  <div className="w-8 h-8 rounded-full overflow-hidden bg-white flex items-center justify-center shrink-0">
+                    <img
+                      src={`/img/logo/security/kr/${stock.ticker}.png`}
+                      alt={stock.name}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
-                  <span className="text-xs text-white truncate flex-1 text-left">{stock.name}</span>
-                  <span className={`text-[10px] shrink-0 ${stock.change >= 0 ? 'text-up' : 'text-down'}`}>
+                  <span className="text-[13px] font-medium text-white truncate flex-1 text-left">{stock.name}</span>
+                  <span className={`text-[11px] shrink-0 ${stock.change >= 0 ? 'text-up' : 'text-down'}`}>
                     {stock.change >= 0 ? '+' : ''}{stock.change.toFixed(2)}%
                   </span>
                 </button>
@@ -527,7 +530,7 @@ export function HomePage({ onSelectETF, onNavigate, onLongPressETF, onOpenSearch
 
           {/* 해외 */}
           <div>
-            <div className="text-xs text-gray-400 font-medium mb-2 pb-1 border-b border-[#3d3650]">해외</div>
+            <div className="text-[13px] text-gray-400 font-medium mb-2 pb-1 border-b border-[#3d3650]">해외</div>
             <div className="space-y-1">
               {overseasStocks.map((stock) => (
                 <button
@@ -535,11 +538,15 @@ export function HomePage({ onSelectETF, onNavigate, onLongPressETF, onOpenSearch
                   onClick={() => handleConstituentSearch(stock.name)}
                   className="w-full flex items-center gap-2 py-1.5 hover:bg-[#3d3650]/50 rounded transition-colors"
                 >
-                  <div className="w-5 h-5 rounded-full bg-[#3d3650] flex items-center justify-center shrink-0">
-                    <span className="text-[9px]">{stock.icon}</span>
+                  <div className="w-8 h-8 rounded-full overflow-hidden bg-white flex items-center justify-center shrink-0">
+                    <img
+                      src={`/img/logo/security/fr/${stock.ticker}.png`}
+                      alt={stock.name}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
-                  <span className="text-xs text-white truncate flex-1 text-left">{stock.name}</span>
-                  <span className={`text-[10px] shrink-0 ${stock.change >= 0 ? 'text-up' : 'text-down'}`}>
+                  <span className="text-[13px] font-medium text-white truncate flex-1 text-left">{stock.name}</span>
+                  <span className={`text-[11px] shrink-0 ${stock.change >= 0 ? 'text-up' : 'text-down'}`}>
                     {stock.change >= 0 ? '+' : ''}{stock.change.toFixed(2)}%
                   </span>
                 </button>
@@ -593,8 +600,8 @@ export function HomePage({ onSelectETF, onNavigate, onLongPressETF, onOpenSearch
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-medium text-white truncate">{etf.shortName}</div>
                       <div className="flex items-center gap-1.5 mt-0.5">
-                        <span className="text-[10px] text-gray-500">{etf.ticker}</span>
-                        <span className={`text-[9px] px-1.5 py-0.5 rounded ${
+                        <span className="text-[11px] text-gray-500">{etf.ticker}</span>
+                        <span className={`text-[11px] px-1.5 py-0.5 rounded ${
                           etf.marketClass === '해외' ? 'bg-blue-500/20 text-blue-400' : 'bg-emerald-500/20 text-emerald-400'
                         }`}>
                           {etf.marketClass}
@@ -666,7 +673,7 @@ export function HomePage({ onSelectETF, onNavigate, onLongPressETF, onOpenSearch
                 </span>
                 <div className="flex items-center gap-1">
                   <span className="text-up text-xs">▲</span>
-                  <span className="text-[10px] text-gray-500">{theme.count}</span>
+                  <span className="text-[11px] text-gray-500">{theme.count}</span>
                 </div>
                 <span className="text-sm text-white flex-1 text-left">{theme.name}</span>
                 <span className={`text-sm font-medium ${theme.change >= 0 ? 'text-up' : 'text-down'}`}>
@@ -715,7 +722,7 @@ export function HomePage({ onSelectETF, onNavigate, onLongPressETF, onOpenSearch
             <div className="overflow-y-auto max-h-[calc(80vh-220px)]">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs text-gray-400">총 {constituentSearchResults.length}건</span>
-                <span className="text-[10px] text-gray-500">비중높은순</span>
+                <span className="text-[11px] text-gray-500">비중높은순</span>
               </div>
               {constituentSearchResults.map(({ etf, weight }) => (
                 <button
@@ -728,7 +735,7 @@ export function HomePage({ onSelectETF, onNavigate, onLongPressETF, onOpenSearch
                   className="w-full flex items-center gap-3 p-3 hover:bg-[#2a2438] rounded-lg transition-colors"
                 >
                   {/* ETF 뱃지 */}
-                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#2d2640] text-[10px] text-gray-400 font-medium shrink-0">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#2d2640] text-[11px] text-gray-400 font-medium shrink-0">
                     ETF
                   </div>
 
@@ -743,7 +750,7 @@ export function HomePage({ onSelectETF, onNavigate, onLongPressETF, onOpenSearch
                           style={{ width: `${weight}%` }}
                         />
                       </div>
-                      <span className="text-[10px] text-[#d64f79] shrink-0">{weight}%</span>
+                      <span className="text-[11px] text-[#d64f79] shrink-0">{weight}%</span>
                     </div>
                   </div>
 

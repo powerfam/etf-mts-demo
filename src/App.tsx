@@ -149,13 +149,6 @@ function App() {
     window.scrollTo(0, 0)
   }
 
-  // 상세 페이지에서 비교하기 클릭 시 (ETF 추가 + 비교 탭 이동)
-  const handleAddToCompareAndNavigate = (etf: ETF) => {
-    handleAddToCompare(etf)
-    setShowDetail(false)
-    setActiveTab('compare')
-    window.scrollTo(0, 0)
-  }
 
   // 비교 목록 초기화
   const handleClearCompare = () => {
@@ -206,6 +199,17 @@ function App() {
   // Show ETF detail page
   if (showDetail && selectedETF) {
     const currentIdx = etfNavigationList.findIndex(e => e.id === selectedETF.id)
+    const isInCompare = compareETFs.some(e => e.id === selectedETF.id)
+
+    // 비교함 토글 핸들러 (추가/제거)
+    const handleToggleCompare = (etf: ETF) => {
+      if (compareETFs.some(e => e.id === etf.id)) {
+        handleRemoveFromCompare(etf.id)
+      } else {
+        handleAddToCompare(etf)
+      }
+    }
+
     return (
       <div className="min-h-screen bg-[#191322]">
         <ETFDetailPage
@@ -214,10 +218,17 @@ function App() {
           accountType={accountType}
           onBack={handleBackFromDetail}
           onTrade={handleTrade}
-          onAddToCompare={handleAddToCompareAndNavigate}
+          onAddToCompare={handleToggleCompare}
+          onGoToCompare={() => {
+            setShowDetail(false)
+            setActiveTab('compare')
+            window.scrollTo(0, 0)
+          }}
           etfList={etfNavigationList}
           currentIndex={currentIdx >= 0 ? currentIdx : 0}
           onNavigateETF={handleNavigateETF}
+          compareCount={compareETFs.length}
+          isInCompare={isInCompare}
         />
         <BottomNav activeTab={activeTab} onTabChange={handleNavigate} />
         {/* FloatingChatbot 임시 숨김 */}
@@ -269,6 +280,10 @@ function App() {
           onSelectETF={handleSelectETF}
           accountType={accountType}
           onLongPressETF={handleAddToCompare}
+          onGoToCompare={(etfs) => {
+            setCompareETFs(etfs)
+            setActiveTab('compare')
+          }}
         />
       )}
 

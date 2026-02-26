@@ -569,7 +569,7 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
                     <button
                       key={etf.id}
                       onClick={() => onSelectETF(etf)}
-                      className="w-full text-left hover:bg-[#2a2438] rounded-lg p-2 -m-2 transition-colors"
+                      className="w-full text-left hover:bg-[#2a2438]/50 rounded-lg p-2 -m-2 transition-colors"
                     >
                       <div className="flex items-center justify-between mb-1.5">
                         <div className="flex items-center gap-2">
@@ -828,12 +828,12 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
                                       {displayValue}
                                     </span>
                                     {newHigh && (
-                                      <span className="text-[10px] px-1 py-0.5 bg-red-500/20 text-up rounded font-medium">
+                                      <span className="text-[11px] px-1 py-0.5 bg-red-500/20 text-up rounded font-medium">
                                         신고가
                                       </span>
                                     )}
                                     {newLow && (
-                                      <span className="text-[10px] px-1 py-0.5 bg-blue-500/20 text-down rounded font-medium">
+                                      <span className="text-[11px] px-1 py-0.5 bg-blue-500/20 text-down rounded font-medium">
                                         신저가
                                       </span>
                                     )}
@@ -853,7 +853,7 @@ export function ComparePage({ onSelectETF, initialETFs, onClearInitialETFs }: Co
                                       style={{ left: `calc(${positionClamped}% - 4px)` }}
                                     />
                                   </div>
-                                  <div className="flex justify-between w-full text-[10px] text-gray-500">
+                                  <div className="flex justify-between w-full text-[11px] text-gray-500">
                                     <span>저가</span>
                                     <span>고가</span>
                                   </div>

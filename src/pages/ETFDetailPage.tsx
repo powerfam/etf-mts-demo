@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
-import { ArrowLeft, Star, Share2, AlertTriangle, Info, Zap, Shield, ArrowDownUp, X, Calendar, PieChart as PieChartIcon, Lightbulb, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, TrendingUp, CandlestickChart } from 'lucide-react'
+import { ArrowLeft, Star, Info, Zap, Shield, ArrowDownUp, X, Calendar, PieChart as PieChartIcon, Lightbulb, ChevronDown, ChevronUp, ChevronRight, TrendingUp, CandlestickChart, ShoppingCart, Plus, Check } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -15,11 +15,15 @@ interface ETFDetailPageProps {
   onBack: () => void
   onTrade: () => void
   onAddToCompare?: (etf: ETF) => void
+  onGoToCompare?: () => void
   onSelectETF?: (etf: ETF) => void
   // 스와이프 네비게이션용 prop
   etfList?: ETF[]
   currentIndex?: number
   onNavigateETF?: (etf: ETF) => void
+  // 비교함 상태
+  compareCount?: number
+  isInCompare?: boolean
 }
 
 const generateChartData = (etf: ETF) => {
@@ -424,7 +428,7 @@ const getPeerGroup = (etf: ETF) => {
   return { ...computePeerStats(peers), label, count: peers.length, isActive, styleLabel }
 }
 
-export function ETFDetailPage({ etf, onBack, onTrade, onAddToCompare, onSelectETF, etfList, currentIndex, onNavigateETF }: ETFDetailPageProps) {
+export function ETFDetailPage({ etf, onBack, onTrade, onAddToCompare, onGoToCompare, onSelectETF, etfList, currentIndex, onNavigateETF, compareCount = 0, isInCompare = false }: ETFDetailPageProps) {
   const [tab, setTab] = useState('overview')
   const [expandedMetricInfo, setExpandedMetricInfo] = useState<string | null>(null)
   const [dividendPeriod, setDividendPeriod] = useState<'1y' | '3y' | '5y'>('1y')
@@ -675,72 +679,72 @@ export function ETFDetailPage({ etf, onBack, onTrade, onAddToCompare, onSelectET
 
       {/* Header - 디자인에 맞춰 중앙 정렬 */}
       <div className="sticky top-0 z-50 bg-[#191322] border-b border-[#2d2640]">
-        <div className="flex items-center justify-between px-4 py-3">
-          <Button variant="ghost" size="icon" onClick={onBack}><ArrowLeft className="h-5 w-5" /></Button>
-          {/* 티커 중앙 정렬 */}
-          <span className="text-sm text-gray-400">{etf.ticker}</span>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon"><Star className="h-5 w-5" /></Button>
-            <Button variant="ghost" size="icon"><Share2 className="h-5 w-5" /></Button>
+        <div className="relative px-4 py-2">
+          {/* 좌측: 뒤로가기 */}
+          <Button variant="ghost" size="icon" onClick={onBack} className="absolute left-2 top-1/2 -translate-y-1/2">
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+
+          {/* 중앙: 종목코드 + 종목명 (세로 정렬) */}
+          <div className="flex flex-col items-center">
+            <span className="text-sm text-gray-400">{etf.ticker}</span>
+            <div className="flex items-center gap-2 mt-0.5">
+              <h1 className="text-base font-bold text-white">{etf.shortName}</h1>
+              {etf.isLeveraged && <Badge variant="destructive" className="text-[10px] px-1.5 py-0"><Zap className="h-2.5 w-2.5 mr-0.5" />레버리지</Badge>}
+              {etf.isInverse && <Badge variant="secondary" className="text-[10px] px-1.5 py-0"><ArrowDownUp className="h-2.5 w-2.5 mr-0.5" />인버스</Badge>}
+              {etf.isHedged && <Badge variant="info" className="text-[10px] px-1.5 py-0"><Shield className="h-2.5 w-2.5 mr-0.5" />환헤지</Badge>}
+            </div>
           </div>
-        </div>
-        {/* 종목명 중앙 정렬 */}
-        <div className="px-4 pb-3 flex items-center justify-center gap-2">
-          <h1 className="text-lg font-bold text-white text-center">{etf.shortName}</h1>
-          {etf.isLeveraged && <Badge variant="destructive" className="text-[10px]"><Zap className="h-3 w-3 mr-0.5" />레버리지</Badge>}
-          {etf.isInverse && <Badge variant="secondary" className="text-[10px]"><ArrowDownUp className="h-3 w-3 mr-0.5" />인버스</Badge>}
-          {etf.isHedged && <Badge variant="info" className="text-[10px]"><Shield className="h-3 w-3 mr-0.5" />환헤지</Badge>}
+
+          {/* 우측: 즐겨찾기 */}
+          <Button variant="ghost" size="icon" className="absolute right-2 top-1/2 -translate-y-1/2">
+            <Star className="h-5 w-5" />
+          </Button>
         </div>
       </div>
 
-      {/* ETF Info Header */}
-      <div className="px-4 py-4 bg-gradient-to-b from-[#2a1f3d] to-[#191322]">
-        {/* 랭킹 배지 */}
-        {rankingPosition && (
-          <div className="flex justify-center mb-3">
-            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#d64f79]/20 text-[#d64f79] text-xs font-medium">
-              어제 ETF 조회수 {rankingPosition}위
-            </span>
-          </div>
-        )}
+      {/* ETF Info Header - 카드형 디자인 */}
+      <div className="px-4 pt-4 pb-2">
+        <div className="flex gap-2">
+          {/* 메인 카드 */}
+          <div className="flex-1 bg-[#2d2640]/50 border border-[#3d3650] rounded-2xl p-4 relative">
+            {/* 랭킹 배지 - 우측 상단 */}
+            {rankingPosition && (
+              <span className="absolute top-3 right-3 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#d64f79]/20 text-[#d64f79] text-xs font-medium">
+                어제 ETF 조회수 {rankingPosition}위
+              </span>
+            )}
 
-        {/* 가격 정보 - 디자인에 맞게 레이아웃 조정 */}
-        <div className="text-center">
-          <div className="flex items-baseline justify-center gap-2">
-            <span className="text-3xl font-bold text-white">{formatNumber(etf.price)}</span>
-            <span className="text-lg text-gray-400">원</span>
-            <span className={`text-lg font-medium ${isUp ? 'text-up' : 'text-down'}`}>
-              {formatNumber(Math.abs(etf.change))}원
-            </span>
+            {/* 가격 정보 - 좌측 정렬 */}
+            <div>
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-bold text-white">{formatNumber(etf.price)}</span>
+                <span className="text-lg text-gray-400">원</span>
+                <span className={`text-lg font-medium ${isUp ? 'text-up' : 'text-down'}`}>
+                  {formatNumber(Math.abs(etf.change))}원
+                </span>
+              </div>
+              <div className={`flex items-center gap-3 mt-1 text-sm`}>
+                <span className={`font-medium ${isUp ? 'text-up' : 'text-down'}`}>
+                  {etf.changePercent >= 0 ? '+' : ''}{etf.changePercent.toFixed(2)}%
+                </span>
+                <span className="text-gray-400">iNAV {formatNumber(etf.iNav)}원</span>
+                <span className="text-gray-400">
+                  괴리율 {etf.discrepancy >= 0 ? '+' : ''}{etf.discrepancy.toFixed(2)}%
+                </span>
+              </div>
+            </div>
           </div>
-          <div className={`flex items-center justify-center gap-3 mt-1 text-sm ${isUp ? 'text-up' : 'text-down'}`}>
-            <span className="font-medium">{etf.changePercent >= 0 ? '+' : ''}{etf.changePercent.toFixed(2)}%</span>
-            <span className="text-gray-400">iNAV {formatNumber(etf.iNav)}원</span>
-            <span className={`${Math.abs(etf.discrepancy) <= 0.1 ? 'text-emerald-400' : 'text-amber-400'}`}>
-              괴리율 {etf.discrepancy >= 0 ? '+' : ''}{etf.discrepancy.toFixed(2)}%
-            </span>
-          </div>
-        </div>
 
-        {/* 분류 배지 */}
-        <div className="flex items-center justify-center gap-2 mt-3">
-          <span className={`text-[10px] px-2 py-0.5 rounded ${etf.marketClass === '해외' ? 'bg-blue-500/20 text-blue-400' : 'bg-emerald-500/20 text-emerald-400'}`}>
-            {etf.marketClass}
-          </span>
-          <span className="text-[10px] px-2 py-0.5 rounded bg-gray-500/20 text-gray-400">
-            {etf.assetClass}
-          </span>
-          {etf.category !== '레버리지' && (
-            <span className="text-[10px] px-2 py-0.5 rounded bg-purple-500/20 text-purple-400">
-              {etf.category}
-            </span>
+          {/* 다음 카드 힌트 (살짝 보이는 카드) */}
+          {etfList && etfList.length > 1 && (
+            <div className="w-3 bg-[#2d2640]/30 border border-[#3d3650]/50 rounded-l-2xl" />
           )}
         </div>
 
-        {/* 스와이프 힌트 */}
+        {/* 스와이프 힌트 - 카드 외부 중앙 */}
         {etfList && etfList.length > 1 && (
-          <div className="flex items-center justify-center gap-2 mt-4 text-xs text-gray-500">
-            <ChevronLeft className="h-3 w-3" />
+          <div className="flex items-center justify-center gap-1 mt-3 text-xs text-gray-500">
             <span>왼쪽으로 밀면 검색한 종목을 볼 수 있어요</span>
             <ChevronRight className="h-3 w-3" />
           </div>
@@ -749,35 +753,46 @@ export function ETFDetailPage({ etf, onBack, onTrade, onAddToCompare, onSelectET
 
       {/* Price Chart */}
       <div className="px-4 py-4">
-        {/* 차트 영역 - 우측에 아이콘 배치 */}
-        <div className="relative">
-          {/* 차트 타입 전환 버튼 (단일 토글) */}
+        {/* 차트 타입 아이콘 - 차트 위에 별도 행으로 배치 */}
+        <div className="flex justify-end gap-2 mb-2">
           <button
-            onClick={() => setChartType(chartType === 'line' ? 'candle' : 'line')}
-            className="absolute top-0 right-0 z-10 p-2 rounded-lg bg-[#2d2640]/80 text-gray-400 hover:text-white hover:bg-[#3d3650] transition-colors"
-            title={chartType === 'line' ? '캔들 차트로 전환' : '라인 차트로 전환'}
+            onClick={() => setChartType('line')}
+            className={`p-2 rounded-lg transition-colors ${
+              chartType === 'line'
+                ? 'bg-[#d64f79] text-white'
+                : 'bg-[#2d2640] text-gray-400 hover:text-white hover:bg-[#3d3650]'
+            }`}
+            title="라인 차트"
           >
-            {chartType === 'line' ? (
-              <CandlestickChart className="h-4 w-4" />
-            ) : (
-              <TrendingUp className="h-4 w-4" />
-            )}
+            <TrendingUp className="h-4 w-4" />
           </button>
+          <button
+            onClick={() => setChartType('candle')}
+            className={`p-2 rounded-lg transition-colors ${
+              chartType === 'candle'
+                ? 'bg-[#d64f79] text-white'
+                : 'bg-[#2d2640] text-gray-400 hover:text-white hover:bg-[#3d3650]'
+            }`}
+            title="캔들 차트"
+          >
+            <CandlestickChart className="h-4 w-4" />
+          </button>
+        </div>
 
-          <div className="h-[160px]">
-            {chartType === 'line' ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chartData}>
-                  <defs><linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#d64f79" stopOpacity={0.3}/><stop offset="95%" stopColor="#d64f79" stopOpacity={0}/></linearGradient></defs>
-                  <XAxis dataKey="date" tick={false} axisLine={false} /><YAxis domain={['auto', 'auto']} hide />
-                  <Tooltip contentStyle={{ backgroundColor: '#1f1a2e', border: '1px solid #3d3450', borderRadius: '8px', color: 'white' }} formatter={(value) => value !== undefined ? [`${formatNumber(value as number)}원`, '가격'] : ['', '']} />
-                  <Area type="monotone" dataKey="price" stroke="#d64f79" fillOpacity={1} fill="url(#colorPrice)" strokeWidth={2} />
-                </AreaChart>
-              </ResponsiveContainer>
-            ) : (
-              <CandleChart data={candleData} height={160} />
-            )}
-          </div>
+        {/* 차트 영역 */}
+        <div className="h-[180px]">
+          {chartType === 'line' ? (
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={chartData}>
+                <defs><linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#d64f79" stopOpacity={0.3}/><stop offset="95%" stopColor="#d64f79" stopOpacity={0}/></linearGradient></defs>
+                <XAxis dataKey="date" tick={false} axisLine={false} /><YAxis domain={['auto', 'auto']} hide />
+                <Tooltip contentStyle={{ backgroundColor: '#1f1a2e', border: '1px solid #3d3450', borderRadius: '8px', color: 'white' }} formatter={(value) => value !== undefined ? [`${formatNumber(value as number)}원`, '가격'] : ['', '']} />
+                <Area type="monotone" dataKey="price" stroke="#d64f79" fillOpacity={1} fill="url(#colorPrice)" strokeWidth={2} />
+              </AreaChart>
+            </ResponsiveContainer>
+          ) : (
+            <CandleChart data={candleData} height={180} />
+          )}
         </div>
 
         {/* 기간 선택 탭 */}
@@ -801,16 +816,22 @@ export function ETFDetailPage({ etf, onBack, onTrade, onAddToCompare, onSelectET
           {/* 종목개요 */}
           <Card className="bg-[#2d2640]/50 border-[#3d3650]">
             <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-2">
+              <div className="flex items-center justify-between mb-2">
                 <span className="text-xs text-gray-500">종목개요</span>
-                <span className={`text-[10px] px-1.5 py-0.5 rounded ${etf.marketClass === '해외' ? 'bg-blue-500/20 text-blue-400' : 'bg-emerald-500/20 text-emerald-400'}`}>
-                  {etf.marketClass}
-                </span>
-                {etf.category && etf.category !== '레버리지' && (
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#d64f79]/20 text-[#d64f79]">
-                    {etf.category}
+                <div className="flex items-center gap-1.5">
+                  {/* 국내/해외 */}
+                  <span className={`text-[11px] px-1.5 py-0.5 rounded border ${etf.marketClass === '해외' ? 'border-blue-400/50 text-blue-400' : 'border-emerald-400/50 text-emerald-400'}`}>
+                    {etf.marketClass}
                   </span>
-                )}
+                  {/* 자산클래스 */}
+                  <span className="text-[11px] px-1.5 py-0.5 rounded border border-gray-500/50 text-gray-400">
+                    {etf.assetClass}
+                  </span>
+                  {/* 패시브/액티브 */}
+                  <span className={`text-[11px] px-1.5 py-0.5 rounded border ${isActiveETF(etf) ? 'border-amber-400/50 text-amber-400' : 'border-cyan-400/50 text-cyan-400'}`}>
+                    {isActiveETF(etf) ? '액티브' : '패시브'}
+                  </span>
+                </div>
               </div>
               <p className="text-sm text-white leading-relaxed">{etf.overview}</p>
             </CardContent>
@@ -844,30 +865,30 @@ export function ETFDetailPage({ etf, onBack, onTrade, onAddToCompare, onSelectET
             {/* Row 1: 순자산, 거래대금, 배당수익률 */}
             <div className="grid grid-cols-3 gap-2 mb-2">
               <div className="bg-[#2d2640]/50 border border-[#3d3650] rounded-lg p-3 text-center">
-                <div className="text-[10px] text-gray-500 mb-1">순자산(AUM)</div>
+                <div className="text-[11px] text-gray-500 mb-1">순자산(AUM)</div>
                 <div className="text-sm font-bold text-white">{formatCurrency(etf.aum)}</div>
               </div>
               <div className="bg-[#2d2640]/50 border border-[#3d3650] rounded-lg p-3 text-center">
-                <div className="text-[10px] text-gray-500 mb-1">거래대금</div>
+                <div className="text-[11px] text-gray-500 mb-1">거래대금</div>
                 <div className="text-sm font-bold text-white">{formatCurrency(etf.adtv)}</div>
               </div>
               <div className="bg-[#2d2640]/50 border border-[#3d3650] rounded-lg p-3 text-center">
-                <div className="text-[10px] text-gray-500 mb-1">배당수익률</div>
+                <div className="text-[11px] text-gray-500 mb-1">배당수익률</div>
                 <div className="text-sm font-bold text-white">{etf.dividendYield.toFixed(2)}%</div>
               </div>
             </div>
             {/* Row 2: 총보수, 운용사, 상장일 */}
             <div className="grid grid-cols-3 gap-2 mb-2">
               <div className="bg-[#2d2640]/50 border border-[#3d3650] rounded-lg p-3 text-center">
-                <div className="text-[10px] text-gray-500 mb-1">총보수(TER)</div>
+                <div className="text-[11px] text-gray-500 mb-1">총보수(TER)</div>
                 <div className="text-sm font-bold text-white">{etf.ter.toFixed(2)}%</div>
               </div>
               <div className="bg-[#2d2640]/50 border border-[#3d3650] rounded-lg p-3 text-center">
-                <div className="text-[10px] text-gray-500 mb-1">운용사</div>
+                <div className="text-[11px] text-gray-500 mb-1">운용사</div>
                 <div className="text-xs font-bold text-white truncate">{etf.issuer}</div>
               </div>
               <div className="bg-[#2d2640]/50 border border-[#3d3650] rounded-lg p-3 text-center">
-                <div className="text-[10px] text-gray-500 mb-1">상장일</div>
+                <div className="text-[11px] text-gray-500 mb-1">상장일</div>
                 <div className="text-sm font-bold text-white">{etf.listedDate}</div>
               </div>
             </div>
@@ -1316,13 +1337,13 @@ export function ETFDetailPage({ etf, onBack, onTrade, onAddToCompare, onSelectET
           <div className="flex items-center justify-between px-1 py-1">
             <div className="flex items-center gap-1.5">
               <span className="text-xs text-gray-400">비교 기준:</span>
-              <span className={`text-[10px] px-1.5 py-0.5 rounded ${etf.marketClass === '해외' ? 'bg-blue-500/20 text-blue-400' : 'bg-emerald-500/20 text-emerald-400'}`}>
+              <span className={`text-[11px] px-1.5 py-0.5 rounded ${etf.marketClass === '해외' ? 'bg-blue-500/20 text-blue-400' : 'bg-emerald-500/20 text-emerald-400'}`}>
                 {etf.marketClass}
               </span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-500/20 text-gray-400">
+              <span className="text-[11px] px-1.5 py-0.5 rounded bg-gray-500/20 text-gray-400">
                 {etf.assetClass}
               </span>
-              <span className={`text-[10px] px-1.5 py-0.5 rounded ${peerGroup.isActive ? 'bg-amber-500/20 text-amber-400' : 'bg-cyan-500/20 text-cyan-400'}`}>
+              <span className={`text-[11px] px-1.5 py-0.5 rounded ${peerGroup.isActive ? 'bg-amber-500/20 text-amber-400' : 'bg-cyan-500/20 text-cyan-400'}`}>
                 {peerGroup.styleLabel}
               </span>
               <span className="text-xs text-gray-400">{peerGroup.count}개 ETF</span>
@@ -1474,10 +1495,41 @@ export function ETFDetailPage({ etf, onBack, onTrade, onAddToCompare, onSelectET
         </TabsContent>
       </Tabs>
 
+      {/* 플로팅 비교 추가 버튼 */}
+      <button
+        onClick={() => onAddToCompare?.(etf)}
+        className={`fixed bottom-[156px] right-4 z-50 flex items-center justify-center w-14 h-14 rounded-full shadow-lg transition-all ${
+          isInCompare
+            ? 'bg-[#d64f79] text-white'
+            : compareCount >= 3
+              ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+              : 'bg-[#2d2640] text-white hover:bg-[#3d3650] border border-[#3d3650]'
+        }`}
+        disabled={compareCount >= 3 && !isInCompare}
+      >
+        <div className="relative">
+          <ShoppingCart className="h-6 w-6" />
+          {/* 추가 아이콘 또는 체크 아이콘 */}
+          {isInCompare ? (
+            <Check className="absolute -top-1 -right-1 h-3.5 w-3.5 bg-white text-[#d64f79] rounded-full p-0.5" />
+          ) : (
+            <Plus className="absolute -top-1 -right-1 h-3.5 w-3.5 bg-[#d64f79] text-white rounded-full" />
+          )}
+        </div>
+        {/* 카운트 배지 - 라이트/다크 모드 대응 */}
+        <span className={`absolute -bottom-1 left-1/2 -translate-x-1/2 text-[10px] font-bold px-1.5 py-0.5 rounded-full border ${
+          isInCompare
+            ? 'bg-white text-[#d64f79] border-white'
+            : 'bg-[#191322] text-white border-[#3d3650]'
+        }`}>
+          {compareCount}/3
+        </span>
+      </button>
+
       {/* Bottom Action Buttons */}
-      <div className="fixed bottom-16 left-0 right-0 px-4 py-3 bg-[#191322]/95 backdrop-blur border-t border-[#2d2640]">
+      <div className="fixed bottom-[76px] left-0 right-0 px-4 py-3 bg-[#191322]/95 backdrop-blur border-t border-[#2d2640]">
         <div className="flex gap-3">
-          <Button variant="outline" className="flex-1" onClick={() => onAddToCompare?.(etf)}>비교하러가기</Button>
+          <Button variant="outline" className="flex-1" onClick={onGoToCompare}>비교하러가기</Button>
           <Button className="flex-1" onClick={onTrade}>주문하러가기</Button>
         </div>
       </div>

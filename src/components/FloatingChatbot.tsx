@@ -151,7 +151,7 @@ export function FloatingChatbot({ onSelectContent, onNavigateToGlossary, hasComp
                               <span className="text-sm text-gray-200 line-clamp-1 block">
                                 {content.question}
                               </span>
-                              <span className="text-[10px] text-gray-500">{category.label}</span>
+                              <span className="text-[11px] text-gray-500">{category.label}</span>
                             </div>
                             <ChevronRight className="h-4 w-4 text-gray-600" />
                           </button>

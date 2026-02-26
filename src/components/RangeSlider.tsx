@@ -27,9 +27,11 @@ export function RangeSlider({
   const [localValue, setLocalValue] = useState<[number, number]>(value)
   const sliderRef = useRef<HTMLDivElement>(null)
   const isDragging = useRef<'min' | 'max' | null>(null)
+  const localValueRef = useRef<[number, number]>(value)
 
   useEffect(() => {
     setLocalValue(value)
+    localValueRef.current = value
   }, [value])
 
   const formatDisplay = (val: number) => {
@@ -65,13 +67,16 @@ export function RangeSlider({
     const newValue = getValueFromPercent(clampedPercent)
 
     setLocalValue(prev => {
+      let newLocalValue: [number, number]
       if (isDragging.current === 'min') {
         const newMin = Math.min(newValue, prev[1] - step)
-        return [Math.max(min, newMin), prev[1]]
+        newLocalValue = [Math.max(min, newMin), prev[1]]
       } else {
         const newMax = Math.max(newValue, prev[0] + step)
-        return [prev[0], Math.min(max, newMax)]
+        newLocalValue = [prev[0], Math.min(max, newMax)]
       }
+      localValueRef.current = newLocalValue
+      return newLocalValue
     })
   }, [min, max, step])
 
@@ -85,14 +90,14 @@ export function RangeSlider({
 
   const handleMouseUp = useCallback(() => {
     if (isDragging.current) {
-      onChange(localValue)
+      onChange(localValueRef.current)
       isDragging.current = null
     }
     document.removeEventListener('mousemove', handleMouseMove)
     document.removeEventListener('mouseup', handleMouseUp)
     document.removeEventListener('touchmove', handleTouchMove)
     document.removeEventListener('touchend', handleMouseUp)
-  }, [localValue, onChange, handleMouseMove, handleTouchMove])
+  }, [onChange, handleMouseMove, handleTouchMove])
 
   const leftPercent = getPercent(localValue[0])
   const rightPercent = getPercent(localValue[1])
@@ -159,8 +164,8 @@ export function RangeSlider({
 
       {/* Min/Max labels */}
       <div className="flex justify-between mt-1">
-        <span className="text-[10px] text-gray-500">{formatDisplay(min)}</span>
-        <span className="text-[10px] text-gray-500">{formatDisplay(max)}</span>
+        <span className="text-[11px] text-gray-500">{formatDisplay(min)}</span>
+        <span className="text-[11px] text-gray-500">{formatDisplay(max)}</span>
       </div>
     </div>
   )

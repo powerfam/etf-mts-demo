@@ -308,7 +308,7 @@ export function SearchPage({ isOpen, onClose, onSelectETF, compareETFs, onAddToC
                 <span className="text-sm font-medium text-white">조회수가 집중된 ETF종목은?</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] text-gray-500">2026.02.12 16:10:30 기준</span>
+                <span className="text-[11px] text-gray-500">2026.02.12 16:10:30 기준</span>
                 <button className="p-1 text-gray-400 hover:text-[#d64f79]">
                   <RefreshCw className="h-4 w-4" />
                 </button>
@@ -431,7 +431,7 @@ export function SearchPage({ isOpen, onClose, onSelectETF, compareETFs, onAddToC
                   className="flex items-center gap-3 p-3 bg-[#1f1a2e] rounded-lg cursor-pointer hover:bg-[#2a2438] transition-colors"
                 >
                   {/* ETF 뱃지 */}
-                  <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-[#2d2640] text-[10px] text-gray-400 font-medium shrink-0">
+                  <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-[#2d2640] text-[11px] text-gray-400 font-medium shrink-0">
                     ETF
                   </div>
 

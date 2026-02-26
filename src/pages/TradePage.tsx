@@ -79,7 +79,7 @@ export function TradePage({ etf, accountType, onBack }: TradePageProps) {
             <h1 className="text-base font-semibold text-white">{etf.shortName}</h1>
             <div className="flex items-center gap-2 text-xs text-gray-400">
               <span>{etf.ticker}</span>
-              <Badge variant="outline" className="text-[10px]">{getTaxLabel()}</Badge>
+              <Badge variant="outline" className="text-[11px]">{getTaxLabel()}</Badge>
             </div>
           </div>
         </div>
@@ -140,7 +140,7 @@ export function TradePage({ etf, accountType, onBack }: TradePageProps) {
               </span>
             </div>
             <Progress value={feasibilityScore} className="h-2" />
-            <p className="text-[10px] text-gray-500 mt-2">
+            <p className="text-[11px] text-gray-500 mt-2">
               괴리율, 스프레드, 유동성, 주문규모 기반 산출
             </p>
           </CardContent>
@@ -298,7 +298,7 @@ export function TradePage({ etf, accountType, onBack }: TradePageProps) {
                   ))}
                 </div>
               </div>
-              <p className="text-[10px] text-gray-500">
+              <p className="text-[11px] text-gray-500">
                 {Math.floor(parseInt(quantity || '0') / splitCount)}주씩 {splitCount}회에 걸쳐 주문합니다
               </p>
             </div>
@@ -341,7 +341,7 @@ export function TradePage({ etf, accountType, onBack }: TradePageProps) {
         >
           {orderType === 'buy' ? '매수' : '매도'} 주문
         </Button>
-        <p className="text-[10px] text-gray-500 text-center mt-2">
+        <p className="text-[11px] text-gray-500 text-center mt-2">
           주문 전 체결가능성과 예상 비용을 확인해주세요
         </p>
       </div>

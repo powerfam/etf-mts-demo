@@ -5,7 +5,7 @@ export const homeTourSteps: TourStep[] = [
   {
     target: '[data-tour="dividend-calendar"]',
     title: '분배금 캘린더',
-    content: '달력 아이콘을 누르면 ETF 분배금 지급 일정을 확인할 수 있습니다. 내가 보유한 ETF는 강조 표시됩니다.',
+    content: '달력 아이콘을 누르면 ETF 분배금 지급 일정을 확인할 수 있습니다. 날짜별로 분배금 지급 ETF를 확인하세요.',
     placement: 'bottom',
   },
   {
@@ -35,19 +35,53 @@ export const homeTourSteps: TourStep[] = [
   {
     target: '[data-tour="popular-etf"]',
     title: '인기 테마 랭킹',
-    content: '혁신기술, ESG, 배당, 트렌드 탭별 인기 ETF TOP5를 확인하세요. 클릭하면 상세 페이지로 이동합니다.',
+    content: '혁신, 가치, 배당/인컴 탭별 인기 ETF TOP5를 확인하세요. 클릭하면 상세 페이지로 이동합니다.',
     placement: 'top',
   },
   {
     target: '[data-tour="heatmap"]',
     title: '테마 히트맵',
-    content: '12개 테마별 수익률을 색상으로 표시합니다. 빨강=상승, 파랑=하락. 클릭하면 해당 테마 ETF 목록을 확인합니다.',
+    content: '12개 테마별 수익률을 색상으로 표시합니다. 빨강=상승, 파랑=하락. 클릭하면 해당 테마 ETF TOP10을 확인합니다.',
     placement: 'top',
   },
   {
     target: '[data-tour="constituent-search"]',
     title: '구성종목 검색',
     content: '삼성전자, NVIDIA 등 구성종목으로 ETF를 검색합니다. 특정 주식이 담긴 ETF를 찾고 싶을 때 유용합니다.',
+    placement: 'top',
+  },
+]
+
+// 스크리닝 화면 투어
+export const screeningTourSteps: TourStep[] = [
+  {
+    target: '[data-tour="screening-filter"]',
+    title: '스크리닝 필터',
+    content: '운용사, 자산분류, 투자지역, TER, AUM, 배당수익률 등 다양한 조건으로 ETF를 필터링합니다.',
+    placement: 'bottom',
+  },
+  {
+    target: '[data-tour="screening-sort"]',
+    title: '정렬 옵션',
+    content: '수익률순, 유동성순, 저비용순 등 원하는 기준으로 ETF 목록을 정렬할 수 있습니다.',
+    placement: 'bottom',
+  },
+  {
+    target: '[data-tour="screening-view"]',
+    title: '뷰 모드 전환',
+    content: '테이블 뷰와 카드 뷰를 전환할 수 있습니다. 가로보기 모드로 더 많은 정보를 확인하세요.',
+    placement: 'bottom',
+  },
+  {
+    target: '[data-tour="screening-compare"]',
+    title: '비교함 추가',
+    content: 'ETF를 길게 누르거나 담기 버튼을 눌러 비교함에 추가합니다. 최대 3개까지 비교 가능합니다.',
+    placement: 'top',
+  },
+  {
+    target: '[data-tour="column-sort"]',
+    title: '컬럼 정렬',
+    content: '테이블 헤더(현재가, 등락률, TER 등)를 클릭하면 오름차순/내림차순으로 정렬됩니다.',
     placement: 'top',
   },
 ]
@@ -71,12 +105,6 @@ export const investInfoTourSteps: TourStep[] = [
     title: '리서치 탭',
     content: 'ETF Weekly 보고서와 신규 ETF 라인업 분석 리포트를 PDF로 제공합니다.',
     placement: 'bottom',
-  },
-  {
-    target: '[data-tour="chatbot"]',
-    title: 'AI 챗봇',
-    content: 'ETF 관련 궁금한 점을 바로 질문할 수 있습니다. 자주 묻는 질문도 제공됩니다.',
-    placement: 'top',
   },
 ]
 
@@ -141,13 +169,13 @@ export const welcomeTourSteps: TourStep[] = [
   {
     target: '[data-tour="heatmap"]',
     title: '테마 히트맵',
-    content: '테마별 수익률을 색상으로 한눈에 파악하세요. 클릭하면 해당 테마 ETF 목록을 볼 수 있습니다.',
+    content: '테마별 수익률을 색상으로 한눈에 파악하세요. 클릭하면 해당 테마 ETF TOP10을 볼 수 있습니다.',
     placement: 'top',
   },
   {
     target: '[data-tour="bottom-nav"]',
     title: '하단 네비게이션',
-    content: '홈, 비교, 투자정보 메뉴로 이동할 수 있습니다.',
+    content: '홈, 스크리닝(ETF 검색/필터), 비교, 투자정보 메뉴로 이동할 수 있습니다.',
     placement: 'top',
   },
 ]
@@ -155,6 +183,7 @@ export const welcomeTourSteps: TourStep[] = [
 // 페이지별 투어 맵
 export const tourStepsByPage: Record<string, TourStep[]> = {
   home: homeTourSteps,
+  screening: screeningTourSteps,
   investinfo: investInfoTourSteps,
   compare: compareTourSteps,
   detail: detailTourSteps,

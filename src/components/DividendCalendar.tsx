@@ -1,8 +1,9 @@
 import { useState, useMemo } from 'react'
 import { ChevronLeft, ChevronRight, Coins } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog'
-import { Badge } from './ui/badge'
-import { getDividendsByDate, getDividendDates, getAccountTypesForETF, type ETF } from '@/data/mockData'
+// import { Badge } from './ui/badge' // 보유종목 표시 숨김으로 미사용
+import { getDividendsByDate, getDividendDates, type ETF } from '@/data/mockData'
+// import { getAccountTypesForETF } from '@/data/mockData' // 보유종목 표시 숨김으로 미사용
 
 interface DividendCalendarProps {
   isOpen: boolean
@@ -11,12 +12,12 @@ interface DividendCalendarProps {
   onSelectETF?: (etf: ETF) => void
 }
 
-// 계좌 타입별 스타일 설정
-const accountTypeStyles: Record<string, { label: string; bgColor: string; textColor: string }> = {
-  general: { label: '일반', bgColor: 'bg-gray-500', textColor: 'text-white' },
-  pension: { label: '연금', bgColor: 'bg-emerald-500', textColor: 'text-white' },
-  isa: { label: 'ISA', bgColor: 'bg-blue-500', textColor: 'text-white' },
-}
+// 계좌 타입별 스타일 설정 - 보유종목 표시 숨김으로 미사용
+// const accountTypeStyles: Record<string, { label: string; bgColor: string; textColor: string }> = {
+//   general: { label: '일반', bgColor: 'bg-gray-500', textColor: 'text-white' },
+//   pension: { label: '연금', bgColor: 'bg-emerald-500', textColor: 'text-white' },
+//   isa: { label: 'ISA', bgColor: 'bg-blue-500', textColor: 'text-white' },
+// }
 
 export function DividendCalendar({ isOpen, onClose, onSelectETF }: DividendCalendarProps) {
   const today = new Date()
@@ -147,7 +148,7 @@ export function DividendCalendar({ isOpen, onClose, onSelectETF }: DividendCalen
             {dayNames.map((day, index) => (
               <div
                 key={day}
-                className={`text-[10px] py-0.5 font-medium ${
+                className={`text-[11px] py-0.5 font-medium ${
                   index === 0 ? 'text-red-400' : index === 6 ? 'text-blue-400' : 'text-gray-500'
                 }`}
               >
@@ -213,24 +214,21 @@ export function DividendCalendar({ isOpen, onClose, onSelectETF }: DividendCalen
             ) : (
               <div className="p-2 space-y-1">
                 {selectedDividends.map((dividend) => {
-                  const accountTypes = getAccountTypesForETF(dividend.etfId)
-                  const isOwned = accountTypes.length > 0
+                  // 보유종목 표시 기능 숨김 - "보유종목 표시 다시 보이게 해줘"로 복구
+                  // const accountTypes = getAccountTypesForETF(dividend.etfId)
+                  // const isOwned = accountTypes.length > 0
                   return (
                     <button
                       key={dividend.etfId}
                       onClick={() => handleETFClick(dividend.etf)}
-                      className={`
-                        w-full flex items-center justify-between p-2.5 rounded-lg transition-all
-                        ${isOwned
-                          ? 'bg-[#d64f79]/10 border border-[#d64f79]/30 hover:border-[#d64f79]/50'
-                          : 'bg-[#2d2640]/50 hover:bg-[#2d2640]'}
-                      `}
+                      className="w-full flex items-center justify-between p-2.5 rounded-lg transition-all bg-[#2d2640]/50 hover:bg-[#2d2640]"
                     >
                       <div className="text-left">
                         <div className="flex items-center gap-1 flex-wrap">
                           <span className="text-sm text-white font-medium">
                             {dividend.etf.shortName}
                           </span>
+                          {/* 보유계좌 배지 숨김 - "보유종목 표시 다시 보이게 해줘"로 복구
                           {accountTypes.map((type) => {
                             const style = accountTypeStyles[type]
                             return (
@@ -243,14 +241,15 @@ export function DividendCalendar({ isOpen, onClose, onSelectETF }: DividendCalen
                               </Badge>
                             )
                           })}
+                          */}
                         </div>
-                        <div className="text-[10px] text-gray-500">{dividend.etf.ticker}</div>
+                        <div className="text-[11px] text-gray-500">{dividend.etf.ticker}</div>
                       </div>
                       <div className="text-right">
                         <div className="text-sm text-[#d64f79] font-semibold">
                           {dividend.dividendPerShare.toLocaleString()}원
                         </div>
-                        <div className="text-[9px] text-gray-500">
+                        <div className="text-[11px] text-gray-500">
                           주당
                         </div>
                       </div>
@@ -264,7 +263,7 @@ export function DividendCalendar({ isOpen, onClose, onSelectETF }: DividendCalen
 
         {/* 범례 - 고정 하단 */}
         <div className="shrink-0 px-3 py-1.5 border-t border-[#2d2640]">
-          <div className="flex items-center justify-center gap-2 text-[8px] text-gray-500 mb-1">
+          <div className="flex items-center justify-center gap-3 text-[8px] text-gray-500">
             <div className="flex items-center gap-0.5">
               <span className="w-1.5 h-1.5 rounded-full bg-[#d64f79]/30 border border-[#d64f79]/50" />
               <span>오늘</span>
@@ -274,24 +273,7 @@ export function DividendCalendar({ isOpen, onClose, onSelectETF }: DividendCalen
               <span>지급일</span>
             </div>
           </div>
-          <div className="flex items-center justify-center gap-2 text-[8px] text-gray-500">
-            <span>보유계좌:</span>
-            <div className="flex items-center gap-0.5">
-              <Badge variant="default" className="text-[6px] px-0.5 py-0 bg-gray-500 hover:bg-gray-500">
-                일반
-              </Badge>
-            </div>
-            <div className="flex items-center gap-0.5">
-              <Badge variant="default" className="text-[6px] px-0.5 py-0 bg-emerald-500 hover:bg-emerald-500">
-                연금
-              </Badge>
-            </div>
-            <div className="flex items-center gap-0.5">
-              <Badge variant="default" className="text-[6px] px-0.5 py-0 bg-blue-500 hover:bg-blue-500">
-                ISA
-              </Badge>
-            </div>
-          </div>
+          {/* 보유계좌 범례 숨김 - "보유종목 표시 다시 보이게 해줘"로 복구 */}
         </div>
       </DialogContent>
     </Dialog>

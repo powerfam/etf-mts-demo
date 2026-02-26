@@ -1,4 +1,4 @@
-import { Home, Search, GitCompare, BookOpen } from 'lucide-react'
+import { Home, SlidersHorizontal, GitCompare, BookOpen } from 'lucide-react'
 // import { Briefcase } from 'lucide-react' // 보유 탭 숨김으로 미사용
 import { cn } from '@/lib/utils'
 
@@ -9,7 +9,7 @@ interface BottomNavProps {
 
 const navItems = [
   { id: 'home', label: '홈', icon: Home },
-  { id: 'screening', label: '스크리닝', icon: Search },
+  { id: 'screening', label: '스크리닝', icon: SlidersHorizontal },
   { id: 'compare', label: '비교', icon: GitCompare },
   { id: 'investinfo', label: '투자정보', icon: BookOpen },
   // { id: 'portfolio', label: '보유', icon: Briefcase }, // 임시 숨김 - "보유 기능 다시 보이게 해줘"로 복구

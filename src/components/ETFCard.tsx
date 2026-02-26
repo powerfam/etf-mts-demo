@@ -1,5 +1,6 @@
 import { useRef } from 'react'
-import { TrendingUp, TrendingDown, AlertTriangle, Zap, ArrowDownUp, Shield } from 'lucide-react'
+import { TrendingUp, TrendingDown, Zap, ArrowDownUp, Shield } from 'lucide-react'
+// import { AlertTriangle } from 'lucide-react' // 건전성 스코어 숨김으로 미사용
 import { Card } from './ui/card'
 import { Badge } from './ui/badge'
 import type { ETF } from '@/data/mockData'
@@ -30,24 +31,22 @@ export function ETFCard({ etf, onClick, onLongPress }: ETFCardProps) {
   }
   const isUp = etf.change >= 0
 
-  // Determine risk level badges
-  const getDiscrepancyBadge = () => {
-    if (Math.abs(etf.discrepancy) < 0.1) return <Badge variant="success">괴리↓</Badge>
-    if (Math.abs(etf.discrepancy) < 0.3) return <Badge variant="warning">괴리↑</Badge>
-    return <Badge variant="danger">괴리↑↑</Badge>
-  }
-
-  const getSpreadBadge = () => {
-    if (etf.spread < 0.05) return <Badge variant="success">스프레드↓</Badge>
-    if (etf.spread < 0.1) return <Badge variant="warning">스프레드↑</Badge>
-    return <Badge variant="danger">스프레드↑↑</Badge>
-  }
-
-  const getLiquidityBadge = () => {
-    if (etf.adtv > 500000000000) return <Badge variant="success">유동성↑</Badge>
-    if (etf.adtv > 100000000000) return <Badge variant="info">유동성○</Badge>
-    return <Badge variant="warning">유동성↓</Badge>
-  }
+  // 스프레드/유동성/괴리 배지 숨김 - "지표 배지 다시 보이게 해줘"로 복구
+  // const getDiscrepancyBadge = () => {
+  //   if (Math.abs(etf.discrepancy) < 0.1) return <Badge variant="success">괴리↓</Badge>
+  //   if (Math.abs(etf.discrepancy) < 0.3) return <Badge variant="warning">괴리↑</Badge>
+  //   return <Badge variant="danger">괴리↑↑</Badge>
+  // }
+  // const getSpreadBadge = () => {
+  //   if (etf.spread < 0.05) return <Badge variant="success">스프레드↓</Badge>
+  //   if (etf.spread < 0.1) return <Badge variant="warning">스프레드↑</Badge>
+  //   return <Badge variant="danger">스프레드↑↑</Badge>
+  // }
+  // const getLiquidityBadge = () => {
+  //   if (etf.adtv > 500000000000) return <Badge variant="success">유동성↑</Badge>
+  //   if (etf.adtv > 100000000000) return <Badge variant="info">유동성○</Badge>
+  //   return <Badge variant="warning">유동성↓</Badge>
+  // }
 
   // Sparkline SVG
   const sparklinePoints = etf.sparkline.map((val, i) => {
@@ -77,19 +76,19 @@ export function ETFCard({ etf, onClick, onLongPress }: ETFCardProps) {
             <div className="flex items-center gap-2 mb-1">
               <span className="text-xs text-gray-400">{etf.ticker}</span>
               {etf.isLeveraged && (
-                <Badge variant="destructive" className="text-[10px] px-1.5">
+                <Badge variant="destructive" className="text-[11px] px-1.5">
                   <Zap className="h-3 w-3 mr-0.5" />
                   레버리지
                 </Badge>
               )}
               {etf.isInverse && (
-                <Badge variant="secondary" className="text-[10px] px-1.5">
+                <Badge variant="secondary" className="text-[11px] px-1.5">
                   <ArrowDownUp className="h-3 w-3 mr-0.5" />
                   인버스
                 </Badge>
               )}
               {etf.isHedged && (
-                <Badge variant="info" className="text-[10px] px-1.5">
+                <Badge variant="info" className="text-[11px] px-1.5">
                   <Shield className="h-3 w-3 mr-0.5" />
                   환헤지
                 </Badge>
@@ -132,57 +131,29 @@ export function ETFCard({ etf, onClick, onLongPress }: ETFCardProps) {
           </div>
         </div>
 
-        {/* Risk Badges */}
-        <div className="flex flex-wrap gap-1.5 mb-3">
-          {getDiscrepancyBadge()}
-          {getSpreadBadge()}
-          {getLiquidityBadge()}
-        </div>
+        {/* 스프레드/유동성/괴리 배지 숨김 - "지표 배지 다시 보이게 해줘"로 복구 */}
 
         {/* Key Metrics */}
         <div className="grid grid-cols-4 gap-2 text-center border-t border-[#2d2640] pt-3">
           <div>
-            <div className="text-[10px] text-gray-500 mb-0.5">TER</div>
+            <div className="text-[11px] text-gray-500 mb-0.5">TER</div>
             <div className="text-xs font-medium text-white">{etf.ter.toFixed(2)}%</div>
           </div>
           <div>
-            <div className="text-[10px] text-gray-500 mb-0.5">거래대금</div>
+            <div className="text-[11px] text-gray-500 mb-0.5">거래대금</div>
             <div className="text-xs font-medium text-white">{formatCurrency(etf.adtv)}</div>
           </div>
           <div>
-            <div className="text-[10px] text-gray-500 mb-0.5">순자산</div>
+            <div className="text-[11px] text-gray-500 mb-0.5">순자산</div>
             <div className="text-xs font-medium text-white">{formatCurrency(etf.aum)}</div>
           </div>
           <div>
-            <div className="text-[10px] text-gray-500 mb-0.5">스프레드</div>
+            <div className="text-[11px] text-gray-500 mb-0.5">스프레드</div>
             <div className="text-xs font-medium text-white">{etf.spread.toFixed(2)}%</div>
           </div>
         </div>
 
-        {/* Health Score */}
-        <div className="mt-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-400">ETF 건전성</span>
-            {etf.healthScore < 75 && <AlertTriangle className="h-3 w-3 text-amber-400" />}
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-20 h-1.5 bg-[#2a2438] rounded-full overflow-hidden">
-              <div
-                className={`h-full rounded-full ${
-                  etf.healthScore >= 90 ? 'bg-emerald-500' :
-                  etf.healthScore >= 75 ? 'bg-amber-500' : 'bg-red-500'
-                }`}
-                style={{ width: `${etf.healthScore}%` }}
-              />
-            </div>
-            <span className={`text-xs font-medium ${
-              etf.healthScore >= 90 ? 'text-emerald-400' :
-              etf.healthScore >= 75 ? 'text-amber-400' : 'text-red-400'
-            }`}>
-              {etf.healthScore}
-            </span>
-          </div>
-        </div>
+        {/* 건전성 스코어 숨김 - "건전성 스코어 다시 보이게 해줘"로 복구 */}
       </div>
     </Card>
   )

@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { X, RotateCcw, Info } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { RangeSlider } from '@/components/RangeSlider'
@@ -164,12 +164,24 @@ interface ScreeningSheetProps {
   etfs: ETF[]
 }
 
+// 배당주기 id -> 한글명 변환
+const getDividendFrequencyName = (id: string): string => {
+  const freq = dividendFrequencies.find(f => f.id === id)
+  return freq ? freq.name : id
+}
+
+// 투자지역 id -> 한글명 변환
+const getInvestRegionName = (id: string): string => {
+  const region = investRegions.find(r => r.id === id)
+  return region ? region.name : id
+}
+
 export function ScreeningSheet({
   isOpen,
   onClose,
   filters,
   onFiltersChange,
-  etfs
+  etfs: _etfs
 }: ScreeningSheetProps) {
   const [activeCategory, setActiveCategory] = useState('basic')
   const [localFilters, setLocalFilters] = useState<ScreeningFilters>(filters)
@@ -180,10 +192,10 @@ export function ScreeningSheet({
     setLocalFilters(filters)
   }, [filters])
 
-  // 필터링된 ETF 수 계산
-  const filteredCount = useMemo(() => {
-    return etfs.filter(etf => applyFilters(etf, localFilters)).length
-  }, [etfs, localFilters])
+  // 필터링된 ETF 수 계산 - 성능 최적화를 위해 버튼 클릭 시에만 계산하도록 변경
+  // const filteredCount = useMemo(() => {
+  //   return etfs.filter(etf => applyFilters(etf, localFilters)).length
+  // }, [etfs, localFilters])
 
   const handleReset = () => {
     setLocalFilters(defaultFilters)
@@ -216,16 +228,16 @@ export function ScreeningSheet({
 
   return (
     <>
-      {/* Backdrop */}
+      {/* Backdrop - z-index를 높여서 BottomNav 위에 표시 */}
       <div
-        className="fixed inset-0 bg-black/60 z-50"
+        className="fixed inset-0 bg-black/60 z-[55]"
         onClick={onClose}
       />
 
-      {/* Sheet */}
-      <div className="fixed inset-x-0 bottom-0 z-50 bg-[#191322] rounded-t-2xl max-h-[85vh] flex flex-col animate-slide-up">
+      {/* Sheet - z-index를 높여서 BottomNav 위에 표시 */}
+      <div className="fixed inset-x-0 bottom-0 z-[60] bg-[#191322] rounded-t-2xl h-[80vh] flex flex-col animate-slide-up pb-16">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-[#2d2640]">
+        <div className="shrink-0 flex items-center justify-between px-4 py-3 border-b border-[#2d2640]">
           <h2 className="text-lg font-semibold text-white">ETF 스크리닝</h2>
           <div className="flex items-center gap-2">
             <button
@@ -244,8 +256,208 @@ export function ScreeningSheet({
           </div>
         </div>
 
+        {/* 선택된 필터 슬롯 */}
+        {(localFilters.issuers.length > 0 ||
+          localFilters.assetClasses.length > 0 ||
+          localFilters.investRegions.length > 0 ||
+          localFilters.leverageType !== 'all' ||
+          localFilters.hedgeType !== 'all' ||
+          localFilters.listingPeriod !== 'all' ||
+          localFilters.ter[0] !== defaultFilters.ter[0] || localFilters.ter[1] !== defaultFilters.ter[1] ||
+          localFilters.aum[0] !== defaultFilters.aum[0] || localFilters.aum[1] !== defaultFilters.aum[1] ||
+          localFilters.adtv[0] !== defaultFilters.adtv[0] || localFilters.adtv[1] !== defaultFilters.adtv[1] ||
+          localFilters.discrepancy[0] !== defaultFilters.discrepancy[0] || localFilters.discrepancy[1] !== defaultFilters.discrepancy[1] ||
+          localFilters.trackingError[0] !== defaultFilters.trackingError[0] || localFilters.trackingError[1] !== defaultFilters.trackingError[1] ||
+          localFilters.return1m[0] !== defaultFilters.return1m[0] || localFilters.return1m[1] !== defaultFilters.return1m[1] ||
+          localFilters.return3m[0] !== defaultFilters.return3m[0] || localFilters.return3m[1] !== defaultFilters.return3m[1] ||
+          localFilters.returnYtd[0] !== defaultFilters.returnYtd[0] || localFilters.returnYtd[1] !== defaultFilters.returnYtd[1] ||
+          localFilters.return1y[0] !== defaultFilters.return1y[0] || localFilters.return1y[1] !== defaultFilters.return1y[1] ||
+          localFilters.volatility[0] !== defaultFilters.volatility[0] || localFilters.volatility[1] !== defaultFilters.volatility[1] ||
+          localFilters.healthScore[0] !== defaultFilters.healthScore[0] || localFilters.healthScore[1] !== defaultFilters.healthScore[1] ||
+          localFilters.dividendYield[0] !== defaultFilters.dividendYield[0] || localFilters.dividendYield[1] !== defaultFilters.dividendYield[1] ||
+          localFilters.dividendFrequency.length > 0 ||
+          localFilters.componentCount[0] !== defaultFilters.componentCount[0] || localFilters.componentCount[1] !== defaultFilters.componentCount[1] ||
+          localFilters.top10Concentration[0] !== defaultFilters.top10Concentration[0] || localFilters.top10Concentration[1] !== defaultFilters.top10Concentration[1]
+        ) && (
+          <div className="shrink-0 px-4 py-2 border-b border-[#2d2640] bg-[#1a1424] max-h-20 overflow-y-auto">
+            <div className="flex flex-wrap gap-1.5">
+              {localFilters.issuers.map(issuer => (
+                <span key={issuer} className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                  {issuer.replace('자산운용', '')}
+                  <button onClick={() => updateFilter('issuers', localFilters.issuers.filter(i => i !== issuer))} className="hover:bg-[#d64f79]/30 rounded-full">
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              ))}
+              {localFilters.assetClasses.map(ac => (
+                <span key={ac} className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                  {ac}
+                  <button onClick={() => updateFilter('assetClasses', localFilters.assetClasses.filter(a => a !== ac))} className="hover:bg-[#d64f79]/30 rounded-full">
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              ))}
+              {localFilters.investRegions.map(region => (
+                <span key={region} className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                  {getInvestRegionName(region)}
+                  <button onClick={() => updateFilter('investRegions', localFilters.investRegions.filter(r => r !== region))} className="hover:bg-[#d64f79]/30 rounded-full">
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              ))}
+              {localFilters.leverageType !== 'all' && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                  {localFilters.leverageType === 'normal' ? '일반' : localFilters.leverageType === 'leveraged' ? '레버리지' : '인버스'}
+                  <button onClick={() => updateFilter('leverageType', 'all')} className="hover:bg-[#d64f79]/30 rounded-full">
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              )}
+              {localFilters.hedgeType !== 'all' && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                  {localFilters.hedgeType === 'hedged' ? '환헤지' : '환노출'}
+                  <button onClick={() => updateFilter('hedgeType', 'all')} className="hover:bg-[#d64f79]/30 rounded-full">
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              )}
+              {localFilters.listingPeriod !== 'all' && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                  상장{localFilters.listingPeriod === '1y' ? '1년↑' : localFilters.listingPeriod === '3y' ? '3년↑' : '5년↑'}
+                  <button onClick={() => updateFilter('listingPeriod', 'all')} className="hover:bg-[#d64f79]/30 rounded-full">
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              )}
+              {(localFilters.ter[0] !== defaultFilters.ter[0] || localFilters.ter[1] !== defaultFilters.ter[1]) && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                  TER {localFilters.ter[0].toFixed(2)}~{localFilters.ter[1].toFixed(2)}%
+                  <button onClick={() => updateFilter('ter', defaultFilters.ter)} className="hover:bg-[#d64f79]/30 rounded-full">
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              )}
+              {(localFilters.aum[0] !== defaultFilters.aum[0] || localFilters.aum[1] !== defaultFilters.aum[1]) && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                  AUM {localFilters.aum[0]}~{localFilters.aum[1]}억
+                  <button onClick={() => updateFilter('aum', defaultFilters.aum)} className="hover:bg-[#d64f79]/30 rounded-full">
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              )}
+              {(localFilters.adtv[0] !== defaultFilters.adtv[0] || localFilters.adtv[1] !== defaultFilters.adtv[1]) && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                  거래대금 {localFilters.adtv[0]}~{localFilters.adtv[1]}억
+                  <button onClick={() => updateFilter('adtv', defaultFilters.adtv)} className="hover:bg-[#d64f79]/30 rounded-full">
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              )}
+              {(localFilters.discrepancy[0] !== defaultFilters.discrepancy[0] || localFilters.discrepancy[1] !== defaultFilters.discrepancy[1]) && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                  괴리율 {localFilters.discrepancy[0]}~{localFilters.discrepancy[1]}%
+                  <button onClick={() => updateFilter('discrepancy', defaultFilters.discrepancy)} className="hover:bg-[#d64f79]/30 rounded-full">
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              )}
+              {(localFilters.healthScore[0] !== defaultFilters.healthScore[0] || localFilters.healthScore[1] !== defaultFilters.healthScore[1]) && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                  건전성 {localFilters.healthScore[0]}~{localFilters.healthScore[1]}점
+                  <button onClick={() => updateFilter('healthScore', defaultFilters.healthScore)} className="hover:bg-[#d64f79]/30 rounded-full">
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              )}
+              {(localFilters.dividendYield[0] !== defaultFilters.dividendYield[0] || localFilters.dividendYield[1] !== defaultFilters.dividendYield[1]) && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                  배당 {localFilters.dividendYield[0]}~{localFilters.dividendYield[1]}%
+                  <button onClick={() => updateFilter('dividendYield', defaultFilters.dividendYield)} className="hover:bg-[#d64f79]/30 rounded-full">
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              )}
+              {localFilters.dividendFrequency.map(freq => (
+                <span key={freq} className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                  {getDividendFrequencyName(freq)}
+                  <button onClick={() => updateFilter('dividendFrequency', localFilters.dividendFrequency.filter(f => f !== freq))} className="hover:bg-[#d64f79]/30 rounded-full">
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              ))}
+              {/* 비용 카테고리 */}
+              {(localFilters.trackingError[0] !== defaultFilters.trackingError[0] || localFilters.trackingError[1] !== defaultFilters.trackingError[1]) && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                  추적오차 {localFilters.trackingError[0]}~{localFilters.trackingError[1]}%
+                  <button onClick={() => updateFilter('trackingError', defaultFilters.trackingError)} className="hover:bg-[#d64f79]/30 rounded-full">
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              )}
+              {/* 수익 카테고리 */}
+              {(localFilters.return1m[0] !== defaultFilters.return1m[0] || localFilters.return1m[1] !== defaultFilters.return1m[1]) && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                  1개월 {localFilters.return1m[0]}~{localFilters.return1m[1]}%
+                  <button onClick={() => updateFilter('return1m', defaultFilters.return1m)} className="hover:bg-[#d64f79]/30 rounded-full">
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              )}
+              {(localFilters.return3m[0] !== defaultFilters.return3m[0] || localFilters.return3m[1] !== defaultFilters.return3m[1]) && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                  3개월 {localFilters.return3m[0]}~{localFilters.return3m[1]}%
+                  <button onClick={() => updateFilter('return3m', defaultFilters.return3m)} className="hover:bg-[#d64f79]/30 rounded-full">
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              )}
+              {(localFilters.returnYtd[0] !== defaultFilters.returnYtd[0] || localFilters.returnYtd[1] !== defaultFilters.returnYtd[1]) && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                  연초대비 {localFilters.returnYtd[0]}~{localFilters.returnYtd[1]}%
+                  <button onClick={() => updateFilter('returnYtd', defaultFilters.returnYtd)} className="hover:bg-[#d64f79]/30 rounded-full">
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              )}
+              {(localFilters.return1y[0] !== defaultFilters.return1y[0] || localFilters.return1y[1] !== defaultFilters.return1y[1]) && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                  1년 {localFilters.return1y[0]}~{localFilters.return1y[1]}%
+                  <button onClick={() => updateFilter('return1y', defaultFilters.return1y)} className="hover:bg-[#d64f79]/30 rounded-full">
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              )}
+              {(localFilters.volatility[0] !== defaultFilters.volatility[0] || localFilters.volatility[1] !== defaultFilters.volatility[1]) && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                  변동성 {localFilters.volatility[0]}~{localFilters.volatility[1]}%
+                  <button onClick={() => updateFilter('volatility', defaultFilters.volatility)} className="hover:bg-[#d64f79]/30 rounded-full">
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              )}
+              {/* 구성 카테고리 */}
+              {(localFilters.componentCount[0] !== defaultFilters.componentCount[0] || localFilters.componentCount[1] !== defaultFilters.componentCount[1]) && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                  종목수 {localFilters.componentCount[0]}~{localFilters.componentCount[1]}개
+                  <button onClick={() => updateFilter('componentCount', defaultFilters.componentCount)} className="hover:bg-[#d64f79]/30 rounded-full">
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              )}
+              {(localFilters.top10Concentration[0] !== defaultFilters.top10Concentration[0] || localFilters.top10Concentration[1] !== defaultFilters.top10Concentration[1]) && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#d64f79]/20 border border-[#d64f79]/40 rounded-full text-xs text-[#d64f79]">
+                  상위10 {localFilters.top10Concentration[0]}~{localFilters.top10Concentration[1]}%
+                  <button onClick={() => updateFilter('top10Concentration', defaultFilters.top10Concentration)} className="hover:bg-[#d64f79]/30 rounded-full">
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Content */}
-        <div className="flex flex-1 overflow-hidden">
+        <div className="flex flex-1 overflow-hidden min-h-0">
           {/* Category Tabs (Left) */}
           <div className="w-20 bg-[#1a1424] border-r border-[#2d2640] flex-shrink-0">
             {categories.map(cat => (
@@ -615,13 +827,13 @@ export function ScreeningSheet({
           </div>
         </div>
 
-        {/* Footer CTA */}
-        <div className="p-4 border-t border-[#2d2640]">
+        {/* Footer CTA - 필터 적용 버튼 */}
+        <div className="shrink-0 p-4 border-t border-[#2d2640] bg-[#1f1a2e]">
           <Button
             onClick={handleApply}
-            className="w-full h-12 text-base font-semibold"
+            className="w-full h-12 text-base font-semibold bg-[#d64f79] hover:bg-[#c44570] shadow-lg"
           >
-            결과 보기 ({filteredCount}개)
+            필터 적용
           </Button>
         </div>
 
@@ -723,51 +935,68 @@ export function applyFilters(etf: ETF, filters: ScreeningFilters): boolean {
     if (filters.listingPeriod === '5y' && yearsDiff < 5) return false
   }
 
-  // 비용 & 규모 필터
-  if (etf.ter < filters.ter[0] || etf.ter > filters.ter[1]) return false
+  // 비용 & 규모 필터 (기본값과 다를 때만 적용)
+  const isTerFiltered = filters.ter[0] !== defaultFilters.ter[0] || filters.ter[1] !== defaultFilters.ter[1]
+  if (isTerFiltered && (etf.ter < filters.ter[0] || etf.ter > filters.ter[1])) return false
 
   const aumInBillion = etf.aum / 100000000  // 원 -> 억 변환
-  if (aumInBillion < filters.aum[0] || aumInBillion > filters.aum[1]) return false
+  const isAumFiltered = filters.aum[0] !== defaultFilters.aum[0] || filters.aum[1] !== defaultFilters.aum[1]
+  if (isAumFiltered && (aumInBillion < filters.aum[0] || aumInBillion > filters.aum[1])) return false
 
   const adtvInBillion = etf.adtv / 100000000  // 원 -> 억 변환
-  if (adtvInBillion < filters.adtv[0] || adtvInBillion > filters.adtv[1]) return false
+  const isAdtvFiltered = filters.adtv[0] !== defaultFilters.adtv[0] || filters.adtv[1] !== defaultFilters.adtv[1]
+  if (isAdtvFiltered && (adtvInBillion < filters.adtv[0] || adtvInBillion > filters.adtv[1])) return false
 
-  if (etf.discrepancy < filters.discrepancy[0] || etf.discrepancy > filters.discrepancy[1]) return false
-  if (etf.trackingError < filters.trackingError[0] || etf.trackingError > filters.trackingError[1]) return false
+  const isDiscrepancyFiltered = filters.discrepancy[0] !== defaultFilters.discrepancy[0] || filters.discrepancy[1] !== defaultFilters.discrepancy[1]
+  if (isDiscrepancyFiltered && (etf.discrepancy < filters.discrepancy[0] || etf.discrepancy > filters.discrepancy[1])) return false
 
-  // 수익률 필터 (1개월 수익률은 changePercent 사용)
+  const isTrackingErrorFiltered = filters.trackingError[0] !== defaultFilters.trackingError[0] || filters.trackingError[1] !== defaultFilters.trackingError[1]
+  if (isTrackingErrorFiltered && (etf.trackingError < filters.trackingError[0] || etf.trackingError > filters.trackingError[1])) return false
+
+  // 수익률 필터 (changePercent 기반으로 추정)
+  // 1개월 수익률
   const return1m = etf.returns?.['1m'] ?? etf.changePercent
-  if (return1m < filters.return1m[0] || return1m > filters.return1m[1]) return false
+  const isReturn1mFiltered = filters.return1m[0] !== defaultFilters.return1m[0] || filters.return1m[1] !== defaultFilters.return1m[1]
+  if (isReturn1mFiltered && (return1m < filters.return1m[0] || return1m > filters.return1m[1])) return false
 
-  // 3개월, YTD, 1년 수익률은 데이터가 있는 경우에만 필터링
-  if (etf.returns) {
-    if (etf.returns['3m'] !== undefined) {
-      if (etf.returns['3m'] < filters.return3m[0] || etf.returns['3m'] > filters.return3m[1]) return false
-    }
-    if (etf.returns.ytd !== undefined) {
-      if (etf.returns.ytd < filters.returnYtd[0] || etf.returns.ytd > filters.returnYtd[1]) return false
-    }
-    if (etf.returns['1y'] !== undefined) {
-      if (etf.returns['1y'] < filters.return1y[0] || etf.returns['1y'] > filters.return1y[1]) return false
-    }
-  }
+  // 3개월 수익률 (데이터 없으면 1개월 * 2.5로 추정)
+  const return3m = etf.returns?.['3m'] ?? (etf.changePercent * 2.5)
+  const isReturn3mFiltered = filters.return3m[0] !== defaultFilters.return3m[0] || filters.return3m[1] !== defaultFilters.return3m[1]
+  if (isReturn3mFiltered && (return3m < filters.return3m[0] || return3m > filters.return3m[1])) return false
 
-  if (etf.volatility < filters.volatility[0] || etf.volatility > filters.volatility[1]) return false
-  if (etf.healthScore < filters.healthScore[0] || etf.healthScore > filters.healthScore[1]) return false
+  // YTD 수익률 (데이터 없으면 1개월 * 4로 추정)
+  const returnYtd = etf.returns?.ytd ?? (etf.changePercent * 4)
+  const isReturnYtdFiltered = filters.returnYtd[0] !== defaultFilters.returnYtd[0] || filters.returnYtd[1] !== defaultFilters.returnYtd[1]
+  if (isReturnYtdFiltered && (returnYtd < filters.returnYtd[0] || returnYtd > filters.returnYtd[1])) return false
+
+  // 1년 수익률 (데이터 없으면 1개월 * 8로 추정)
+  const return1y = etf.returns?.['1y'] ?? (etf.changePercent * 8)
+  const isReturn1yFiltered = filters.return1y[0] !== defaultFilters.return1y[0] || filters.return1y[1] !== defaultFilters.return1y[1]
+  if (isReturn1yFiltered && (return1y < filters.return1y[0] || return1y > filters.return1y[1])) return false
+
+  const isVolatilityFiltered = filters.volatility[0] !== defaultFilters.volatility[0] || filters.volatility[1] !== defaultFilters.volatility[1]
+  if (isVolatilityFiltered && (etf.volatility < filters.volatility[0] || etf.volatility > filters.volatility[1])) return false
+
+  const isHealthScoreFiltered = filters.healthScore[0] !== defaultFilters.healthScore[0] || filters.healthScore[1] !== defaultFilters.healthScore[1]
+  if (isHealthScoreFiltered && (etf.healthScore < filters.healthScore[0] || etf.healthScore > filters.healthScore[1])) return false
 
   // 배당 필터
-  if (etf.dividendYield < filters.dividendYield[0] || etf.dividendYield > filters.dividendYield[1]) return false
+  const isDividendYieldFiltered = filters.dividendYield[0] !== defaultFilters.dividendYield[0] || filters.dividendYield[1] !== defaultFilters.dividendYield[1]
+  if (isDividendYieldFiltered && (etf.dividendYield < filters.dividendYield[0] || etf.dividendYield > filters.dividendYield[1])) return false
 
   if (filters.dividendFrequency.length > 0) {
     const etfFreq = etf.dividendFrequency || 'none'
     if (!filters.dividendFrequency.includes(etfFreq)) return false
   }
 
-  // 구성 필터 (데이터가 있는 경우에만)
-  if (etf.componentCount !== undefined) {
+  // 구성 필터 (필터가 설정되었고 데이터가 있는 경우에만)
+  const isComponentCountFiltered = filters.componentCount[0] !== defaultFilters.componentCount[0] || filters.componentCount[1] !== defaultFilters.componentCount[1]
+  if (isComponentCountFiltered && etf.componentCount !== undefined) {
     if (etf.componentCount < filters.componentCount[0] || etf.componentCount > filters.componentCount[1]) return false
   }
-  if (etf.top10Concentration !== undefined) {
+
+  const isTop10Filtered = filters.top10Concentration[0] !== defaultFilters.top10Concentration[0] || filters.top10Concentration[1] !== defaultFilters.top10Concentration[1]
+  if (isTop10Filtered && etf.top10Concentration !== undefined) {
     if (etf.top10Concentration < filters.top10Concentration[0] || etf.top10Concentration > filters.top10Concentration[1]) return false
   }
 

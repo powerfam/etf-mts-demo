@@ -1,8 +1,9 @@
-import { useState, useMemo, useEffect, useCallback } from 'react'
-import { ChevronLeft, ChevronDown, Filter, ShoppingCart, Star, Smartphone } from 'lucide-react'
+import { useState, useMemo, useEffect } from 'react'
+import { ChevronLeft, ChevronDown, ChevronUp, ShoppingCart, Star, Smartphone } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { mockETFs } from '@/data/mockData'
 import { formatNumber, formatPercent } from '@/lib/utils'
+import { ETFLogo } from '@/components/ETFLogo'
 import type { ETF } from '@/data/mockData'
 
 interface QuickSearchPageProps {
@@ -66,29 +67,43 @@ const detailTabs = [
 const returnPeriods = ['1일', '1주', '1개월', '3개월', '6개월', 'YTD', '1년', '3년', '5년', '10년']
 const flowPeriods = ['전일', '1주', '1개월', '3개월', '6개월', '1년', 'YTD']
 
-// Mock data for returns and flows (실제로는 API에서 가져옴)
-const generateMockReturns = (etf: ETF) => ({
-  '1일': etf.changePercent,
-  '1주': (Math.random() * 10 - 5).toFixed(2),
-  '1개월': (Math.random() * 20 - 10).toFixed(2),
-  '3개월': (Math.random() * 30 - 15).toFixed(2),
-  '6개월': (Math.random() * 50 - 25).toFixed(2),
-  'YTD': (Math.random() * 40 - 20).toFixed(2),
-  '1년': (Math.random() * 60 - 30).toFixed(2),
-  '3년': '-',
-  '5년': '-',
-  '10년': '-',
-})
+// 시드 기반 랜덤 함수 (ETF id 기반으로 일관된 값 생성)
+const seededRandom = (seed: number, index: number) => {
+  const x = Math.sin(seed * 9999 + index * 1000) * 10000
+  return x - Math.floor(x)
+}
 
-const generateMockFlow = (_etf: ETF) => ({
-  '전일': Math.round((Math.random() * 200 - 100) * 10) / 10,
-  '1주': Math.round((Math.random() * 500 - 250) * 10) / 10,
-  '1개월': Math.round((Math.random() * 2000 - 1000) * 10) / 10,
-  '3개월': Math.round((Math.random() * 5000 - 2500) * 10) / 10,
-  '6개월': Math.round((Math.random() * 10000 - 5000) * 10) / 10,
-  '1년': Math.round((Math.random() * 20000 - 10000) * 10) / 10,
-  'YTD': Math.round((Math.random() * 15000 - 7500) * 10) / 10,
-})
+// Mock data for returns and flows (실제로는 API에서 가져옴)
+// ETF id 기반 시드로 일관된 값 생성 (정렬 시 필요)
+const generateMockReturns = (etf: ETF) => {
+  const seed = parseInt(etf.id.replace(/\D/g, '') || '0', 10)
+  return {
+    '1일': etf.changePercent,
+    '1주': parseFloat((seededRandom(seed, 1) * 10 - 5).toFixed(2)),
+    '1개월': parseFloat((seededRandom(seed, 2) * 20 - 10).toFixed(2)),
+    '3개월': parseFloat((seededRandom(seed, 3) * 30 - 15).toFixed(2)),
+    '6개월': parseFloat((seededRandom(seed, 4) * 50 - 25).toFixed(2)),
+    'YTD': parseFloat((seededRandom(seed, 5) * 40 - 20).toFixed(2)),
+    '1년': parseFloat((seededRandom(seed, 6) * 60 - 30).toFixed(2)),
+    '3년': null as number | null,
+    '5년': null as number | null,
+    '10년': null as number | null,
+  }
+}
+
+const generateMockFlow = (etf: ETF) => {
+  const seed = parseInt(etf.id.replace(/\D/g, '') || '0', 10)
+  return {
+    '전일': Math.round((seededRandom(seed, 10) * 200 - 100) * 10) / 10,
+    '1주': Math.round((seededRandom(seed, 11) * 500 - 250) * 10) / 10,
+    '1개월': Math.round((seededRandom(seed, 12) * 2000 - 1000) * 10) / 10,
+    '3개월': Math.round((seededRandom(seed, 13) * 5000 - 2500) * 10) / 10,
+    '6개월': Math.round((seededRandom(seed, 14) * 10000 - 5000) * 10) / 10,
+    '1년': Math.round((seededRandom(seed, 15) * 20000 - 10000) * 10) / 10,
+    'YTD': Math.round((seededRandom(seed, 16) * 15000 - 7500) * 10) / 10,
+  }
+}
+
 
 export function QuickSearchPage({
   isOpen,
@@ -115,8 +130,8 @@ export function QuickSearchPage({
   const [viewMode, setViewMode] = useState<'summary' | 'detail'>('summary')
   // 상세 탭
   const [detailTab, setDetailTab] = useState('basic')
-  // 필터 모달
-  const [showFilterModal, setShowFilterModal] = useState(false)
+  // 정렬 드롭다운 표시 상태
+  const [showSortDropdown, setShowSortDropdown] = useState(false)
   // 지수 선택 모달
   const [showIndexModal, setShowIndexModal] = useState(false)
   // 정렬/필터 상태
@@ -124,6 +139,8 @@ export function QuickSearchPage({
   const [selectedStockFilter, setSelectedStockFilter] = useState('all')
   // 즐겨찾기 상태
   const [favorites, setFavorites] = useState<string[]>([])
+  // 테이블 헤더 클릭 정렬 상태
+  const [columnSort, setColumnSort] = useState<{ column: string; direction: 'asc' | 'desc' } | null>(null)
 
   // 탭에 따른 ETF 필터링
   const filteredETFs = useMemo(() => {
@@ -305,6 +322,89 @@ export function QuickSearchPage({
     return results
   }, [activeTab, selectedIndex, selectedSector, selectedStockFilter, selectedSort])
 
+  // 테이블 헤더 클릭 정렬 핸들러
+  const handleColumnSort = (column: string) => {
+    setColumnSort(prev => {
+      if (prev?.column === column) {
+        // 같은 컬럼 클릭: asc <-> desc 토글
+        return { column, direction: prev.direction === 'asc' ? 'desc' : 'asc' }
+      }
+      // 새 컬럼 클릭: 기본 내림차순 (가격/수익률 등은 높은게 먼저)
+      return { column, direction: 'desc' }
+    })
+  }
+
+  // 정렬 아이콘 렌더링
+  const renderSortIcon = (column: string) => {
+    if (columnSort?.column !== column) {
+      return <ChevronDown className="h-3 w-3 opacity-30" />
+    }
+    return columnSort.direction === 'asc'
+      ? <ChevronUp className="h-3 w-3 text-[#d64f79]" />
+      : <ChevronDown className="h-3 w-3 text-[#d64f79]" />
+  }
+
+  // 컬럼 정렬 적용된 ETF 리스트
+  const sortedETFs = useMemo(() => {
+    if (!columnSort) return filteredETFs
+
+    const sorted = [...filteredETFs]
+    const { column, direction } = columnSort
+    const multiplier = direction === 'asc' ? 1 : -1
+
+    sorted.sort((a, b) => {
+      let aVal: number, bVal: number
+
+      // 수익률 컬럼 정렬 (return_1일, return_1주, ...)
+      if (column.startsWith('return_')) {
+        const period = column.replace('return_', '') as keyof ReturnType<typeof generateMockReturns>
+        const aReturns = generateMockReturns(a)
+        const bReturns = generateMockReturns(b)
+        aVal = aReturns[period] ?? -999
+        bVal = bReturns[period] ?? -999
+        return (aVal - bVal) * multiplier
+      }
+
+      // 자금유입 컬럼 정렬 (flow_전일, flow_1주, ...)
+      if (column.startsWith('flow_')) {
+        const period = column.replace('flow_', '') as keyof ReturnType<typeof generateMockFlow>
+        const aFlows = generateMockFlow(a)
+        const bFlows = generateMockFlow(b)
+        aVal = aFlows[period]
+        bVal = bFlows[period]
+        return (aVal - bVal) * multiplier
+      }
+
+      switch (column) {
+        case 'price':
+          aVal = a.price; bVal = b.price; break
+        case 'change':
+          aVal = a.changePercent; bVal = b.changePercent; break
+        case 'ter':
+          aVal = a.ter; bVal = b.ter; break
+        case 'discrepancy':
+          aVal = Math.abs(a.discrepancy); bVal = Math.abs(b.discrepancy); break
+        case 'volume':
+          aVal = a.adtv / a.price; bVal = b.adtv / b.price; break
+        case 'adtv':
+          aVal = a.adtv; bVal = b.adtv; break
+        case 'aum':
+          aVal = a.aum; bVal = b.aum; break
+        case 'dividend':
+          aVal = a.dividendYield; bVal = b.dividendYield; break
+        case 'health':
+          aVal = a.healthScore; bVal = b.healthScore; break
+        case 'inav':
+          aVal = a.iNav; bVal = b.iNav; break
+        default:
+          return 0
+      }
+      return (aVal - bVal) * multiplier
+    })
+
+    return sorted
+  }, [filteredETFs, columnSort])
+
   // 비교함에 있는지 확인
   const isInCompare = (etfId: string) => compareETFs.some(e => e.id === etfId)
 
@@ -390,18 +490,34 @@ export function QuickSearchPage({
               <thead className="bg-[#2d2640] sticky top-0">
                 <tr>
                   <th className="text-left text-gray-400 font-medium px-2 py-2">종목</th>
-                  <th className="text-right text-gray-400 font-medium px-2 py-2">현재가</th>
-                  <th className="text-right text-gray-400 font-medium px-2 py-2">등락률</th>
-                  <th className="text-right text-gray-400 font-medium px-2 py-2">TER</th>
-                  <th className="text-right text-gray-400 font-medium px-2 py-2">괴리율</th>
-                  <th className="text-right text-gray-400 font-medium px-2 py-2">거래대금</th>
-                  <th className="text-right text-gray-400 font-medium px-2 py-2">AUM</th>
-                  <th className="text-right text-gray-400 font-medium px-2 py-2">배당률</th>
-                  <th className="text-right text-gray-400 font-medium px-2 py-2">건전성</th>
+                  <th className="text-right text-gray-400 font-medium px-2 py-2 cursor-pointer hover:text-white" onClick={() => handleColumnSort('price')}>
+                    <span className="inline-flex items-center gap-1">현재가 {renderSortIcon('price')}</span>
+                  </th>
+                  <th className="text-right text-gray-400 font-medium px-2 py-2 cursor-pointer hover:text-white" onClick={() => handleColumnSort('change')}>
+                    <span className="inline-flex items-center gap-1">등락률 {renderSortIcon('change')}</span>
+                  </th>
+                  <th className="text-right text-gray-400 font-medium px-2 py-2 cursor-pointer hover:text-white" onClick={() => handleColumnSort('ter')}>
+                    <span className="inline-flex items-center gap-1">TER {renderSortIcon('ter')}</span>
+                  </th>
+                  <th className="text-right text-gray-400 font-medium px-2 py-2 cursor-pointer hover:text-white" onClick={() => handleColumnSort('discrepancy')}>
+                    <span className="inline-flex items-center gap-1">괴리율 {renderSortIcon('discrepancy')}</span>
+                  </th>
+                  <th className="text-right text-gray-400 font-medium px-2 py-2 cursor-pointer hover:text-white" onClick={() => handleColumnSort('adtv')}>
+                    <span className="inline-flex items-center gap-1">거래대금 {renderSortIcon('adtv')}</span>
+                  </th>
+                  <th className="text-right text-gray-400 font-medium px-2 py-2 cursor-pointer hover:text-white" onClick={() => handleColumnSort('aum')}>
+                    <span className="inline-flex items-center gap-1">AUM {renderSortIcon('aum')}</span>
+                  </th>
+                  <th className="text-right text-gray-400 font-medium px-2 py-2 cursor-pointer hover:text-white" onClick={() => handleColumnSort('dividend')}>
+                    <span className="inline-flex items-center gap-1">배당률 {renderSortIcon('dividend')}</span>
+                  </th>
+                  <th className="text-right text-gray-400 font-medium px-2 py-2 cursor-pointer hover:text-white" onClick={() => handleColumnSort('health')}>
+                    <span className="inline-flex items-center gap-1">건전성 {renderSortIcon('health')}</span>
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                {filteredETFs.slice(0, 30).map((etf) => (
+                {sortedETFs.slice(0, 30).map((etf) => (
                   <tr
                     key={etf.id}
                     onClick={() => {
@@ -427,7 +543,7 @@ export function QuickSearchPage({
                     <td className="text-right px-2 py-2 text-white">{(etf.aum / 100000000).toFixed(0)}억</td>
                     <td className="text-right px-2 py-2 text-white">{etf.dividendYield.toFixed(1)}%</td>
                     <td className="text-right px-2 py-2">
-                      <span className={`px-1.5 py-0.5 rounded text-[10px] ${
+                      <span className={`px-1.5 py-0.5 rounded text-[11px] ${
                         etf.healthScore >= 85 ? 'bg-green-500/20 text-green-400' :
                         etf.healthScore >= 70 ? 'bg-yellow-500/20 text-yellow-400' :
                         'bg-red-500/20 text-red-400'
@@ -457,22 +573,6 @@ export function QuickSearchPage({
               </button>
             )}
             <h1 className="text-lg font-semibold text-white">ETF 빠른검색</h1>
-          </div>
-          <div className="flex items-center gap-2">
-            {/* 가로보기 버튼 */}
-            <button
-              onClick={() => setIsLandscape(true)}
-              className="icon-btn-3d"
-              title="가로보기 (테이블 회전)"
-            >
-              <Smartphone className={`h-5 w-5 ${isLandscape ? 'rotate-90' : ''} transition-transform`} />
-            </button>
-            <button
-              onClick={() => setShowFilterModal(true)}
-              className="icon-btn-3d"
-            >
-              <Filter className="h-5 w-5" />
-            </button>
           </div>
         </div>
 
@@ -527,9 +627,9 @@ export function QuickSearchPage({
         </div>
       )}
 
-      {/* 결과 카운트 & 뷰 토글 */}
+      {/* 통합 컨트롤 바: 결과수 + 뷰모드 + 정렬 + 가로보기 */}
       <div className="flex items-center justify-between px-4 py-3">
-        <span className="text-sm text-gray-400">총 {filteredETFs.length}건</span>
+        <span className="text-sm text-gray-400 font-medium">{filteredETFs.length}개 ETF</span>
         <div className="flex items-center gap-2">
           {/* 요약/상세 토글 */}
           <div className="flex bg-[#2d2640] rounded-lg p-0.5">
@@ -549,6 +649,68 @@ export function QuickSearchPage({
             >
               상세
             </button>
+          </div>
+          {/* 가로보기 버튼 */}
+          <button
+            onClick={() => setIsLandscape(true)}
+            className="icon-btn-3d"
+            title="가로보기"
+          >
+            <Smartphone className="h-4 w-4" />
+          </button>
+          {/* 정렬 드롭다운 */}
+          <div className="relative">
+            <button
+              onClick={() => setShowSortDropdown(!showSortDropdown)}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#2d2640] text-xs text-white"
+            >
+              <span>
+                {sortOptions.find(o => o.id === selectedSort)?.label || '정렬'} - {stockFilters.find(f => f.id === selectedStockFilter)?.label || '전체'}
+              </span>
+              <ChevronDown className={`h-3.5 w-3.5 transition-transform ${showSortDropdown ? 'rotate-180' : ''}`} />
+            </button>
+            {showSortDropdown && (
+              <div className="absolute right-0 top-full mt-1 w-48 bg-[#1f1a2e] border border-[#2d2640] rounded-lg shadow-lg z-50 overflow-hidden">
+                {/* 종목 필터 */}
+                <div className="px-3 py-2 border-b border-[#2d2640]">
+                  <div className="text-[11px] text-gray-500 mb-1.5">종목 필터</div>
+                  <div className="flex flex-wrap gap-1">
+                    {stockFilters.map((filter) => (
+                      <button
+                        key={filter.id}
+                        onClick={() => setSelectedStockFilter(filter.id)}
+                        className={`px-2 py-0.5 rounded text-[11px] transition-colors ${
+                          selectedStockFilter === filter.id
+                            ? 'bg-[#d64f79] text-white'
+                            : 'bg-[#2d2640] text-gray-400'
+                        }`}
+                      >
+                        {filter.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                {/* 정렬 옵션 */}
+                <div className="py-1">
+                  {sortOptions.map((option) => (
+                    <button
+                      key={option.id}
+                      onClick={() => {
+                        setSelectedSort(option.id)
+                        setShowSortDropdown(false)
+                      }}
+                      className={`w-full text-left px-3 py-2 text-xs transition-colors ${
+                        selectedSort === option.id
+                          ? 'bg-[#d64f79] text-white font-medium'
+                          : 'text-gray-300 hover:bg-[#2d2640]'
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -577,29 +739,35 @@ export function QuickSearchPage({
         {viewMode === 'summary' ? (
           // 요약 뷰
           <div className="divide-y divide-[#2d2640]">
-            {filteredETFs.map((etf) => (
+            {sortedETFs.map((etf) => (
               <div
                 key={etf.id}
-                className="flex items-center justify-between px-4 py-3 hover:bg-[#2d2640]/50 transition-colors"
+                className="flex items-center gap-3 px-4 py-3 hover:bg-[#2d2640]/50 transition-colors"
               >
+                {/* ETF 로고 */}
                 <button
                   onClick={() => onSelectETF(etf)}
-                  className="flex-1 text-left"
+                  className="shrink-0"
                 >
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#2d2640] text-gray-400 shrink-0">
-                      ETF
-                    </span>
-                    <span className="text-sm text-white truncate max-w-[180px]">{etf.shortName}</span>
-                  </div>
-                  <div className="flex items-center gap-3 mt-1">
-                    <span className="text-xs text-gray-500">{formatNumber(etf.price)}원</span>
-                    <span className={`text-xs ${etf.changePercent >= 0 ? 'text-up' : 'text-down'}`}>
+                  <ETFLogo shortName={etf.shortName} size="md" />
+                </button>
+
+                {/* 종목명 + 가격/수익률 (2줄) */}
+                <button
+                  onClick={() => onSelectETF(etf)}
+                  className="flex-1 min-w-0 text-left"
+                >
+                  <div className="text-[13px] text-white truncate">{etf.shortName}</div>
+                  <div className="flex items-center gap-1 mt-0.5">
+                    <span className="text-[11px] text-gray-400">{formatNumber(etf.price)}원</span>
+                    <span className={`text-[11px] ${etf.changePercent >= 0 ? 'text-up' : 'text-down'}`}>
                       {formatPercent(etf.changePercent)}
                     </span>
                   </div>
                 </button>
-                <div className="flex items-center gap-2">
+
+                {/* 아이콘 버튼들 */}
+                <div className="flex items-center gap-1.5 shrink-0">
                   <button
                     onClick={() => onAddToCompare(etf)}
                     className={`icon-btn-3d ${isInCompare(etf.id) ? 'icon-btn-3d-active' : ''}`}
@@ -626,30 +794,60 @@ export function QuickSearchPage({
                   <th className="text-left text-xs text-gray-400 font-medium px-4 py-2 w-40">종목</th>
                   {detailTab === 'basic' && (
                     <>
-                      <th className="text-right text-xs text-gray-400 font-medium px-2 py-2">현재가</th>
-                      <th className="text-right text-xs text-gray-400 font-medium px-2 py-2">등락률</th>
-                      <th className="text-right text-xs text-gray-400 font-medium px-2 py-2">iNAV</th>
-                      <th className="text-right text-xs text-gray-400 font-medium px-2 py-2">괴리율</th>
-                      <th className="text-right text-xs text-gray-400 font-medium px-2 py-2">거래량</th>
-                      <th className="text-right text-xs text-gray-400 font-medium px-2 py-2">거래대금</th>
+                      <th className="text-right text-xs text-gray-400 font-medium px-2 py-2 cursor-pointer hover:text-white" onClick={() => handleColumnSort('price')}>
+                        <span className="inline-flex items-center gap-0.5">현재가 {renderSortIcon('price')}</span>
+                      </th>
+                      <th className="text-right text-xs text-gray-400 font-medium px-2 py-2 cursor-pointer hover:text-white" onClick={() => handleColumnSort('change')}>
+                        <span className="inline-flex items-center gap-0.5">등락률 {renderSortIcon('change')}</span>
+                      </th>
+                      <th className="text-right text-xs text-gray-400 font-medium px-2 py-2 cursor-pointer hover:text-white" onClick={() => handleColumnSort('inav')}>
+                        <span className="inline-flex items-center gap-0.5">iNAV {renderSortIcon('inav')}</span>
+                      </th>
+                      <th className="text-right text-xs text-gray-400 font-medium px-2 py-2 cursor-pointer hover:text-white" onClick={() => handleColumnSort('discrepancy')}>
+                        <span className="inline-flex items-center gap-0.5">괴리율 {renderSortIcon('discrepancy')}</span>
+                      </th>
+                      <th className="text-right text-xs text-gray-400 font-medium px-2 py-2 cursor-pointer hover:text-white" onClick={() => handleColumnSort('volume')}>
+                        <span className="inline-flex items-center gap-0.5">거래량 {renderSortIcon('volume')}</span>
+                      </th>
+                      <th className="text-right text-xs text-gray-400 font-medium px-2 py-2 cursor-pointer hover:text-white" onClick={() => handleColumnSort('adtv')}>
+                        <span className="inline-flex items-center gap-0.5">거래대금 {renderSortIcon('adtv')}</span>
+                      </th>
                     </>
                   )}
                   {detailTab === 'returns' && (
                     <>
-                      {returnPeriods.map((period) => (
-                        <th key={period} className="text-right text-xs text-gray-400 font-medium px-2 py-2">
-                          {period}
-                        </th>
-                      ))}
+                      {returnPeriods.map((period) => {
+                        const colId = `return_${period}`
+                        return (
+                          <th
+                            key={period}
+                            className="text-right text-xs text-gray-400 font-medium px-2 py-2 cursor-pointer hover:text-white whitespace-nowrap"
+                            onClick={() => handleColumnSort(colId)}
+                          >
+                            <span className="inline-flex items-center gap-0.5">
+                              {period} {renderSortIcon(colId)}
+                            </span>
+                          </th>
+                        )
+                      })}
                     </>
                   )}
                   {detailTab === 'flow' && (
                     <>
-                      {flowPeriods.map((period) => (
-                        <th key={period} className="text-right text-xs text-gray-400 font-medium px-2 py-2">
-                          {period}
-                        </th>
-                      ))}
+                      {flowPeriods.map((period) => {
+                        const colId = `flow_${period}`
+                        return (
+                          <th
+                            key={period}
+                            className="text-right text-xs text-gray-400 font-medium px-2 py-2 cursor-pointer hover:text-white whitespace-nowrap"
+                            onClick={() => handleColumnSort(colId)}
+                          >
+                            <span className="inline-flex items-center gap-0.5">
+                              {period} {renderSortIcon(colId)}
+                            </span>
+                          </th>
+                        )
+                      })}
                     </>
                   )}
                   <th className="text-center text-xs text-gray-400 font-medium px-2 py-2">비교담기</th>
@@ -657,7 +855,7 @@ export function QuickSearchPage({
                 </tr>
               </thead>
               <tbody>
-                {filteredETFs.map((etf) => {
+                {sortedETFs.map((etf) => {
                   const returns = generateMockReturns(etf)
                   const flows = generateMockFlow(etf)
                   return (
@@ -701,16 +899,17 @@ export function QuickSearchPage({
                         <>
                           {returnPeriods.map((period) => {
                             const value = returns[period as keyof typeof returns]
-                            const numValue = parseFloat(String(value))
+                            const isNull = value === null
+                            const numValue = isNull ? 0 : value
                             return (
                               <td
                                 key={period}
                                 className={`text-right text-sm px-2 py-3 ${
-                                  value === '-' ? 'text-gray-500' :
+                                  isNull ? 'text-gray-500' :
                                   numValue >= 0 ? 'text-up' : 'text-down'
                                 }`}
                               >
-                                {value === '-' ? '-' : `${numValue >= 0 ? '+' : ''}${value}%`}
+                                {isNull ? '-' : `${numValue >= 0 ? '+' : ''}${numValue.toFixed(2)}%`}
                               </td>
                             )
                           })}
@@ -816,61 +1015,6 @@ export function QuickSearchPage({
         </DialogContent>
       </Dialog>
 
-      {/* 필터 모달 */}
-      <Dialog open={showFilterModal} onOpenChange={setShowFilterModal}>
-        <DialogContent className="bg-[#1f1a2e] border-[#2d2640] max-w-sm">
-          <DialogHeader>
-            <DialogTitle className="text-white">정렬기준 선택</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-2">
-            {/* 종목 필터 기준 */}
-            <div>
-              <h3 className="text-sm text-gray-400 mb-2">종목 필터 기준</h3>
-              <div className="flex flex-wrap gap-2">
-                {stockFilters.map((filter) => (
-                  <button
-                    key={filter.id}
-                    onClick={() => setSelectedStockFilter(filter.id)}
-                    className={`px-3 py-1.5 rounded-full text-sm transition-colors ${
-                      selectedStockFilter === filter.id
-                        ? 'bg-[#d64f79] text-white'
-                        : 'bg-[#2d2640] text-gray-400'
-                    }`}
-                  >
-                    {filter.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* 결과 정렬 기준 */}
-            <div>
-              <h3 className="text-sm text-gray-400 mb-2">결과 정렬 기준</h3>
-              <div className="space-y-2">
-                {sortOptions.map((option) => (
-                  <button
-                    key={option.id}
-                    onClick={() => setSelectedSort(option.id)}
-                    className={`w-full px-4 py-3 rounded-lg text-sm text-left transition-colors ${
-                      selectedSort === option.id
-                        ? 'bg-[#d64f79] text-white'
-                        : 'bg-[#2d2640] text-gray-400 hover:text-white'
-                    }`}
-                  >
-                    {option.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-          <button
-            onClick={() => setShowFilterModal(false)}
-            className="w-full py-3 mt-4 rounded-xl bg-[#d64f79] text-white font-medium"
-          >
-            확인
-          </button>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }

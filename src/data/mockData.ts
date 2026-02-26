@@ -288,7 +288,7 @@ export const mockETFs: ETF[] = [
     issuer: '삼성자산운용', listedDate: '2012/02/22', indexProvider: 'KIS', assetClass: '채권', marketClass: '국내',
   },
   {
-    id: '10', ticker: '138230', name: 'KOSEF 미국달러선물', shortName: 'KOSEF 미국달러선물',
+    id: '10', ticker: '138230', name: 'KIWOOM 미국달러선물', shortName: 'KIWOOM 미국달러선물',
     price: 13250, prevClose: 13180, change: 70, changePercent: 0.53,
     iNav: 13245, discrepancy: 0.04, ter: 0.25, spread: 0.05,
     adtv: 78000000000, aum: 450000000000, trackingError: 0.06, volatility: 8.5, dividendYield: 0,
@@ -1835,3 +1835,69 @@ export const getAccountTypesForETF = (etfId: string): string[] => {
 
   return accountTypes
 }
+
+// ETF 데이터 보강: componentCount, top10Concentration, returns 추가
+function enrichETFData(etfs: ETF[]): ETF[] {
+  return etfs.map(etf => {
+    // 이미 데이터가 있으면 그대로 반환
+    if (etf.componentCount !== undefined && etf.top10Concentration !== undefined && etf.returns !== undefined) {
+      return etf
+    }
+
+    // 시드 기반 랜덤 (id 기반으로 일관된 값 생성)
+    const seed = parseInt(etf.id.replace(/\D/g, '') || '0', 10)
+    const random = (min: number, max: number) => {
+      const x = Math.sin(seed * 9999) * 10000
+      return min + (x - Math.floor(x)) * (max - min)
+    }
+
+    // 자산 클래스별 기본 범위 설정
+    let componentCountRange = [30, 200]
+    let top10Range = [30, 70]
+
+    if (etf.category.includes('채권') || etf.assetClass === '채권') {
+      componentCountRange = [50, 500]
+      top10Range = [15, 40]
+    } else if (etf.category.includes('배당')) {
+      componentCountRange = [30, 100]
+      top10Range = [35, 65]
+    } else if (etf.isLeveraged || etf.isInverse) {
+      componentCountRange = [1, 30]
+      top10Range = [70, 100]
+    } else if (etf.category.includes('글로벌') || etf.tags.includes('S&P500')) {
+      componentCountRange = [100, 500]
+      top10Range = [20, 35]
+    } else if (etf.category.includes('시장대표')) {
+      componentCountRange = [150, 300]
+      top10Range = [25, 45]
+    }
+
+    const componentCount = etf.componentCount ?? Math.round(random(componentCountRange[0], componentCountRange[1]))
+    const top10Concentration = etf.top10Concentration ?? Math.round(random(top10Range[0], top10Range[1]) * 10) / 10
+
+    // 수익률 데이터 생성 (changePercent 기반)
+    const baseReturn = etf.changePercent
+    const returns: ETFReturns = etf.returns ?? {
+      '1m': Math.round((baseReturn + random(-2, 2)) * 100) / 100,
+      '3m': Math.round((baseReturn * 2.5 + random(-5, 5)) * 100) / 100,
+      'ytd': Math.round((baseReturn * 4 + random(-10, 10)) * 100) / 100,
+      '1y': Math.round((baseReturn * 8 + random(-15, 15)) * 100) / 100,
+      '3y': Math.round((baseReturn * 20 + random(-30, 30)) * 100) / 100,
+      '5y': Math.round((baseReturn * 35 + random(-50, 50)) * 100) / 100,
+    }
+
+    return {
+      ...etf,
+      componentCount,
+      top10Concentration,
+      returns
+    }
+  })
+}
+
+// mockETFs 데이터 보강 적용
+const enrichedMockETFs = enrichETFData(mockETFs)
+
+// 보강된 데이터로 교체 (기존 mockETFs를 수정)
+mockETFs.length = 0
+mockETFs.push(...enrichedMockETFs)

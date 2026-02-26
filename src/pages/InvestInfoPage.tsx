@@ -736,7 +736,7 @@ function GlossaryMiniCard({
         </span>
       )}
       {/* 한글 설명 */}
-      <span className="text-[10px] text-gray-500 text-center line-clamp-2">
+      <span className="text-[11px] text-gray-500 text-center line-clamp-2">
         {description}
       </span>
     </button>

@@ -1,11 +1,58 @@
 import { useState, useEffect, useMemo } from 'react'
-import { Search, ChevronDown, X, Filter, ShoppingCart, Star, Smartphone } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { ETFCard } from '@/components/ETFCard'
+import { Search, ChevronDown, ChevronUp, X, Filter, ShoppingCart, Star, Smartphone } from 'lucide-react'
 import { mockETFs } from '@/data/mockData'
 import type { ETF } from '@/data/mockData'
 import { ScreeningSheet, applyFilters, defaultFilters, type ScreeningFilters } from '@/components/ScreeningSheet'
 import { formatNumber, formatPercent } from '@/lib/utils'
+import { ETFLogo } from '@/components/ETFLogo'
+
+// 상세 뷰 탭
+const detailTabs = [
+  { id: 'basic', label: '기본정보' },
+  { id: 'returns', label: '수익률' },
+  { id: 'flow', label: '자금유입' },
+]
+
+
+// 수익률/자금유입 기간
+const returnPeriods = ['1일', '1주', '1개월', '3개월', '6개월', 'YTD', '1년', '3년', '5년', '10년']
+const flowPeriods = ['전일', '1주', '1개월', '3개월', '6개월', '1년', 'YTD']
+
+// 시드 기반 랜덤 함수 (ETF id 기반으로 일관된 값 생성)
+const seededRandom = (seed: number, index: number) => {
+  const x = Math.sin(seed * 9999 + index * 1000) * 10000
+  return x - Math.floor(x)
+}
+
+// Mock data for returns and flows
+const generateMockReturns = (etf: ETF) => {
+  const seed = parseInt(etf.id.replace(/\D/g, '') || '0', 10)
+  return {
+    '1일': etf.changePercent,
+    '1주': parseFloat((seededRandom(seed, 1) * 10 - 5).toFixed(2)),
+    '1개월': parseFloat((seededRandom(seed, 2) * 20 - 10).toFixed(2)),
+    '3개월': parseFloat((seededRandom(seed, 3) * 30 - 15).toFixed(2)),
+    '6개월': parseFloat((seededRandom(seed, 4) * 50 - 25).toFixed(2)),
+    'YTD': parseFloat((seededRandom(seed, 5) * 40 - 20).toFixed(2)),
+    '1년': parseFloat((seededRandom(seed, 6) * 60 - 30).toFixed(2)),
+    '3년': null as number | null,
+    '5년': null as number | null,
+    '10년': null as number | null,
+  }
+}
+
+const generateMockFlow = (etf: ETF) => {
+  const seed = parseInt(etf.id.replace(/\D/g, '') || '0', 10)
+  return {
+    '전일': Math.round((seededRandom(seed, 10) * 200 - 100) * 10) / 10,
+    '1주': Math.round((seededRandom(seed, 11) * 500 - 250) * 10) / 10,
+    '1개월': Math.round((seededRandom(seed, 12) * 2000 - 1000) * 10) / 10,
+    '3개월': Math.round((seededRandom(seed, 13) * 5000 - 2500) * 10) / 10,
+    '6개월': Math.round((seededRandom(seed, 14) * 10000 - 5000) * 10) / 10,
+    '1년': Math.round((seededRandom(seed, 15) * 20000 - 10000) * 10) / 10,
+    'YTD': Math.round((seededRandom(seed, 16) * 15000 - 7500) * 10) / 10,
+  }
+}
 
 // 필터 칩 컴포넌트
 function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }) {
@@ -24,6 +71,7 @@ interface DiscoverPageProps {
   accountType?: string
   selectedTheme?: string
   onLongPressETF?: (etf: ETF) => void
+  onGoToCompare?: (etfs: ETF[]) => void
 }
 
 const INITIAL_DISPLAY_COUNT = 10
@@ -32,11 +80,13 @@ export function DiscoverPage({
   onSelectETF,
   accountType = 'general',
   selectedTheme: externalTheme = 'all',
-  onLongPressETF
+  onLongPressETF: _onLongPressETF,
+  onGoToCompare
 }: DiscoverPageProps) {
   const [internalTheme, setInternalTheme] = useState<string>(externalTheme)
   const [sortBy, setSortBy] = useState<string>('return')
-  const [mode, setMode] = useState<string>('table') // 기본값: 테이블 뷰
+  const [viewMode, setViewMode] = useState<'summary' | 'detail'>('summary') // 요약/상세 뷰
+  const [detailTab, setDetailTab] = useState<string>('basic') // 상세 뷰 탭
   const [searchQuery, setSearchQuery] = useState<string>('')
   const [showAll, setShowAll] = useState<boolean>(false)
   const [isScreeningOpen, setIsScreeningOpen] = useState<boolean>(false)
@@ -63,6 +113,8 @@ export function DiscoverPage({
     }
   }, [])
   const [showSortDropdown, setShowSortDropdown] = useState<boolean>(false)
+  // 테이블 헤더 클릭 정렬 상태
+  const [columnSort, setColumnSort] = useState<{ column: string; direction: 'asc' | 'desc' } | null>(null)
 
   // 비교 ETFs (임시 상태)
   const [compareETFs, setCompareETFs] = useState<ETF[]>([])
@@ -86,6 +138,26 @@ export function DiscoverPage({
   }
 
   const isInCompare = (etfId: string) => compareETFs.some(e => e.id === etfId)
+
+  // 테이블 헤더 클릭 정렬 핸들러
+  const handleColumnSort = (column: string) => {
+    setColumnSort(prev => {
+      if (prev?.column === column) {
+        return { column, direction: prev.direction === 'asc' ? 'desc' : 'asc' }
+      }
+      return { column, direction: 'desc' }
+    })
+  }
+
+  // 정렬 아이콘 렌더링
+  const renderSortIcon = (column: string) => {
+    if (columnSort?.column !== column) {
+      return <ChevronDown className="h-3 w-3 opacity-30" />
+    }
+    return columnSort.direction === 'asc'
+      ? <ChevronUp className="h-3 w-3 text-[#d64f79]" />
+      : <ChevronDown className="h-3 w-3 text-[#d64f79]" />
+  }
 
   // 외부 테마 변경 시 내부 상태 동기화
   useEffect(() => {
@@ -163,16 +235,64 @@ export function DiscoverPage({
     return Math.round(etf.aum / 100000000)
   }
 
-  const sortedETFs = [...filteredETFs].sort((a, b) => {
-    switch (sortBy) {
-      case 'health': return b.healthScore - a.healthScore
-      case 'ter': return a.ter - b.ter
-      case 'liquidity': return b.adtv - a.adtv
-      case 'return': return b.changePercent - a.changePercent
-      case 'holders': return getHoldersCount(b) - getHoldersCount(a)
-      default: return 0
+  const sortedETFs = useMemo(() => {
+    let sorted = [...filteredETFs].sort((a, b) => {
+      switch (sortBy) {
+        case 'health': return b.healthScore - a.healthScore
+        case 'ter': return a.ter - b.ter
+        case 'liquidity': return b.adtv - a.adtv
+        case 'return': return b.changePercent - a.changePercent
+        case 'holders': return getHoldersCount(b) - getHoldersCount(a)
+        default: return 0
+      }
+    })
+
+    // 테이블 헤더 클릭 정렬 적용
+    if (columnSort) {
+      const { column, direction } = columnSort
+      const multiplier = direction === 'asc' ? 1 : -1
+      sorted = sorted.sort((a, b) => {
+        let aVal: number, bVal: number
+
+        // 수익률 컬럼 정렬 (return_1일, return_1주, ...)
+        if (column.startsWith('return_')) {
+          const period = column.replace('return_', '') as keyof ReturnType<typeof generateMockReturns>
+          const aReturns = generateMockReturns(a)
+          const bReturns = generateMockReturns(b)
+          aVal = aReturns[period] ?? -999
+          bVal = bReturns[period] ?? -999
+          return (aVal - bVal) * multiplier
+        }
+
+        // 자금유입 컬럼 정렬 (flow_전일, flow_1주, ...)
+        if (column.startsWith('flow_')) {
+          const period = column.replace('flow_', '') as keyof ReturnType<typeof generateMockFlow>
+          const aFlows = generateMockFlow(a)
+          const bFlows = generateMockFlow(b)
+          aVal = aFlows[period]
+          bVal = bFlows[period]
+          return (aVal - bVal) * multiplier
+        }
+
+        switch (column) {
+          case 'price': aVal = a.price; bVal = b.price; break
+          case 'change': aVal = a.changePercent; bVal = b.changePercent; break
+          case 'ter': aVal = a.ter; bVal = b.ter; break
+          case 'discrepancy': aVal = Math.abs(a.discrepancy); bVal = Math.abs(b.discrepancy); break
+          case 'adtv': aVal = a.adtv; bVal = b.adtv; break
+          case 'aum': aVal = a.aum; bVal = b.aum; break
+          case 'dividend': aVal = a.dividendYield; bVal = b.dividendYield; break
+          case 'volume': aVal = a.adtv / a.price; bVal = b.adtv / b.price; break
+          case 'inav': aVal = a.iNav; bVal = b.iNav; break
+          case 'health': aVal = a.healthScore; bVal = b.healthScore; break
+          default: return 0
+        }
+        return (aVal - bVal) * multiplier
+      })
     }
-  })
+
+    return sorted
+  }, [filteredETFs, sortBy, columnSort])
 
   const isFiltering = searchQuery.trim() !== '' || (selectedTheme !== 'all' && selectedTheme !== 'none')
   const displayedETFs = (showAll || isFiltering) ? sortedETFs : sortedETFs.slice(0, INITIAL_DISPLAY_COUNT)
@@ -196,10 +316,11 @@ export function DiscoverPage({
           <button
             onClick={() => setIsScreeningOpen(true)}
             className={`icon-btn-3d relative ${isScreeningActive ? 'icon-btn-3d-active' : ''}`}
+            data-tour="screening-filter"
           >
             <Filter className="h-4 w-4" />
             {screeningFilterCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#d64f79] text-white text-[10px] rounded-full flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#d64f79] text-white text-[11px] rounded-full flex items-center justify-center">
                 {screeningFilterCount}
               </span>
             )}
@@ -245,6 +366,54 @@ export function DiscoverPage({
                 onRemove={() => setScreeningFilters(prev => ({ ...prev, aum: defaultFilters.aum }))}
               />
             )}
+            {(screeningFilters.adtv[0] !== defaultFilters.adtv[0] || screeningFilters.adtv[1] !== defaultFilters.adtv[1]) && (
+              <FilterChip
+                label={`거래대금 ${screeningFilters.adtv[0]}~${screeningFilters.adtv[1]}억`}
+                onRemove={() => setScreeningFilters(prev => ({ ...prev, adtv: defaultFilters.adtv }))}
+              />
+            )}
+            {(screeningFilters.discrepancy[0] !== defaultFilters.discrepancy[0] || screeningFilters.discrepancy[1] !== defaultFilters.discrepancy[1]) && (
+              <FilterChip
+                label={`괴리율 ${screeningFilters.discrepancy[0]}~${screeningFilters.discrepancy[1]}%`}
+                onRemove={() => setScreeningFilters(prev => ({ ...prev, discrepancy: defaultFilters.discrepancy }))}
+              />
+            )}
+            {(screeningFilters.trackingError[0] !== defaultFilters.trackingError[0] || screeningFilters.trackingError[1] !== defaultFilters.trackingError[1]) && (
+              <FilterChip
+                label={`추적오차 ${screeningFilters.trackingError[0]}~${screeningFilters.trackingError[1]}%`}
+                onRemove={() => setScreeningFilters(prev => ({ ...prev, trackingError: defaultFilters.trackingError }))}
+              />
+            )}
+            {(screeningFilters.return1m[0] !== defaultFilters.return1m[0] || screeningFilters.return1m[1] !== defaultFilters.return1m[1]) && (
+              <FilterChip
+                label={`1개월 ${screeningFilters.return1m[0]}~${screeningFilters.return1m[1]}%`}
+                onRemove={() => setScreeningFilters(prev => ({ ...prev, return1m: defaultFilters.return1m }))}
+              />
+            )}
+            {(screeningFilters.return3m[0] !== defaultFilters.return3m[0] || screeningFilters.return3m[1] !== defaultFilters.return3m[1]) && (
+              <FilterChip
+                label={`3개월 ${screeningFilters.return3m[0]}~${screeningFilters.return3m[1]}%`}
+                onRemove={() => setScreeningFilters(prev => ({ ...prev, return3m: defaultFilters.return3m }))}
+              />
+            )}
+            {(screeningFilters.returnYtd[0] !== defaultFilters.returnYtd[0] || screeningFilters.returnYtd[1] !== defaultFilters.returnYtd[1]) && (
+              <FilterChip
+                label={`연초대비 ${screeningFilters.returnYtd[0]}~${screeningFilters.returnYtd[1]}%`}
+                onRemove={() => setScreeningFilters(prev => ({ ...prev, returnYtd: defaultFilters.returnYtd }))}
+              />
+            )}
+            {(screeningFilters.return1y[0] !== defaultFilters.return1y[0] || screeningFilters.return1y[1] !== defaultFilters.return1y[1]) && (
+              <FilterChip
+                label={`1년 ${screeningFilters.return1y[0]}~${screeningFilters.return1y[1]}%`}
+                onRemove={() => setScreeningFilters(prev => ({ ...prev, return1y: defaultFilters.return1y }))}
+              />
+            )}
+            {(screeningFilters.volatility[0] !== defaultFilters.volatility[0] || screeningFilters.volatility[1] !== defaultFilters.volatility[1]) && (
+              <FilterChip
+                label={`변동성 ${screeningFilters.volatility[0]}~${screeningFilters.volatility[1]}%`}
+                onRemove={() => setScreeningFilters(prev => ({ ...prev, volatility: defaultFilters.volatility }))}
+              />
+            )}
             {(screeningFilters.healthScore[0] !== defaultFilters.healthScore[0] || screeningFilters.healthScore[1] !== defaultFilters.healthScore[1]) && (
               <FilterChip
                 label={`건전성 ${screeningFilters.healthScore[0]}~${screeningFilters.healthScore[1]}점`}
@@ -263,6 +432,30 @@ export function DiscoverPage({
                 onRemove={() => setScreeningFilters(prev => ({ ...prev, dividendFrequency: [] }))}
               />
             )}
+            {(screeningFilters.componentCount[0] !== defaultFilters.componentCount[0] || screeningFilters.componentCount[1] !== defaultFilters.componentCount[1]) && (
+              <FilterChip
+                label={`종목수 ${screeningFilters.componentCount[0]}~${screeningFilters.componentCount[1]}개`}
+                onRemove={() => setScreeningFilters(prev => ({ ...prev, componentCount: defaultFilters.componentCount }))}
+              />
+            )}
+            {(screeningFilters.top10Concentration[0] !== defaultFilters.top10Concentration[0] || screeningFilters.top10Concentration[1] !== defaultFilters.top10Concentration[1]) && (
+              <FilterChip
+                label={`상위10 ${screeningFilters.top10Concentration[0]}~${screeningFilters.top10Concentration[1]}%`}
+                onRemove={() => setScreeningFilters(prev => ({ ...prev, top10Concentration: defaultFilters.top10Concentration }))}
+              />
+            )}
+            {(screeningFilters.hedgeType !== 'all') && (
+              <FilterChip
+                label={screeningFilters.hedgeType === 'hedged' ? '환헤지' : '환노출'}
+                onRemove={() => setScreeningFilters(prev => ({ ...prev, hedgeType: 'all' }))}
+              />
+            )}
+            {(screeningFilters.listingPeriod !== 'all') && (
+              <FilterChip
+                label={`상장${screeningFilters.listingPeriod === '1y' ? '1년↑' : screeningFilters.listingPeriod === '3y' ? '3년↑' : '5년↑'}`}
+                onRemove={() => setScreeningFilters(prev => ({ ...prev, listingPeriod: 'all' }))}
+              />
+            )}
             <button
               onClick={() => setScreeningFilters(defaultFilters)}
               className="shrink-0 px-2 py-1 text-xs text-gray-400 hover:text-white transition-colors"
@@ -274,29 +467,29 @@ export function DiscoverPage({
       </div>
 
       {/* 통합 컨트롤 바: 결과수 + 뷰모드 + 정렬 + 가로보기 */}
-      <div className="px-4 py-3 flex items-center justify-between" data-tour="mode-tabs">
+      <div className="px-4 py-3 flex items-center justify-between" data-tour="screening-sort">
         {/* 왼쪽: 결과 카운트 */}
         <div className="text-sm text-gray-400 font-medium">{sortedETFs.length}개 ETF</div>
 
         {/* 오른쪽: 컨트롤 그룹 */}
         <div className="flex items-center gap-2" data-tour="sort-options">
-          {/* 뷰 모드 토글 */}
-          <div className="flex bg-[#2d2640] rounded-lg p-0.5">
+          {/* 요약/상세 뷰 모드 토글 */}
+          <div className="flex bg-[#2d2640] rounded-lg p-0.5" data-tour="screening-view">
             <button
-              onClick={() => setMode('table')}
+              onClick={() => setViewMode('summary')}
               className={`px-2.5 py-1 rounded text-xs transition-colors ${
-                mode === 'table' ? 'bg-[#d64f79] text-white' : 'text-gray-400'
+                viewMode === 'summary' ? 'bg-[#d64f79] text-white' : 'text-gray-400'
               }`}
             >
-              테이블
+              요약
             </button>
             <button
-              onClick={() => setMode('card')}
+              onClick={() => setViewMode('detail')}
               className={`px-2.5 py-1 rounded text-xs transition-colors ${
-                mode === 'card' ? 'bg-[#d64f79] text-white' : 'text-gray-400'
+                viewMode === 'detail' ? 'bg-[#d64f79] text-white' : 'text-gray-400'
               }`}
             >
-              카드
+              상세
             </button>
           </div>
 
@@ -353,69 +546,251 @@ export function DiscoverPage({
         </div>
       </div>
 
-      {/* 테이블 뷰 */}
-      {mode === 'table' && (
+      {/* 상세 뷰 탭 (상세 모드일 때만) */}
+      {viewMode === 'detail' && (
+        <div className="flex gap-4 px-4 pb-2 border-b border-[#2d2640]">
+          {detailTabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setDetailTab(tab.id)}
+              className={`text-sm pb-2 transition-colors ${
+                detailTab === tab.id
+                  ? 'text-[#d64f79] border-b-2 border-[#d64f79] font-medium'
+                  : 'text-gray-500'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* 요약 뷰 */}
+      {viewMode === 'summary' && (
+        <div className="divide-y divide-[#2d2640]">
+          {displayedETFs.map((etf) => (
+            <div
+              key={etf.id}
+              className="flex items-center gap-3 px-4 py-3 hover:bg-[#2d2640]/50 transition-colors"
+            >
+              {/* ETF 로고 */}
+              <button
+                onClick={() => onSelectETF(etf)}
+                className="shrink-0"
+              >
+                <ETFLogo shortName={etf.shortName} size="md" />
+              </button>
+
+              {/* 종목명 + 가격/수익률 (2줄) */}
+              <button
+                onClick={() => onSelectETF(etf)}
+                className="flex-1 min-w-0 text-left"
+              >
+                <div className="text-[13px] text-white truncate">{etf.shortName}</div>
+                <div className="flex items-center gap-1 mt-0.5">
+                  <span className="text-[11px] text-gray-400">{formatNumber(etf.price)}원</span>
+                  <span className={`text-[11px] ${etf.changePercent >= 0 ? 'text-up' : 'text-down'}`}>
+                    {formatPercent(etf.changePercent)}
+                  </span>
+                </div>
+              </button>
+
+              {/* 아이콘 버튼들 */}
+              <div className="flex items-center gap-1.5 shrink-0">
+                <button
+                  onClick={() => toggleCompare(etf)}
+                  className={`icon-btn-3d ${isInCompare(etf.id) ? 'icon-btn-3d-active' : ''}`}
+                >
+                  <ShoppingCart className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => toggleFavorite(etf.id)}
+                  className={`icon-btn-3d ${favorites.includes(etf.id) ? 'icon-btn-3d-active' : ''}`}
+                >
+                  <Star className={`h-4 w-4 ${favorites.includes(etf.id) ? 'fill-current' : ''}`} />
+                </button>
+              </div>
+            </div>
+          ))}
+          {hasMoreETFs && !showAll && (
+            <button onClick={() => setShowAll(true)} className="w-full py-3 flex items-center justify-center gap-2 bg-[#2d2640] hover:bg-[#3d3650] text-sm text-gray-300 transition-colors">
+              <span>더보기 ({sortedETFs.length - INITIAL_DISPLAY_COUNT}개 더)</span>
+              <ChevronDown className="h-4 w-4" />
+            </button>
+          )}
+          {showAll && hasMoreETFs && (
+            <button onClick={() => setShowAll(false)} className="w-full py-3 flex items-center justify-center gap-2 bg-[#2d2640] hover:bg-[#3d3650] text-sm text-gray-300 transition-colors">
+              <span>접기</span>
+              <ChevronDown className="h-4 w-4 rotate-180" />
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* 상세 뷰 - 테이블 형식 */}
+      {viewMode === 'detail' && (
         <div className="px-4">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[600px]">
-              <thead className="bg-[#2d2640] sticky top-0">
+              <thead className="bg-[#2d2640] sticky top-0" data-tour="column-sort">
                 <tr>
-                  <th className="text-left text-xs text-gray-400 font-medium px-3 py-2 min-w-[120px]">종목</th>
-                  <th className="text-right text-xs text-gray-400 font-medium px-2 py-2 whitespace-nowrap">현재가</th>
-                  <th className="text-right text-xs text-gray-400 font-medium px-2 py-2 whitespace-nowrap">등락률</th>
-                  <th className="text-right text-xs text-gray-400 font-medium px-2 py-2 whitespace-nowrap">TER</th>
-                  <th className="text-right text-xs text-gray-400 font-medium px-2 py-2 whitespace-nowrap">괴리율</th>
-                  <th className="text-right text-xs text-gray-400 font-medium px-2 py-2 whitespace-nowrap">거래대금</th>
+                  <th className="text-left text-xs text-gray-400 font-medium px-3 py-2 w-40">종목</th>
+                  {detailTab === 'basic' && (
+                    <>
+                      <th className="text-right text-xs text-gray-400 font-medium px-2 py-2 whitespace-nowrap cursor-pointer hover:text-white" onClick={() => handleColumnSort('price')}>
+                        <span className="inline-flex items-center gap-0.5">현재가 {renderSortIcon('price')}</span>
+                      </th>
+                      <th className="text-right text-xs text-gray-400 font-medium px-2 py-2 whitespace-nowrap cursor-pointer hover:text-white" onClick={() => handleColumnSort('change')}>
+                        <span className="inline-flex items-center gap-0.5">등락률 {renderSortIcon('change')}</span>
+                      </th>
+                      <th className="text-right text-xs text-gray-400 font-medium px-2 py-2 whitespace-nowrap cursor-pointer hover:text-white" onClick={() => handleColumnSort('inav')}>
+                        <span className="inline-flex items-center gap-0.5">iNAV {renderSortIcon('inav')}</span>
+                      </th>
+                      <th className="text-right text-xs text-gray-400 font-medium px-2 py-2 whitespace-nowrap cursor-pointer hover:text-white" onClick={() => handleColumnSort('discrepancy')}>
+                        <span className="inline-flex items-center gap-0.5">괴리율 {renderSortIcon('discrepancy')}</span>
+                      </th>
+                      <th className="text-right text-xs text-gray-400 font-medium px-2 py-2 whitespace-nowrap cursor-pointer hover:text-white" onClick={() => handleColumnSort('volume')}>
+                        <span className="inline-flex items-center gap-0.5">거래량 {renderSortIcon('volume')}</span>
+                      </th>
+                      <th className="text-right text-xs text-gray-400 font-medium px-2 py-2 whitespace-nowrap cursor-pointer hover:text-white" onClick={() => handleColumnSort('adtv')}>
+                        <span className="inline-flex items-center gap-0.5">거래대금 {renderSortIcon('adtv')}</span>
+                      </th>
+                    </>
+                  )}
+                  {detailTab === 'returns' && (
+                    <>
+                      {returnPeriods.map((period) => {
+                        const colId = `return_${period}`
+                        return (
+                          <th
+                            key={period}
+                            className="text-right text-xs text-gray-400 font-medium px-2 py-2 cursor-pointer hover:text-white whitespace-nowrap"
+                            onClick={() => handleColumnSort(colId)}
+                          >
+                            <span className="inline-flex items-center gap-0.5">
+                              {period} {renderSortIcon(colId)}
+                            </span>
+                          </th>
+                        )
+                      })}
+                    </>
+                  )}
+                  {detailTab === 'flow' && (
+                    <>
+                      {flowPeriods.map((period) => {
+                        const colId = `flow_${period}`
+                        return (
+                          <th
+                            key={period}
+                            className="text-right text-xs text-gray-400 font-medium px-2 py-2 cursor-pointer hover:text-white whitespace-nowrap"
+                            onClick={() => handleColumnSort(colId)}
+                          >
+                            <span className="inline-flex items-center gap-0.5">
+                              {period} {renderSortIcon(colId)}
+                            </span>
+                          </th>
+                        )
+                      })}
+                    </>
+                  )}
                   <th className="text-center text-xs text-gray-400 font-medium px-2 py-2">비교</th>
                   <th className="text-center text-xs text-gray-400 font-medium px-2 py-2">관심</th>
                 </tr>
               </thead>
               <tbody>
-                {displayedETFs.map((etf) => (
-                  <tr
-                    key={etf.id}
-                    className="border-b border-[#2d2640] hover:bg-[#2d2640]/30 transition-colors cursor-pointer"
-                    onClick={() => onSelectETF(etf)}
-                  >
-                    <td className="px-3 py-3">
-                      <div className="marquee-wrapper max-w-[120px]">
-                        <span className="marquee-text text-sm text-white">{etf.shortName}</span>
-                      </div>
-                      <div className="text-xs text-gray-500">{etf.ticker}</div>
-                    </td>
-                    <td className="text-right text-sm text-white px-2 py-3 whitespace-nowrap">
-                      {formatNumber(etf.price)}
-                    </td>
-                    <td className={`text-right text-sm px-2 py-3 whitespace-nowrap ${etf.changePercent >= 0 ? 'text-up' : 'text-down'}`}>
-                      {formatPercent(etf.changePercent)}
-                    </td>
-                    <td className={`text-right text-sm px-2 py-3 whitespace-nowrap ${etf.ter <= 0.05 ? 'text-emerald-400' : etf.ter <= 0.1 ? 'text-amber-400' : 'text-white'}`}>
-                      {etf.ter.toFixed(2)}%
-                    </td>
-                    <td className={`text-right text-sm px-2 py-3 whitespace-nowrap ${Math.abs(etf.discrepancy) > 0.1 ? 'text-yellow-400' : 'text-white'}`}>
-                      {etf.discrepancy.toFixed(2)}%
-                    </td>
-                    <td className="text-right text-sm text-white px-2 py-3 whitespace-nowrap">
-                      {(etf.adtv / 100000000).toFixed(0)}억
-                    </td>
-                    <td className="text-center px-2 py-3" onClick={(e) => e.stopPropagation()}>
-                      <button
-                        onClick={() => toggleCompare(etf)}
-                        className={`icon-btn-3d ${isInCompare(etf.id) ? 'icon-btn-3d-active' : ''}`}
-                      >
-                        <ShoppingCart className="h-4 w-4" />
-                      </button>
-                    </td>
-                    <td className="text-center px-2 py-3" onClick={(e) => e.stopPropagation()}>
-                      <button
-                        onClick={() => toggleFavorite(etf.id)}
-                        className={`icon-btn-3d ${favorites.includes(etf.id) ? 'icon-btn-3d-active' : ''}`}
-                      >
-                        <Star className={`h-4 w-4 ${favorites.includes(etf.id) ? 'fill-current' : ''}`} />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {displayedETFs.map((etf) => {
+                  const returns = generateMockReturns(etf)
+                  const flows = generateMockFlow(etf)
+                  return (
+                    <tr
+                      key={etf.id}
+                      className="border-b border-[#2d2640] hover:bg-[#2d2640]/30 transition-colors cursor-pointer"
+                      onClick={() => onSelectETF(etf)}
+                    >
+                      <td className="px-3 py-3">
+                        <div className="marquee-wrapper max-w-[140px]">
+                          <span className="marquee-text text-sm text-white">{etf.shortName}</span>
+                        </div>
+                        <div className="text-xs text-gray-500">{etf.ticker}</div>
+                      </td>
+                      {detailTab === 'basic' && (
+                        <>
+                          <td className="text-right text-sm text-white px-2 py-3 whitespace-nowrap">
+                            {formatNumber(etf.price)}원
+                          </td>
+                          <td className={`text-right text-sm px-2 py-3 whitespace-nowrap ${etf.changePercent >= 0 ? 'text-up' : 'text-down'}`}>
+                            {formatPercent(etf.changePercent)}
+                          </td>
+                          <td className="text-right text-sm text-white px-2 py-3 whitespace-nowrap">
+                            {formatNumber(etf.iNav)}
+                          </td>
+                          <td className={`text-right text-sm px-2 py-3 whitespace-nowrap ${Math.abs(etf.discrepancy) > 0.1 ? 'text-yellow-400' : 'text-white'}`}>
+                            {etf.discrepancy.toFixed(2)}%
+                          </td>
+                          <td className="text-right text-sm text-white px-2 py-3 whitespace-nowrap">
+                            {Math.floor(etf.adtv / etf.price / 1000).toLocaleString()}천주
+                          </td>
+                          <td className="text-right text-sm text-white px-2 py-3 whitespace-nowrap">
+                            {(etf.adtv / 100000000).toFixed(0)}억
+                          </td>
+                        </>
+                      )}
+                      {detailTab === 'returns' && (
+                        <>
+                          {returnPeriods.map((period) => {
+                            const value = returns[period as keyof typeof returns]
+                            const isNull = value === null
+                            const numValue = isNull ? 0 : value
+                            return (
+                              <td
+                                key={period}
+                                className={`text-right text-sm px-2 py-3 whitespace-nowrap ${
+                                  isNull ? 'text-gray-500' :
+                                  numValue >= 0 ? 'text-up' : 'text-down'
+                                }`}
+                              >
+                                {isNull ? '-' : `${numValue >= 0 ? '+' : ''}${numValue.toFixed(2)}%`}
+                              </td>
+                            )
+                          })}
+                        </>
+                      )}
+                      {detailTab === 'flow' && (
+                        <>
+                          {flowPeriods.map((period) => {
+                            const value = flows[period as keyof typeof flows]
+                            return (
+                              <td
+                                key={period}
+                                className={`text-right text-sm px-2 py-3 whitespace-nowrap ${
+                                  value >= 0 ? 'text-up' : 'text-down'
+                                }`}
+                              >
+                                {value >= 0 ? '+' : ''}{value}억
+                              </td>
+                            )
+                          })}
+                        </>
+                      )}
+                      <td className="text-center px-2 py-3" onClick={(e) => e.stopPropagation()}>
+                        <button
+                          onClick={() => toggleCompare(etf)}
+                          className={`icon-btn-3d ${isInCompare(etf.id) ? 'icon-btn-3d-active' : ''}`}
+                        >
+                          <ShoppingCart className="h-4 w-4" />
+                        </button>
+                      </td>
+                      <td className="text-center px-2 py-3" onClick={(e) => e.stopPropagation()}>
+                        <button
+                          onClick={() => toggleFavorite(etf.id)}
+                          className={`icon-btn-3d ${favorites.includes(etf.id) ? 'icon-btn-3d-active' : ''}`}
+                        >
+                          <Star className={`h-4 w-4 ${favorites.includes(etf.id) ? 'fill-current' : ''}`} />
+                        </button>
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>
@@ -427,27 +802,6 @@ export function DiscoverPage({
           )}
           {showAll && hasMoreETFs && (
             <button onClick={() => setShowAll(false)} className="w-full mt-3 py-3 flex items-center justify-center gap-2 bg-[#2d2640] hover:bg-[#3d3650] rounded-xl text-sm text-gray-300 transition-colors">
-              <span>접기</span>
-              <ChevronDown className="h-4 w-4 rotate-180" />
-            </button>
-          )}
-        </div>
-      )}
-
-      {/* 카드 뷰 */}
-      {mode === 'card' && (
-        <div className="px-4 space-y-3">
-          {displayedETFs.map((etf) => (
-            <ETFCard key={etf.id} etf={etf} onClick={() => onSelectETF(etf)} onLongPress={() => onLongPressETF?.(etf)} />
-          ))}
-          {hasMoreETFs && !showAll && (
-            <button onClick={() => setShowAll(true)} className="w-full py-3 flex items-center justify-center gap-2 bg-[#2d2640] hover:bg-[#3d3650] rounded-xl text-sm text-gray-300 transition-colors">
-              <span>더보기 ({sortedETFs.length - INITIAL_DISPLAY_COUNT}개 더)</span>
-              <ChevronDown className="h-4 w-4" />
-            </button>
-          )}
-          {showAll && hasMoreETFs && (
-            <button onClick={() => setShowAll(false)} className="w-full py-3 flex items-center justify-center gap-2 bg-[#2d2640] hover:bg-[#3d3650] rounded-xl text-sm text-gray-300 transition-colors">
               <span>접기</span>
               <ChevronDown className="h-4 w-4 rotate-180" />
             </button>
@@ -488,13 +842,27 @@ export function DiscoverPage({
                 <thead className="bg-[#2d2640] sticky top-0">
                   <tr>
                     <th className="text-left text-gray-400 font-medium px-2 py-2 min-w-[130px]">종목</th>
-                    <th className="text-right text-gray-400 font-medium px-2 py-2 whitespace-nowrap">현재가</th>
-                    <th className="text-right text-gray-400 font-medium px-2 py-2 whitespace-nowrap">등락률</th>
-                    <th className="text-right text-gray-400 font-medium px-2 py-2 whitespace-nowrap">TER</th>
-                    <th className="text-right text-gray-400 font-medium px-2 py-2 whitespace-nowrap">괴리율</th>
-                    <th className="text-right text-gray-400 font-medium px-2 py-2 whitespace-nowrap">거래대금</th>
-                    <th className="text-right text-gray-400 font-medium px-2 py-2 whitespace-nowrap">AUM</th>
-                    <th className="text-right text-gray-400 font-medium px-2 py-2 whitespace-nowrap">배당률</th>
+                    <th className="text-right text-gray-400 font-medium px-2 py-2 whitespace-nowrap cursor-pointer hover:text-white" onClick={() => handleColumnSort('price')}>
+                      <span className="inline-flex items-center gap-1">현재가 {renderSortIcon('price')}</span>
+                    </th>
+                    <th className="text-right text-gray-400 font-medium px-2 py-2 whitespace-nowrap cursor-pointer hover:text-white" onClick={() => handleColumnSort('change')}>
+                      <span className="inline-flex items-center gap-1">등락률 {renderSortIcon('change')}</span>
+                    </th>
+                    <th className="text-right text-gray-400 font-medium px-2 py-2 whitespace-nowrap cursor-pointer hover:text-white" onClick={() => handleColumnSort('ter')}>
+                      <span className="inline-flex items-center gap-1">TER {renderSortIcon('ter')}</span>
+                    </th>
+                    <th className="text-right text-gray-400 font-medium px-2 py-2 whitespace-nowrap cursor-pointer hover:text-white" onClick={() => handleColumnSort('discrepancy')}>
+                      <span className="inline-flex items-center gap-1">괴리율 {renderSortIcon('discrepancy')}</span>
+                    </th>
+                    <th className="text-right text-gray-400 font-medium px-2 py-2 whitespace-nowrap cursor-pointer hover:text-white" onClick={() => handleColumnSort('adtv')}>
+                      <span className="inline-flex items-center gap-1">거래대금 {renderSortIcon('adtv')}</span>
+                    </th>
+                    <th className="text-right text-gray-400 font-medium px-2 py-2 whitespace-nowrap cursor-pointer hover:text-white" onClick={() => handleColumnSort('aum')}>
+                      <span className="inline-flex items-center gap-1">AUM {renderSortIcon('aum')}</span>
+                    </th>
+                    <th className="text-right text-gray-400 font-medium px-2 py-2 whitespace-nowrap cursor-pointer hover:text-white" onClick={() => handleColumnSort('dividend')}>
+                      <span className="inline-flex items-center gap-1">배당률 {renderSortIcon('dividend')}</span>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -529,6 +897,19 @@ export function DiscoverPage({
               </table>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* 비교하기 플로팅 버튼 */}
+      {compareETFs.length > 0 && (
+        <div className="fixed bottom-20 left-0 right-0 px-4 z-20" data-tour="screening-compare">
+          <button
+            onClick={() => onGoToCompare?.(compareETFs)}
+            className="w-full py-3 rounded-xl bg-[#d64f79] text-white font-medium flex items-center justify-center gap-2"
+          >
+            <ShoppingCart className="h-5 w-5" />
+            비교하기 ({compareETFs.length}/3)
+          </button>
         </div>
       )}
 
